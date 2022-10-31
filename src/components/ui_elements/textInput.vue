@@ -38,7 +38,7 @@
         error: {
             type: Boolean, 
             default: false
-        }
+        },
         modelValue: String
     });
 
