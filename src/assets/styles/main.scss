@@ -1,0 +1,34 @@
+*,
+*::before, 
+*::after {
+    margin:0;
+    padding:0;
+    box-sizing:inherit;
+}
+
+html{
+    font-size:62.5%;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:'Poppins', sans-serif;
+}
+
+button, 
+a, 
+select {
+    cursor: pointer;
+}
+
+button, 
+input[type="text"], 
+input[type="email"], 
+input[type="search"], 
+input[type="url"], 
+input[type="tel"], 
+textarea, 
+select{
+    font-family:inherit;
+    outline:none;
+}
