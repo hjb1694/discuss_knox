@@ -50,6 +50,9 @@
                         <div class="fade-in-up delay">
                             <text-input v-model="registrationFormFields.email" label="Email" input-type="email" class="registration-email__input"/>
                         </div>
+                        <div v-if="registrationErrors.email.length" class="errbox">
+                            <p v-for="error of registrationErrors.email" :key="error" >{{ error }}</p>
+                        </div>
                     </div>
                     <div class="registration-username" v-show="regStepIsShown[3]">
                         <h2 class="section-heading fade-in-down">
@@ -66,6 +69,9 @@
                                 <li>No spaces or special characters</li>
                                 <li>Must be between 6 and 12 characters</li>
                             </ol>
+                        </div>
+                         <div v-if="registrationErrors.username.length" class="errbox">
+                            <p v-for="error of registrationErrors.username" :key="error" >{{ error }}</p>
                         </div>
                     </div>
                     <div class="registration-password" v-show="regStepIsShown[4]">
@@ -140,6 +146,8 @@
     import textInput from '@/components/ui_elements/TextInput.vue';
     import checkboxInput from '@/components/ui_elements/CheckboxInput.vue';
     import { DateTime } from 'luxon';
+    import isEmail from 'validator/es/lib/isEmail';
+    import axios from 'axios';
 
     const isRegistrationShown = ref<boolean>(true);
     const isLoginShown = ref<boolean>(false);
@@ -197,9 +205,47 @@
 
             registrationErrors.email = [];
 
+            if(!isEmail(registrationFormFields.email)){
+                registrationErrors.email.push('Invalid email address.');
+                return false;
+            }
+
+            try{
+                const response = await axios.post('http://localhost:3001/api/v1/validate-new-email', {
+                    email: registrationFormFields.email
+                });
+                return true;
+            }catch(err){
+                console.error(err);
+                return false;
+            }
+
+
         }, 
         // Validate Username
-        function(){}, 
+        async function(){
+
+            registrationErrors.username = [];
+
+            if(!/^[A-Z0-9]{6,12}$/i.test(registrationFormFields.username)){
+                registrationErrors.username.push('Provided username does not meet criteria.');
+                return false;
+            }
+
+            try{
+
+                await axios.post('http://localhost:3001/api/v1/validate-new-username', {
+                    username: registrationFormFields.username
+                });
+                return true;
+
+            }catch(err){
+                console.error(err);
+                return false;
+            }
+
+
+        }, 
         // Validate Password
         function(){}, 
         // Validate TOS and Rule Agreements
