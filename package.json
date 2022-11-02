@@ -10,6 +10,7 @@
     "type-check": "vue-tsc --noEmit"
   },
   "dependencies": {
+    "luxon": "^3.1.0",
     "pinia": "^2.0.23",
     "sass": "^1.55.0",
     "vue": "^3.2.41",

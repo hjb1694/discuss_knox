@@ -4,15 +4,15 @@
         <div class="auth-modal__dialog">
             <header class="auth-modal__header">
                 <div class="auth-modal__toggle-btns">
-                    <button class="register-btn toggle-btn">Register</button>
-                    <button class="login-btn toggle-btn">Login</button>
+                    <button @click="toggleToRegistration" class="register-btn toggle-btn">Register</button>
+                    <button @click="toggleToLogin" class="login-btn toggle-btn">Login</button>
                 </div>
                 <button class="auth-modal__close-btn">
                     <i class="fa fa-close"></i>
                 </button>
             </header>
             <section class="auth-modal__body">
-                <div class="registration-part">
+                <div class="registration-part" v-if="isRegistrationShown">
                     <div class="registration-briefing" v-show="regStepIsShown[0]">
                         <h2 class="section-heading">Create a Ktown Portal Account</h2>
                         <div class="benefits-list">
@@ -39,13 +39,16 @@
                     <div class="dob-selection" v-show="regStepIsShown[1]"> 
                         <h2 class="section-heading fade-in-down">First thing's first, what is your date of birth?</h2>
                         <div class="fade-in-up delay">
-                            <date-picker v-model="registrationFormFields.dob"/>
+                            <date-picker v-model="registrationFormFields.dob" :upper-limit="upperLimitDOB"/>
+                        </div>
+                        <div v-if="registrationErrors.dob.length" class="errbox">
+                            <p v-for="error of registrationErrors.dob" :key="error" >{{ error }}</p>
                         </div>
                     </div>
                     <div class="registration-email" v-show="regStepIsShown[2]">
                         <h2 class="section-heading fade-in-down">What is your email address?</h2>
                         <div class="fade-in-up delay">
-                            <text-input label="Email" input-type="email" class="registration-email__input"/>
+                            <text-input v-model="registrationFormFields.email" label="Email" input-type="email" class="registration-email__input"/>
                         </div>
                     </div>
                     <div class="registration-username" v-show="regStepIsShown[3]">
@@ -54,7 +57,7 @@
                             <p class="section-heading__sub">(C'mon! Be creative!)</p>
                         </h2>
                         <div class="fade-in-up delay">
-                            <text-input label="Username" class="registration-username__input"/>
+                            <text-input v-model="registrationFormFields.username" label="Username" class="registration-username__input"/>
                         </div>
                         <div class="criteria fade-in-up delay-2">
                             <h3>Criteria</h3>
@@ -72,10 +75,10 @@
                         </h2>
                         <div class="fade-in-up delay">
                             <div class="fgrp">
-                                <text-input label="Password" input-type="password" class="registration-password__input"/>
+                                <text-input v-model="registrationFormFields.password" label="Password" input-type="password" class="registration-password__input"/>
                             </div>
                             <div class="fgrp">
-                                <text-input label="Confirm Password" input-type="password" class="registration-password__input"/>
+                                <text-input v-model="registrationFormFields.confirmPassword" label="Confirm Password" input-type="password" class="registration-password__input"/>
                             </div>
                         </div>
                         <div class="criteria fade-in-up delay-2">
@@ -92,13 +95,40 @@
                         <h2 class="section-heading fade-in-down">
                             <p>Lastly, please agree to the following: </p> 
                         </h2>
-
+                        <div class="fade-in-up delay">
+                            <div class="fgrp">
+                                <checkbox-input v-model="registrationFormFields.agreeTos" input-id="agree-tos" label="I agree to Ktown Portal's Privacy Policy and Terms of Service"/>
+                            </div>
+                            <div class="fgrp">
+                                <checkbox-input v-model="registrationFormFields.agreeRules" input-id="agree-rules" label="I agree to abide by Ktown Portal's rules and regulations regarding usage of its platforms."/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="login-part" v-if="isLoginShown">
+                    <div class="login-form">
+                        <h2 class="section-heading">Sign In to Ktown Portal</h2>
+                        <div class="fgrp">
+                            <text-input label="Email" />
+                        </div>
+                        <div class="fgrp"> 
+                            <text-input label="Password" />
+                        </div>
+                        <div class="fgrp">
+                            <a class="forgot-password-btn">Forgot Password</a>
+                        </div>
                     </div>
                 </div>
             </section>
             <footer class="auth-modal__footer">
-                <button v-if="currentRegStep === 0" class="btn" @click="regNext">Create My Account</button>
-                <button class="btn" @click="regNext" v-if="currentRegStep > 0 && currentRegStep < regStepIsShown.length - 1">Next</button>
+                <template v-if="isRegistrationShown">
+                    <button v-if="currentRegStep === 0" class="btn" @click="regNext">Create My Account</button>
+                    <button class="btn" @click="regNext" v-if="currentRegStep > 0 && currentRegStep < regStepIsShown.length - 1">Next</button>
+                    <button class="btn" v-if="currentRegStep === 5">Finish</button>
+                </template>
+                <template v-if="isLoginShown">
+                    <button class="btn">Login</button>
+                </template>
             </footer>
         </div>
     </div>
@@ -108,20 +138,115 @@
     import { ref, reactive } from 'vue';
     import datePicker from 'vue3-datepicker';
     import textInput from '@/components/ui_elements/TextInput.vue';
+    import checkboxInput from '@/components/ui_elements/CheckboxInput.vue';
+    import { DateTime } from 'luxon';
 
+    const isRegistrationShown = ref<boolean>(true);
+    const isLoginShown = ref<boolean>(false);
     const currentRegStep = ref<number>(0);
+    const upperLimitDOB = new Date();
 
-    const registrationFormFields = {
-        dob: ref(new Date())
-    }
+    const registrationFormFields = reactive({
+        dob: new Date(), 
+        email: '', 
+        username: '', 
+        password: '', 
+        confirmPassword: '', 
+        agreeTos: false, 
+        agreeRules: false
+    });
+
+    const registrationErrors = reactive({
+        dob: [], 
+        email: [], 
+        username: [], 
+        password: [], 
+        agrees: []
+    });
 
     const regStepIsShown = reactive([true, false, false, false, false, false]);
 
-    const regNext = () => {
+    const registrationValidation = [
+        function(){
+            return true;
+        }, 
+        // Validate DOB
+        function(){
+
+            registrationErrors.dob = [];
+
+            const now = DateTime.now();
+            const userDobInput = DateTime.fromJSDate(registrationFormFields.dob);
+
+            if(now.diff(userDobInput, 'years').toObject().years < 13){
+                registrationErrors.dob.push('You must be at least 13 years of age to join.');
+                return false;
+            }
+
+            if(now.diff(userDobInput, 'years').toObject().years > 100){
+                registrationErrors.dob.push('Invalid date input.');
+                return false;
+            }
+
+
+            return true;
+
+        }, 
+        // Validate Email
+        async function(){
+
+            registrationErrors.email = [];
+
+        }, 
+        // Validate Username
+        function(){}, 
+        // Validate Password
+        function(){}, 
+        // Validate TOS and Rule Agreements
+        function(){}
+    ]
+
+    const regNext = async () => {
+
+        const passed = await registrationValidation[currentRegStep.value]();
+
+        if(!passed){
+            return;
+        }
+
         currentRegStep.value++;
         regStepIsShown.forEach((item, idx) => regStepIsShown[idx] = false);
         regStepIsShown[currentRegStep.value] = true;
         console.log(regStepIsShown);
+    }
+
+    const resetRegistration = () => {
+        currentRegStep.value = 0;
+        regStepIsShown.forEach((item, idx) => regStepIsShown[idx] = false);
+        regStepIsShown[0] = true;
+        registrationFormFields.dob = new Date();
+        registrationFormFields.email = '';
+        registrationFormFields.username = '';
+        registrationFormFields.password = '';
+        registrationFormFields.confirmPassword = '';
+        registrationFormFields.agreeTos = '';
+        registrationFormFields.agreeRules = '';
+        registrationErrors.dob = []; 
+        registrationErrors.email = [];
+        registrationErrors.username = [];
+        registrationErrors.password = [];
+        registrationErrors.agrees = [];
+    }
+
+    const toggleToLogin = () => {
+        isRegistrationShown.value = false;
+        isLoginShown.value = true;
+        resetRegistration();
+    }
+
+    const toggleToRegistration = () => {
+        isRegistrationShown.value = true;
+        isLoginShown.value = false;
     }
 </script>
 
@@ -311,6 +436,18 @@
             }
         }
 
+        .forgot-password-btn{
+            display:block;
+            text-align:center;
+            font-size:1.4rem;
+            color:#888;
+            margin-top:2rem;
+        }
+
+        .errbox{
+            color:#f00;
+            margin-top:2rem;
+        }
     }
 
     @keyframes fade-in-down {
