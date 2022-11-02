@@ -1,7 +1,7 @@
 <template>
     <div :class="['textual-input', {'error': error}]">
         <input 
-        :type="type" 
+        :type="inputType" 
         class="textual-input__field" 
         placeholder=" "
         :max-length="maxLength"
@@ -52,7 +52,7 @@
         border:1px solid #ccc;
         border-radius:5px;
         position:relative;
-        height:4.2rem;
+        height:4.5rem;
         transition:border .3s;
 
         &.error, 
@@ -69,7 +69,7 @@
             font-size:2rem;
             width:calc(100% - 3px);
             position:absolute;
-            top:12px;
+            bottom:3px;
             left:3px;
             border:none;
             outline:none;
@@ -77,7 +77,7 @@
             &:focus + .textual-input__label, 
             &:not(:placeholder-shown) + .textual-input__label {
                 font-size:1.2rem;
-                transform:translateY(-2.2rem);
+                transform:translateY(-2.4rem);
             }
 
         }
