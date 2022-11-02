@@ -6,6 +6,8 @@
         placeholder=" "
         :max-length="maxLength"
         :disabled="disabled"
+        :value="modelValue"
+        @input="$emit('update:modelValue', $event.target.value)"
         />
         <label class="textual-input__label">{{ label }}</label>
     </div>
