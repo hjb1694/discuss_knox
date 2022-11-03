@@ -15,6 +15,8 @@
         </header>
         <div class="secondary-header">
             <div class="container">
+                <button>Add Post</button>
+                <button>Live Feed</button>
                 <button>Channels</button>
             </div>
         </div>
@@ -54,6 +56,10 @@
             display:block;
             width:25rem;
         }
+    }
+
+    .secondary-header{
+        padding:0 1rem;
     }
 
     .primary-header .container{
@@ -99,7 +105,11 @@
             color:#fff;
             font-weight:bold;
             font-size:1.6rem;
-            text-shadow:1px 1px 1px #000;
+            text-shadow:1px 1px 1px rgba(0,0,0,.24);
+
+            &:not(:last-child){
+                margin-right:2rem;
+            }
         }
     }
 
