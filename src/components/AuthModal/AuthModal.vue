@@ -147,7 +147,13 @@
                         <h2 class="section-heading">Forgot Your Password?</h2>
                         <p class="section-text">Provide your email address below, and if our records match, we will send you a new password.</p>
                         <div class="fgrp">
-                            <text-input input-type="email" label="Email" />
+                            <text-input v-model="forgotPasswordEmail" input-type="email" label="Email" />
+                        </div>
+                        <div v-if="forgotPasswordFormErrors.length" class="errbox">
+                            <p v-for="error of forgotPasswordFormErrors" :key="error">{{ error }}</p>
+                        </div>
+                        <div v-if="forgotPasswordProcessSuccess" class="success-box">
+                            <p>Success! Check your inbox for your new password.</p>
                         </div>
                     </div>
                 </div>
@@ -162,8 +168,12 @@
                     </button>
                 </template>
                 <template v-if="isLoginShown">
-                    <button class="btn" @click="login" :disabled="isLoginProcessing">
+                    <button class="btn" v-if="!isForgotPasswordFormShown" @click="login" :disabled="isLoginProcessing">
                         <span v-if="!isLoginProcessing">Login</span>
+                        <span v-else>Processing...</span>
+                    </button>
+                    <button class="btn" v-else @click="processForgotPassword" :disabled="isLoginProcessing">
+                        <span v-if="!isForgotPasswordProcessing">Submit</span>
                         <span v-else>Processing...</span>
                     </button>
                 </template>
@@ -203,6 +213,7 @@
     const isLoginProcessing = ref<boolean>(false);
 
     const isForgotPasswordFormShown = ref<boolean>(false);
+    const isForgotPasswordProcessing = ref<boolean>(false);
 
     const { closeAuthModal } = useCoreModalStore();
     const { login: loginUser } = useAuthStore();
@@ -230,7 +241,13 @@
         password: ''
     });
 
+    const forgotPasswordEmail = ref<string>('');
+
     const loginErrors = reactive<string[]>([]);
+
+    const forgotPasswordFormErrors = reactive<string[]>([]);
+
+    const forgotPasswordProcessSuccess = ref<boolean>(false);
 
     const regStepIsShown = reactive([true, false, false, false, false, false]);
 
@@ -425,6 +442,8 @@
         isRegistrationShown.value = false;
         isLoginShown.value = true;
         isForgotPasswordFormShown.value = false;
+        forgotPasswordProcessSuccess.value = false;
+        forgotPasswordFormErrors.splice(0,forgotPasswordFormErrors.length);
         resetRegistration();
     }
 
@@ -527,6 +546,37 @@
 
     const showForgotPasswordForm = () => {
         isForgotPasswordFormShown.value = true;
+    }
+
+    const processForgotPassword = async () => {
+        isForgotPasswordProcessing.value = true;
+
+        forgotPasswordFormErrors.splice(0,forgotPasswordFormErrors.length);
+
+        if(!isEmail(forgotPasswordEmail.value)){
+            forgotPasswordFormErrors.push('Please enter a valid email address.');
+            isForgotPasswordProcessing.value = false;
+            return;
+        }
+
+        try{
+
+            await axios.post('http://localhost:3001/api/v1/forgot-password', {
+                email: forgotPasswordEmail.value
+            });
+
+            forgotPasswordProcessSuccess.value = true;
+            forgotPasswordEmail.value = '';
+
+        }catch(e){
+            console.error(e);
+            forgotPasswordFormErrors.push('There was an issue processing your request.');
+
+        }finally{
+            isForgotPasswordProcessing.value = false;
+        }
+
+
     }
 </script>
 
@@ -730,6 +780,16 @@
             font-size:1.4rem;
             background:#ffe0de;
             border:1px solid #f00;
+            padding:1rem;
+            border-radius:.5rem;
+        }
+
+        .success-box{
+            color:#39bd41;
+            margin-top:2rem;
+            font-size:1.4rem;
+            background:#d4fcd7;
+            border:1px solid #39bd41;
             padding:1rem;
             border-radius:.5rem;
         }
