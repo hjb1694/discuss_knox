@@ -1,13 +1,13 @@
 <template>
     <div class="auth-modal" v-if="isOpen">
-        <div class="auth-modal__backdrop"></div>
+        <div class="auth-modal__backdrop" @click="closeModal"></div>
         <div class="auth-modal__dialog">
             <header class="auth-modal__header">
                 <div class="auth-modal__toggle-btns">
                     <button @click="toggleToRegistration" class="register-btn toggle-btn" :disabled="regFinishProcessing">Register</button>
                     <button @click="toggleToLogin" class="login-btn toggle-btn" :disabled="regFinishProcessing">Login</button>
                 </div>
-                <button class="auth-modal__close-btn">
+                <button class="auth-modal__close-btn" @click="closeModal">
                     <i class="fa fa-close"></i>
                 </button>
             </header>
@@ -158,7 +158,7 @@
 </template>
 
 <script lang="ts" setup>
-    import { ref, reactive, defineProps } from 'vue';
+    import { ref, reactive, defineProps, defineEmits } from 'vue';
     import datePicker from 'vue3-datepicker';
     import textInput from '@/components/ui_elements/TextInput.vue';
     import checkboxInput from '@/components/ui_elements/CheckboxInput.vue';
@@ -166,6 +166,7 @@
     import isEmail from 'validator/es/lib/isEmail';
     import axios from 'axios';
     import stringLength from 'string-length';
+    import { useCoreModalStore } from '@/stores/useCoreModalStore.ts';
 
     const props = defineProps({
         isOpen: {
@@ -174,11 +175,15 @@
         }
     });
 
+    const emit = defineEmits(['closeModal']);
+
     const isRegistrationShown = ref<boolean>(true);
     const isLoginShown = ref<boolean>(false);
     const currentRegStep = ref<number>(0);
     const upperLimitDOB = new Date();
     const regFinishProcessing = ref<boolean>(false);
+
+    const { closeAuthModal } = useCoreModalStore();
 
     const registrationFormFields = reactive({
         dob: new Date(), 
@@ -199,6 +204,11 @@
     });
 
     const regStepIsShown = reactive([true, false, false, false, false, false]);
+
+
+    const closeModal = () => {
+        emit('closeModal');
+    }
 
     const registrationValidation = [
         function(){
@@ -410,14 +420,14 @@
                 dob: DateTime.fromJSDate(registrationFormFields.dob).toFormat('yyyy-MM-dd')
             });
 
-            console.log('success!');
+            closeAuthModal();
 
         }catch(e){
             console.error(e);
-
+            registrationErrors.agrees.push('There was an error processing your request.');
 
         }finally{
-
+            regFinishProcessing.value = false;
         }
 
     }
