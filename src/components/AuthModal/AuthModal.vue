@@ -462,12 +462,18 @@
 
         try{
 
-            await axios.post('http://localhost:3001/api/v1/register', {
+            const response = await axios.post('http://localhost:3001/api/v1/register', {
                 email: registrationFormFields.email, 
                 username: registrationFormFields.username, 
                 password: registrationFormFields.password, 
                 dob: DateTime.fromJSDate(registrationFormFields.dob).toFormat('yyyy-MM-dd')
             });
+
+            console.log(response);
+
+            const { token, user_id, username, core_role, moderator_role } = response.data.body;
+
+            loginUser(token, user_id, username, core_role, moderator_role);
 
             closeAuthModal();
 

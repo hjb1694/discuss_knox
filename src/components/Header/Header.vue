@@ -6,10 +6,13 @@
         <header class="primary-header">
             <div class="container">
                 <img class="primary-header__logo" src="@/assets/knox_discuss_logo.png"/>
-                <button class="auth-btn" @click="openAuthModal">
+                <button v-if="!getIsLoggedIn" class="auth-btn" @click="openAuthModal">
                     <div class="auth-btn__icon-container">
                         <i class="auth-btn__icon fa fa-user"></i>
                     </div>
+                </button>
+                <button v-else class="user-btn">
+                    {{ getUserData.username.substring(0,1) }}
                 </button>
             </div>
         </header>
@@ -24,9 +27,12 @@
 </template>
 
 <script lang="ts" setup>
-    import { useCoreModalStore } from '@/stores/useCoreModalStore.ts';
+    import { useCoreModalStore } from '@/stores/useCoreModalStore';
+    import { useAuthStore } from '@/stores/useAuthStore';
 
     const { openAuthModal } = useCoreModalStore();
+    const { getIsLoggedIn, getUserData } = useAuthStore();
+
 
 </script>
 
@@ -111,6 +117,15 @@
                 margin-right:2rem;
             }
         }
+    }
+
+    .user-btn{
+        width:4rem;
+        height:4rem;
+        border-radius:90%;
+        display:flex;
+        justify-content:center;
+        align-items:center;
     }
 
 
