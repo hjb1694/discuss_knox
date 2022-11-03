@@ -8,6 +8,7 @@
         :disabled="disabled"
         :value="modelValue"
         @input="$emit('update:modelValue', $event.target.value)"
+        autocapitalize="off"
         />
         <label class="textual-input__label">{{ label }}</label>
     </div>
