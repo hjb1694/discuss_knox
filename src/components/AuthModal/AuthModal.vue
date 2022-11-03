@@ -4,14 +4,15 @@
         <div class="auth-modal__dialog">
             <header class="auth-modal__header">
                 <div class="auth-modal__toggle-btns">
-                    <button @click="toggleToRegistration" class="register-btn toggle-btn" :disabled="regFinishProcessing">Register</button>
-                    <button @click="toggleToLogin" class="login-btn toggle-btn" :disabled="regFinishProcessing">Login</button>
+                    <button @click="toggleToRegistration" class="register-btn toggle-btn" :disabled="regFinishProcessing || isLoginProcessing">Register</button>
+                    <button @click="toggleToLogin" class="login-btn toggle-btn" :disabled="regFinishProcessing || isLoginProcessing">Login</button>
                 </div>
                 <button class="auth-modal__close-btn" @click="closeModal">
                     <i class="fa fa-close"></i>
                 </button>
             </header>
             <section class="auth-modal__body">
+                <!-- REGISTER -->
                 <div class="registration-part" v-if="isRegistrationShown">
                     <div v-show="!regFinishProcessing">
                         <div class="registration-briefing" v-show="regStepIsShown[0]">
@@ -125,23 +126,34 @@
                         </h2>
                     </div>
                 </div>
+                <!-- LOGIN -->
                 <div class="login-part" v-if="isLoginShown">
-                    <div class="login-form">
+                    <div v-if="!isForgotPasswordFormShown" class="login-form">
                         <h2 class="section-heading">Sign In to Ktown Portal</h2>
                         <div class="fgrp">
-                            <text-input label="Email" />
+                            <text-input v-model="loginFormFields.email" input-type="email" label="Email" :disabled="isLoginProcessing"/>
                         </div>
                         <div class="fgrp"> 
-                            <text-input label="Password" />
+                            <text-input v-model="loginFormFields.password" input-type="password" label="Password" :disabled="isLoginProcessing"/>
                         </div>
                         <div class="fgrp">
-                            <a class="forgot-password-btn">Forgot Password</a>
+                            <a class="forgot-password-btn" @click="showForgotPasswordForm">Forgot Password</a>
+                        </div>
+                        <div v-if="loginErrors.length" class="errbox">
+                            <p v-for="error of loginErrors" :key="error">{{ error }}</p>
+                        </div>
+                    </div>
+                    <div v-else class="forgot-password-form">
+                        <h2 class="section-heading">Forgot Your Password?</h2>
+                        <p class="section-text">Provide your email address below, and if our records match, we will send you a new password.</p>
+                        <div class="fgrp">
+                            <text-input input-type="email" label="Email" />
                         </div>
                     </div>
                 </div>
             </section>
             <footer class="auth-modal__footer">
-                <template v-if="isRegistrationShown && !regFinishProcessing">
+                <template v-if="isRegistrationShown">
                     <button v-if="currentRegStep === 0" class="btn" @click="regNext">Create My Account</button>
                     <button class="btn" @click="regNext" v-if="currentRegStep > 0 && currentRegStep < regStepIsShown.length - 1">Next</button>
                     <button class="btn" @click="regFinish" v-if="currentRegStep === 5" :disabled="regFinishProcessing">
@@ -150,7 +162,10 @@
                     </button>
                 </template>
                 <template v-if="isLoginShown">
-                    <button class="btn">Login</button>
+                    <button class="btn" @click="login" :disabled="isLoginProcessing">
+                        <span v-if="!isLoginProcessing">Login</span>
+                        <span v-else>Processing...</span>
+                    </button>
                 </template>
             </footer>
         </div>
@@ -167,6 +182,7 @@
     import axios from 'axios';
     import stringLength from 'string-length';
     import { useCoreModalStore } from '@/stores/useCoreModalStore.ts';
+    import { useAuthStore } from '@/stores/useAuthStore.ts';
 
     const props = defineProps({
         isOpen: {
@@ -183,7 +199,13 @@
     const upperLimitDOB = new Date();
     const regFinishProcessing = ref<boolean>(false);
 
+
+    const isLoginProcessing = ref<boolean>(false);
+
+    const isForgotPasswordFormShown = ref<boolean>(false);
+
     const { closeAuthModal } = useCoreModalStore();
+    const { login: loginUser } = useAuthStore();
 
     const registrationFormFields = reactive({
         dob: new Date(), 
@@ -202,6 +224,13 @@
         password: [], 
         agrees: []
     });
+
+    const loginFormFields = reactive({
+        email: '',
+        password: ''
+    });
+
+    const loginErrors = reactive<string[]>([]);
 
     const regStepIsShown = reactive([true, false, false, false, false, false]);
 
@@ -395,6 +424,7 @@
     const toggleToLogin = () => {
         isRegistrationShown.value = false;
         isLoginShown.value = true;
+        isForgotPasswordFormShown.value = false;
         resetRegistration();
     }
 
@@ -430,6 +460,73 @@
             regFinishProcessing.value = false;
         }
 
+    }
+
+    const validateLogin = () => {
+        loginErrors.splice(0,loginErrors.length);
+        let isValid = true;
+
+        if(!isEmail(loginFormFields.email)){
+            loginErrors.push('Please provide a valid email address.');
+            isValid = false;
+        }
+
+        if(stringLength(loginFormFields.password) < 1){
+            loginErrors.push('Please provide a password.');
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
+
+    const login = async () => {
+        if(!validateLogin()){
+            return;
+        }
+
+        isLoginProcessing.value = true;
+
+        try{
+
+            const response = await axios.post('http://localhost:3001/api/v1/login', {
+                email: loginFormFields.email, 
+                password: loginFormFields.password
+            });
+
+            console.log(response);
+
+            const { token, user_id, username, core_role, moderator_role } = response.data.body;
+
+            loginUser(token, user_id, username, core_role, moderator_role);
+            closeAuthModal();
+
+
+        }catch(e){
+            console.error(e);
+
+            if(e.response.data?.short_msg){
+
+                const shortMsg = e.response.data.short_msg;
+
+                if(shortMsg === 'ERR_USER_NOT_EXIST' || shortMsg === 'ERR_INVALID_LOGIN_CREDENTIALS'){
+                    loginErrors.push('Invalid login credentials.');
+                }else if(shortMsg === 'VIOLATION_DEACTIVATION'){
+                    loginErrors.push('This user has been deactivated.');
+                }else{
+                    loginErrors.push('An unexpected error has occurred.');
+                }
+            }else{
+                loginErrors.push('An unexpected error has occurred.');
+            }
+
+        }finally{
+            isLoginProcessing.value = false;
+        }
+    }
+
+    const showForgotPasswordForm = () => {
+        isForgotPasswordFormShown.value = true;
     }
 </script>
 
@@ -630,6 +727,15 @@
         .errbox{
             color:#f00;
             margin-top:2rem;
+            font-size:1.4rem;
+            background:#ffe0de;
+            border:1px solid #f00;
+            padding:1rem;
+            border-radius:.5rem;
+        }
+
+        .section-text{
+            font-size:1.4rem;
         }
     }
 
