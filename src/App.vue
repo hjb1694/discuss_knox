@@ -1,6 +1,8 @@
 <script setup lang="ts">
   import authModal from '@/components/AuthModal/AuthModal.vue';
-  import { isAuthModalOpen } from '@/stores/useCoreModalStore.ts';
+  import { useCoreModalStore } from '@/stores/useCoreModalStore.ts';
+
+  const { isAuthModalOpen } = useCoreModalStore();
 </script>
 
 <template>

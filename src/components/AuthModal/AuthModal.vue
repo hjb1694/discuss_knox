@@ -1,5 +1,5 @@
 <template>
-    <div class="auth-modal">
+    <div class="auth-modal" v-if="isOpen">
         <div class="auth-modal__backdrop"></div>
         <div class="auth-modal__dialog">
             <header class="auth-modal__header">
