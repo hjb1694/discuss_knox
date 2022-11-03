@@ -5,7 +5,7 @@
         class="checkbox-input__field" 
         :id="inputId" 
         :value="modelValue"
-        @input="$emit('update:modelValue', $event.target.value)"
+        @input="$emit('update:modelValue', !!$event.target.value)"
         />
         <div class="checkbox-input__box">
             <i class="checkbox-input__check fa fa-check"></i>
@@ -26,6 +26,10 @@
             type: String, 
             default: '[LABEL]'
         }, 
+        disabled: {
+            type: Boolean, 
+            default: false
+        },
         modelValue: Boolean
     });
 

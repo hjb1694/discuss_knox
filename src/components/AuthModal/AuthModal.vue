@@ -4,8 +4,8 @@
         <div class="auth-modal__dialog">
             <header class="auth-modal__header">
                 <div class="auth-modal__toggle-btns">
-                    <button @click="toggleToRegistration" class="register-btn toggle-btn">Register</button>
-                    <button @click="toggleToLogin" class="login-btn toggle-btn">Login</button>
+                    <button @click="toggleToRegistration" class="register-btn toggle-btn" :disabled="regFinishProcessing">Register</button>
+                    <button @click="toggleToLogin" class="login-btn toggle-btn" :disabled="regFinishProcessing">Login</button>
                 </div>
                 <button class="auth-modal__close-btn">
                     <i class="fa fa-close"></i>
@@ -13,102 +13,116 @@
             </header>
             <section class="auth-modal__body">
                 <div class="registration-part" v-if="isRegistrationShown">
-                    <div class="registration-briefing" v-show="regStepIsShown[0]">
-                        <h2 class="section-heading">Create a Ktown Portal Account</h2>
-                        <div class="benefits-list">
-                            <div class="benefits-list__item"> 
-                                <div class="bullet">
-                                    <i class="fa fa-check"></i>
+                    <div v-show="!regFinishProcessing">
+                        <div class="registration-briefing" v-show="regStepIsShown[0]">
+                            <h2 class="section-heading">Create a Ktown Portal Account</h2>
+                            <div class="benefits-list">
+                                <div class="benefits-list__item"> 
+                                    <div class="bullet">
+                                        <i class="fa fa-check"></i>
+                                    </div>
+                                    <div class="text">Use your account across multiple Ktown Portal sites.</div>
                                 </div>
-                                <div class="text">Use your account across multiple Ktown Portal sites.</div>
-                            </div>
-                            <div class="benefits-list__item"> 
-                                <div class="bullet">
-                                    <i class="fa fa-check"></i>
+                                <div class="benefits-list__item"> 
+                                    <div class="bullet">
+                                        <i class="fa fa-check"></i>
+                                    </div>
+                                    <div class="text">Earn points for participation. Redeem those points for rewards.</div>
                                 </div>
-                                <div class="text">Earn points for participation. Redeem those points for rewards.</div>
-                            </div>
-                            <div class="benefits-list__item"> 
-                                <div class="bullet">
-                                    <i class="fa fa-check"></i>
+                                <div class="benefits-list__item"> 
+                                    <div class="bullet">
+                                        <i class="fa fa-check"></i>
+                                    </div>
+                                    <div class="text">Help fellow Knoxvillians, visitors, and prospective residents.</div>
                                 </div>
-                                <div class="text">Help fellow Knoxvillians, visitors, and prospective residents.</div>
+                            </div>
+                        </div>
+                        <div class="dob-selection" v-show="regStepIsShown[1]"> 
+                            <h2 class="section-heading fade-in-down">First thing's first, what is your date of birth?</h2>
+                            <div class="fade-in-up delay">
+                                <date-picker v-model="registrationFormFields.dob" :upper-limit="upperLimitDOB"/>
+                            </div>
+                            <div v-if="registrationErrors.dob.length" class="errbox">
+                                <p v-for="error of registrationErrors.dob" :key="error" >{{ error }}</p>
+                            </div>
+                        </div>
+                        <div class="registration-email" v-show="regStepIsShown[2]">
+                            <h2 class="section-heading fade-in-down">What is your email address?</h2>
+                            <div class="fade-in-up delay">
+                                <text-input v-model="registrationFormFields.email" label="Email" input-type="email" class="registration-email__input"/>
+                            </div>
+                            <div v-if="registrationErrors.email.length" class="errbox">
+                                <p v-for="error of registrationErrors.email" :key="error" >{{ error }}</p>
+                            </div>
+                        </div>
+                        <div class="registration-username" v-show="regStepIsShown[3]">
+                            <h2 class="section-heading fade-in-down">
+                                <p>Create a Username</p> 
+                                <p class="section-heading__sub">(C'mon! Be creative!)</p>
+                            </h2>
+                            <div class="fade-in-up delay">
+                                <text-input v-model="registrationFormFields.username" label="Username" class="registration-username__input"/>
+                            </div>
+                            <div class="criteria fade-in-up delay-2">
+                                <h3>Criteria</h3>
+                                <ol>
+                                    <li>Only alphabetical letters and numbers</li>
+                                    <li>No spaces or special characters</li>
+                                    <li>Must be between 6 and 12 characters</li>
+                                </ol>
+                            </div>
+                            <div v-if="registrationErrors.username.length" class="errbox">
+                                <p v-for="error of registrationErrors.username" :key="error" >{{ error }}</p>
+                            </div>
+                        </div>
+                        <div class="registration-password" v-show="regStepIsShown[4]">
+                            <h2 class="section-heading fade-in-down">
+                                <p>Now, create your password</p> 
+                                <p class="section-heading__sub">(You're almost done!)</p>
+                            </h2>
+                            <div class="fade-in-up delay">
+                                <div class="fgrp">
+                                    <text-input v-model="registrationFormFields.password" label="Password" input-type="password" class="registration-password__input"/>
+                                </div>
+                                <div class="fgrp">
+                                    <text-input v-model="registrationFormFields.confirmPassword" label="Confirm Password" input-type="password" class="registration-password__input"/>
+                                </div>
+                            </div>
+                            <div class="criteria fade-in-up delay-2">
+                                <h3>Criteria</h3>
+                                <ol>
+                                    <li>Must contain at least one uppercase letter</li>
+                                    <li>Must contain at least one lowercase letter</li>
+                                    <li>Must contain at least one number</li>
+                                    <li>Must be between 8 and 50 characters</li>
+                                </ol>
+                            </div>
+                            <div v-if="registrationErrors.password.length" class="errbox">
+                                <p v-for="error of registrationErrors.password" :key="error" >{{ error }}</p>
+                            </div>
+                        </div>
+                        <div class="registration-agree" v-show="regStepIsShown[5]">
+                            <h2 class="section-heading fade-in-down">
+                                <p>Lastly, please agree to the following: </p> 
+                            </h2>
+                            <div class="fade-in-up delay">
+                                <div class="fgrp">
+                                    <checkbox-input v-model="registrationFormFields.agreeTos" input-id="agree-tos" label="I agree to Ktown Portal's Privacy Policy and Terms of Service" />
+                                </div>
+                                <div class="fgrp">
+                                    <checkbox-input v-model="registrationFormFields.agreeRules" input-id="agree-rules" label="I agree to abide by Ktown Portal's rules and regulations regarding usage of its platforms." />
+                                </div>
+                            </div>
+                            <div v-if="registrationErrors.agrees.length" class="errbox">
+                                <p v-for="error of registrationErrors.agrees" :key="error" >{{ error }}</p>
                             </div>
                         </div>
                     </div>
-                    <div class="dob-selection" v-show="regStepIsShown[1]"> 
-                        <h2 class="section-heading fade-in-down">First thing's first, what is your date of birth?</h2>
-                        <div class="fade-in-up delay">
-                            <date-picker v-model="registrationFormFields.dob" :upper-limit="upperLimitDOB"/>
-                        </div>
-                        <div v-if="registrationErrors.dob.length" class="errbox">
-                            <p v-for="error of registrationErrors.dob" :key="error" >{{ error }}</p>
-                        </div>
-                    </div>
-                    <div class="registration-email" v-show="regStepIsShown[2]">
-                        <h2 class="section-heading fade-in-down">What is your email address?</h2>
-                        <div class="fade-in-up delay">
-                            <text-input v-model="registrationFormFields.email" label="Email" input-type="email" class="registration-email__input"/>
-                        </div>
-                        <div v-if="registrationErrors.email.length" class="errbox">
-                            <p v-for="error of registrationErrors.email" :key="error" >{{ error }}</p>
-                        </div>
-                    </div>
-                    <div class="registration-username" v-show="regStepIsShown[3]">
+                    <div class="registration-processing" v-if="regFinishProcessing">
                         <h2 class="section-heading fade-in-down">
-                            <p>Create a Username</p> 
-                            <p class="section-heading__sub">(C'mon! Be creative!)</p>
+                            <p>Processing. Please wait...</p> 
+                            <p class="section-heading__sub">Do not close this window.</p>
                         </h2>
-                        <div class="fade-in-up delay">
-                            <text-input v-model="registrationFormFields.username" label="Username" class="registration-username__input"/>
-                        </div>
-                        <div class="criteria fade-in-up delay-2">
-                            <h3>Criteria</h3>
-                            <ol>
-                                <li>Only alphabetical letters and numbers</li>
-                                <li>No spaces or special characters</li>
-                                <li>Must be between 6 and 12 characters</li>
-                            </ol>
-                        </div>
-                         <div v-if="registrationErrors.username.length" class="errbox">
-                            <p v-for="error of registrationErrors.username" :key="error" >{{ error }}</p>
-                        </div>
-                    </div>
-                    <div class="registration-password" v-show="regStepIsShown[4]">
-                        <h2 class="section-heading fade-in-down">
-                            <p>Now, create your password</p> 
-                            <p class="section-heading__sub">(You're almost done!)</p>
-                        </h2>
-                        <div class="fade-in-up delay">
-                            <div class="fgrp">
-                                <text-input v-model="registrationFormFields.password" label="Password" input-type="password" class="registration-password__input"/>
-                            </div>
-                            <div class="fgrp">
-                                <text-input v-model="registrationFormFields.confirmPassword" label="Confirm Password" input-type="password" class="registration-password__input"/>
-                            </div>
-                        </div>
-                        <div class="criteria fade-in-up delay-2">
-                            <h3>Criteria</h3>
-                            <ol>
-                                <li>Must contain at least one uppercase letter</li>
-                                <li>Must contain at least one lowercase letter</li>
-                                <li>Must contain at least one number</li>
-                                <li>Must be between 8 and 50 characters</li>
-                            </ol>
-                        </div>
-                    </div>
-                    <div class="registration-agree" v-show="regStepIsShown[5]">
-                        <h2 class="section-heading fade-in-down">
-                            <p>Lastly, please agree to the following: </p> 
-                        </h2>
-                        <div class="fade-in-up delay">
-                            <div class="fgrp">
-                                <checkbox-input v-model="registrationFormFields.agreeTos" input-id="agree-tos" label="I agree to Ktown Portal's Privacy Policy and Terms of Service"/>
-                            </div>
-                            <div class="fgrp">
-                                <checkbox-input v-model="registrationFormFields.agreeRules" input-id="agree-rules" label="I agree to abide by Ktown Portal's rules and regulations regarding usage of its platforms."/>
-                            </div>
-                        </div>
                     </div>
                 </div>
                 <div class="login-part" v-if="isLoginShown">
@@ -127,10 +141,13 @@
                 </div>
             </section>
             <footer class="auth-modal__footer">
-                <template v-if="isRegistrationShown">
+                <template v-if="isRegistrationShown && !regFinishProcessing">
                     <button v-if="currentRegStep === 0" class="btn" @click="regNext">Create My Account</button>
                     <button class="btn" @click="regNext" v-if="currentRegStep > 0 && currentRegStep < regStepIsShown.length - 1">Next</button>
-                    <button class="btn" v-if="currentRegStep === 5">Finish</button>
+                    <button class="btn" @click="regFinish" v-if="currentRegStep === 5" :disabled="regFinishProcessing">
+                        <span v-if="!regFinishProcessing">Finish</span>
+                        <span v-else>Processing...</span>
+                    </button>
                 </template>
                 <template v-if="isLoginShown">
                     <button class="btn">Login</button>
@@ -141,18 +158,27 @@
 </template>
 
 <script lang="ts" setup>
-    import { ref, reactive } from 'vue';
+    import { ref, reactive, defineProps } from 'vue';
     import datePicker from 'vue3-datepicker';
     import textInput from '@/components/ui_elements/TextInput.vue';
     import checkboxInput from '@/components/ui_elements/CheckboxInput.vue';
     import { DateTime } from 'luxon';
     import isEmail from 'validator/es/lib/isEmail';
     import axios from 'axios';
+    import stringLength from 'string-length';
+
+    const props = defineProps({
+        isOpen: {
+            type: Boolean, 
+            default: false
+        }
+    });
 
     const isRegistrationShown = ref<boolean>(true);
     const isLoginShown = ref<boolean>(false);
     const currentRegStep = ref<number>(0);
     const upperLimitDOB = new Date();
+    const regFinishProcessing = ref<boolean>(false);
 
     const registrationFormFields = reactive({
         dob: new Date(), 
@@ -217,6 +243,18 @@
                 return true;
             }catch(err){
                 console.error(err);
+                if(err.response?.data?.short_msg){
+                    const shortMsg = err.response.data.short_msg;
+
+                    if(shortMsg === 'ERR_EMAIL_EXISTS'){
+                        registrationErrors.email.push('This email address already exists.');
+                    }else{
+                        registrationErrors.email.push('An unexpected error has occurred.');
+                    }
+
+                }else{
+                    registrationErrors.email.push('An unexpected error has occurred.');
+                }
                 return false;
             }
 
@@ -241,15 +279,75 @@
 
             }catch(err){
                 console.error(err);
+                if(err.response?.data?.short_msg){
+                    const shortMsg = err.response.data.short_msg;
+
+                    if(shortMsg === 'ERR_USERNAME_EXISTS'){
+                        registrationErrors.username.push('This username already exists.');
+                    }else{
+                        registrationErrors.username.push('An unexpected error has occurred.');
+                    }
+
+                }else{
+                    registrationErrors.username.push('An unexpected error has occurred.');
+                }
                 return false;
             }
 
 
         }, 
         // Validate Password
-        function(){}, 
+        function(){
+
+            registrationErrors.password = [];
+            let isValid = true;
+
+            const passwordRegs = {
+                uppercase: /[A-Z]/, 
+                lowercase: /[a-z]/, 
+                numeric: /[0-9]/
+            }
+
+            const password = registrationFormFields.password;
+            const confirmPassword = registrationFormFields.confirmPassword;
+
+            if(
+                !passwordRegs.uppercase.test(password) ||
+                !passwordRegs.lowercase.test(password) ||
+                !passwordRegs.numeric.test(password) ||
+                stringLength(password) < 8 || 
+                stringLength(password) > 50
+            ) {
+                registrationErrors.password.push('Password does not meet criteria.');
+                isValid = false;
+            }
+
+
+            if(password !== confirmPassword){
+                registrationErrors.password.push('Confirm password does not match password.');
+                isValid = false;
+            }
+
+
+            return isValid;
+
+        }, 
         // Validate TOS and Rule Agreements
-        function(){}
+        function(){
+
+            registrationErrors.agrees = [];
+
+            if(
+                !registrationFormFields.agreeTos ||
+                !registrationFormFields.agreeRules
+            ){
+                registrationErrors.agrees.push('Please agree to the above.');
+                return false;
+            }
+
+            return true;
+
+        }
     ]
 
     const regNext = async () => {
@@ -293,6 +391,35 @@
     const toggleToRegistration = () => {
         isRegistrationShown.value = true;
         isLoginShown.value = false;
+    }
+
+    const regFinish = async () => {
+
+        if(!registrationValidation[5]()){
+            return;
+        }
+
+        regFinishProcessing.value = true;
+
+        try{
+
+            await axios.post('http://localhost:3001/api/v1/register', {
+                email: registrationFormFields.email, 
+                username: registrationFormFields.username, 
+                password: registrationFormFields.password, 
+                dob: DateTime.fromJSDate(registrationFormFields.dob).toFormat('yyyy-MM-dd')
+            });
+
+            console.log('success!');
+
+        }catch(e){
+            console.error(e);
+
+
+        }finally{
+
+        }
+
     }
 </script>
 
