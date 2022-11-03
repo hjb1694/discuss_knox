@@ -9,13 +9,17 @@ export const useCoreModalStore = defineStore('useCoreModalStore', () => {
 
     const closeAuthModal = () => {
         isAuthModalOpen.value = false;
-        console.log(isAuthModalOpen.value);
+    }
+
+    const openAuthModal = () => {
+        isAuthModalOpen.value = true;
     }
 
 
     return {
         isAuthModalShown, 
-        closeAuthModal
+        closeAuthModal, 
+        openAuthModal
     }
 
 

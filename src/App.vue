@@ -1,5 +1,6 @@
 <script setup lang="ts">
   import authModal from '@/components/AuthModal/AuthModal.vue';
+  import appHeader from '@/components/Header/Header.vue';
   import { useCoreModalStore } from '@/stores/useCoreModalStore.ts';
   import { computed } from 'vue';
 
@@ -9,6 +10,7 @@
 
 <template>
     <auth-modal :is-open="isAuthModalShown" @close-modal="closeAuthModal" />
+    <app-header />
   
 </template>
 
