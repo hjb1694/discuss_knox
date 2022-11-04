@@ -14,12 +14,18 @@
                     code below to unlock the many features Ktown Portal has to offer.
                 </p>
                 <div class="fgrp">
-                    <text-input type="text" label="Email Verification Code"/>
+                    <text-input v-model="vericodeInput" type="text" label="Email Verification Code" :disabled="vericodeProcessing"/>
+                </div>
+                <div v-if="vericodeErrors.length" class="errbox">
+                    <p v-for="error in vericodeErrors" :key="error">{{ error }}</p>
                 </div>
             </section>
             <footer class="account-verification-modal__footer">
                 <button class="send-new-code-btn">Send A New Verification Code</button>
-                <button class="verify-btn">Verify</button>
+                <button class="verify-btn" @click="verify">
+                    <span v-if="!vericodeProcessing">Verify</span>
+                    <span v-else>Processing...</span>
+                </button>
             </footer>
         </div>
     </div>
@@ -27,7 +33,11 @@
 
 <script lang="ts" setup>
     import textInput from '@/components/ui_elements/TextInput.vue';
-    import { defineProps, defineEmits } from 'vue';
+    import { defineProps, defineEmits, ref, reactive } from 'vue';
+    import stringLength from 'string-length';
+    import { useAuthStore } from '@/stores/useAuthStore';
+    import { useCoreModalStore } from '@/stores/useCoreModalStore';
+    import axios from 'axios';
 
     const props = defineProps({
         isOpen: {
@@ -38,8 +48,58 @@
 
     const emit = defineEmits(['closeModal']);
 
+    const { getAuthToken, setAccountStatus } = useAuthStore();
+    const { closeEmailVerifyModal } = useCoreModalStore();
+
+    const vericodeInput = ref<string>('');
+    const vericodeErrors = reactive<string[]>([]);
+    const vericodeProcessing = ref<boolean>(false);
+
     const closeModal = () => {
         emit('closeModal');
+    }
+
+    const validation = () => {
+        vericodeErrors.splice(0,vericodeErrors.length);
+
+        if(stringLength(vericodeInput.value) < 1){
+            vericodeErrors.push('Please enter a valid verification code.');
+            return false;
+        }
+
+        return true;
+    }
+
+    const verify = async () => {
+        if(!validation()){
+            return;
+        }
+
+        try{
+            vericodeProcessing.value = true;
+
+            await axios.post('http://localhost:3001/api/v1/verify-account', {
+                vericode: vericodeInput.value
+            }, {
+                headers: {
+                    'x-auth-token': getAuthToken.value
+                }
+            });
+
+            vericodeInput.value = '';
+
+            setAccountStatus('ACTIVE');
+
+            closeEmailVerifyModal();
+
+        }catch(e){
+            console.error(e);
+
+
+        }finally{
+            vericodeProcessing.value = false;
+        }
+
     }
 </script>
 
@@ -130,6 +190,16 @@
             color:#fff;
             font-size:1.6rem;
             font-weight:bold;
+            border-radius:.5rem;
+        }
+
+        .errbox{
+            color:#f00;
+            margin-top:2rem;
+            font-size:1.4rem;
+            background:#ffe0de;
+            border:1px solid #f00;
+            padding:1rem;
             border-radius:.5rem;
         }
 

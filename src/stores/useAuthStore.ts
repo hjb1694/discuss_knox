@@ -25,6 +25,11 @@ export const useAuthStore = defineStore('useAuthStore', () => {
     const getAuthToken = computed(() => authToken);
     const getUserData = computed(() => userData);
 
+    const setAccountStatus = (status: string) => {
+        userData.account_status = status;
+        sessionStorage.setItem('account-status', 'ACTIVE');
+    }
+
 
     const login = (token: string, userId: number, username: string, coreRole: string, moderatorRole: string, account_status: string) => {
 
@@ -81,7 +86,8 @@ export const useAuthStore = defineStore('useAuthStore', () => {
     return {
         getIsLoggedIn, 
         getAuthToken, 
-        getUserData, 
+        getUserData,
+        setAccountStatus, 
         login, 
         autoLogin, 
         logout
