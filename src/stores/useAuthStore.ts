@@ -27,7 +27,7 @@ export const useAuthStore = defineStore('useAuthStore', () => {
 
     const setAccountStatus = (status: string) => {
         userData.account_status = status;
-        sessionStorage.setItem('account-status', 'ACTIVE');
+        sessionStorage.setItem('account-status', status);
     }
 
 
