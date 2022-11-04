@@ -471,9 +471,9 @@
 
             console.log(response);
 
-            const { token, user_id, username, core_role, moderator_role } = response.data.body;
+            const { token, user_id, username, core_role, moderator_role, account_status } = response.data.body;
 
-            loginUser(token, user_id, username, core_role, moderator_role);
+            loginUser(token, user_id, username, core_role, moderator_role, account_status);
 
             closeAuthModal();
 
@@ -521,9 +521,9 @@
 
             console.log(response);
 
-            const { token, user_id, username, core_role, moderator_role } = response.data.body;
+            const { token, user_id, username, core_role, moderator_role, account_status } = response.data.body;
 
-            loginUser(token, user_id, username, core_role, moderator_role);
+            loginUser(token, user_id, username, core_role, moderator_role, account_status);
             closeAuthModal();
 
 

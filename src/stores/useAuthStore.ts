@@ -5,7 +5,8 @@ interface UserData {
     user_id: number | null, 
     username: string | null, 
     core_role: string | null, 
-    moderator_role: string | null
+    moderator_role: string | null, 
+    account_status: string | null
 }
 
 export const useAuthStore = defineStore('useAuthStore', () => {
@@ -16,7 +17,8 @@ export const useAuthStore = defineStore('useAuthStore', () => {
         user_id: null, 
         username: null,
         core_role: null, 
-        moderator_role: null
+        moderator_role: null, 
+        account_status: null
     });
 
     const getIsLoggedIn = computed(() => isLoggedIn);
@@ -24,7 +26,7 @@ export const useAuthStore = defineStore('useAuthStore', () => {
     const getUserData = computed(() => userData);
 
 
-    const login = (token: string, userId: number, username: string, coreRole: string, moderatorRole: string) => {
+    const login = (token: string, userId: number, username: string, coreRole: string, moderatorRole: string, account_status: string) => {
 
         isLoggedIn.value = true;
         authToken.value = token;
