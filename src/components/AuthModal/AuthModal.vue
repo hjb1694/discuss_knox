@@ -191,8 +191,9 @@
     import isEmail from 'validator/es/lib/isEmail';
     import axios from 'axios';
     import stringLength from 'string-length';
-    import { useCoreModalStore } from '@/stores/useCoreModalStore.ts';
-    import { useAuthStore } from '@/stores/useAuthStore.ts';
+    import { useCoreModalStore } from '@/stores/useCoreModalStore';
+    import { useAuthStore } from '@/stores/useAuthStore';
+    import { useFlashToastStore, MessageTypes } from '@/stores/useFlashToastStore';
 
     const props = defineProps({
         isOpen: {
@@ -217,6 +218,7 @@
 
     const { closeAuthModal, openEmailVerifyModal } = useCoreModalStore();
     const { login: loginUser } = useAuthStore();
+    const { openFlashToast } = useFlashToastStore();
 
     const registrationFormFields = reactive({
         dob: new Date(), 
@@ -533,6 +535,8 @@
 
             loginFormFields.email = '';
             loginFormFields.password = '';
+
+            openFlashToast(MessageTypes.SUCCESS, 'Login Successful!');
 
             closeAuthModal();
 

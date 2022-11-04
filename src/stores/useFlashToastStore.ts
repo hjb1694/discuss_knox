@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 
-enum MessageTypes {
+export enum MessageTypes {
     SUCCESS = 'SUCCESS', 
     ERROR = 'ERROR'
 }
@@ -10,8 +10,8 @@ enum MessageTypes {
 export const useFlashToastStore = defineStore('useFlashToastStore', () => {
 
     const isFlashToastOpen = ref<boolean>(false);
-    const messageType = ref<MessageTypes | null>(null);
-    const messageText = ref<string | null>(null);
+    const messageType = ref<MessageTypes | ''>('');
+    const messageText = ref<string | ''>('');
 
 
     const getIsFlashToastOpen = computed(() => isFlashToastOpen);
@@ -28,8 +28,8 @@ export const useFlashToastStore = defineStore('useFlashToastStore', () => {
     }
 
     const closeFlashToast = () => {
-        messageType.value = null;
-        messageText.value = null;
+        messageType.value = '';
+        messageText.value = '';
         isFlashToastOpen.value = false;
     }
 

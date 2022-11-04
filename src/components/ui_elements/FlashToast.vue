@@ -22,7 +22,7 @@
             type: String, 
             required: true, 
             validator(value){
-                return ['SUCCESS','ERROR'].includes(value);
+                return ['SUCCESS','ERROR', ''].includes(value);
             }
         }, 
         messageText: {
@@ -31,12 +31,12 @@
         }
     });
 
-    const emit = defineEmits(['closeFlash']);
+    const emit = defineEmits(['closeToast']);
 
     watch(() => props.isOpen, (val) => {
         if(val === true){
             setTimeout(() => {
-                emit('closeFlash');
+                emit('closeToast');
             }, 3000);
         }
     })
@@ -60,16 +60,17 @@
         align-items:center;
         justify-content:center;
 
-        .red {
+        &.red {
             background:#f00;
         }
 
-        .green {
+        &.green {
             background:green;
         }
 
         &__icon{
             font-size:3.5rem;
+            margin-right:1.5rem;
         }
 
         &__text{

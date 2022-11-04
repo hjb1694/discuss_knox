@@ -2,12 +2,16 @@
   import authModal from '@/components/AuthModal/AuthModal.vue';
   import accountVerificationModal from '@/components/AccountVerificationModal/AccountVerificationModal.vue';
   import appHeader from '@/components/Header/Header.vue';
+  import flashToast from '@/components/ui_elements/FlashToast.vue';
   import { useAuthStore } from '@/stores/useAuthStore';
   import { useCoreModalStore } from '@/stores/useCoreModalStore';
+  import { useFlashToastStore } from '@/stores/useFlashToastStore';
   import { computed, onMounted } from 'vue';
 
   const { autoLogin } = useAuthStore();
   const { isAuthModalShown, closeAuthModal, getIsEmailVerifyModalShown, closeEmailVerifyModal, openEmailVerifyModal } = useCoreModalStore();
+  const { getIsFlashToastOpen, getMessageType, getMessageText, closeFlashToast } = useFlashToastStore();
+
 
   onMounted(() => {
     const accountStatus = autoLogin();
@@ -19,6 +23,7 @@
 </script>
 
 <template>
+    <flash-toast :is-open="getIsFlashToastOpen" :message-type="getMessageType" :message-text="getMessageText" @close-toast="closeFlashToast" />
     <auth-modal :is-open="isAuthModalShown" @close-modal="closeAuthModal" />
     <account-verification-modal :is-open="getIsEmailVerifyModalShown" @close-modal="closeEmailVerifyModal" />
     <app-header />
