@@ -7,6 +7,7 @@
   import { useCoreModalStore } from '@/stores/useCoreModalStore';
   import { useFlashToastStore } from '@/stores/useFlashToastStore';
   import { computed, onMounted } from 'vue';
+  import { RouterView } from 'vue-router'
 
   const { autoLogin } = useAuthStore();
   const { isAuthModalShown, closeAuthModal, getIsEmailVerifyModalShown, closeEmailVerifyModal, openEmailVerifyModal } = useCoreModalStore();
@@ -27,7 +28,7 @@
     <auth-modal :is-open="isAuthModalShown" @close-modal="closeAuthModal" />
     <account-verification-modal :is-open="getIsEmailVerifyModalShown" @close-modal="closeEmailVerifyModal" />
     <app-header />
-  
+    <RouterView />
 </template>
 
 <style lang="scss" scoped>
