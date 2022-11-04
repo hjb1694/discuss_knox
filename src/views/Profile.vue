@@ -1,22 +1,70 @@
 <template>
     <div class="profile">
         <div class="container">
-            <div class="profile-banner">
-                <div class="profile-banner__img"></div>
-                <h1 class="profile-banner__username">{{ username }}</h1>
-            </div>
+            <template v-if="isProfileLoading">
+                <div class="loading-spinner-container">
+                    <img class="loading-spinner" src="@/assets/ring-spinner.svg" alt="Loading..."/>
+                </div>
+            </template>
+            <template v-else-if="!isProfileLoading && isProfileNotFound">
+
+
+            </template>
+            <template v-else>
+                <div class="profile-banner">
+                    <div class="profile-banner__img"></div>
+                    <h1 class="profile-banner__username">{{ username }}</h1>
+                </div>
+                <div class="profile-grid">
+                    <div class="control-pane">
+                        <template v-if="isPersonalBtnsShown">
+                            <button class="control-pane__btn">
+                                <i class="fa fa-edit"></i>
+                                <span>Edit Profile</span>
+                            </button>
+                            <button class="control-pane__btn">
+                                <i class="fa fa-cogs"></i>
+                                <span>Account Settings</span>
+                            </button>
+                        </template>
+                        <template v-else>
+                            <button class="control-pane__btn">
+                                <span>Block User</span>
+                            </button>
+                            <button class="control-pane__btn">
+                                <span>Follow User</span>
+                            </button>
+                            <button class="control-pane__btn">
+                                <span>Report User</span>
+                            </button>
+                        </template>
+                    </div>
+                    <div class="main-area">
+
+                    </div>
+                </div>
+            </template>
         </div>
     </div>
 </template>
 
 
 <script lang="ts" setup>
-    import { computed } from 'vue';
+    import { computed, ref } from 'vue';
     import { useRoute } from 'vue-router';
+    import { useAuthStore } from '@/stores/useAuthStore';
 
     const { params: routeParams } = useRoute();
+    const { getUserData, getIsLoggedIn } = useAuthStore();
+
+    const isProfileLoading = ref<boolean>(true);
+    const isProfileNotFound = ref<boolean>(false);
 
     const username = computed(() => routeParams.username );
+
+    const isPersonalBtnsShown = computed(() => {
+        return getIsLoggedIn.value && username.value === getUserData.username;
+    });
 
 </script>
 
@@ -58,6 +106,49 @@
             text-shadow:1px 1px 1px rgba(0,0,0,.24);
         }
 
+    }
+
+    .profile-grid {
+        display:grid;
+        grid-template-columns:30rem auto;
+        grid-gap:2rem;
+    }
+
+    .control-pane{
+        background:#fff;
+        padding:1rem;
+        margin-top:10rem;
+        border-radius:.5rem;
+        box-shadow:0 0 .5rem rgba(0,0,0,.24);
+
+        &__btn{
+            display:block;
+            padding:1rem;
+            background:#eee;
+            border:1px solid #aaa;
+            width:100%;
+            border-radius:.5rem;
+
+            i {
+                margin-right:.5rem;
+            }
+
+            &:not(:last-child){
+                margin-bottom:1rem;
+            }
+        }
+
+    }
+
+    .loading-spinner-container{
+        display:flex;
+        height:70vh;
+        align-items:center;
+        justify-content:center;
+    }
+
+    .loading-spinner{
+        display:block;
     }
 
 
