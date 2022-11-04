@@ -11,9 +11,32 @@
                         <i class="auth-btn__icon fa fa-user"></i>
                     </div>
                 </button>
-                <button v-else class="user-btn">
-                    {{ getUserData.username.substring(0,1) }}
-                </button>
+                <div v-else class="user-dropdown">
+                    <button class="user-dropdown__toggle" @click="isUserPaneShown = !isUserPaneShown">
+                        {{ getUserData.username.substring(0,1) }}
+                    </button>
+                    <div class="user-dropdown__pane" v-show="isUserPaneShown">
+                        <div class="user-dropdown__item">
+                            <i class="fa fa-user"></i>
+                            <p>{{ getUserData.username }}</p>
+                        </div>
+                        <div class="user-dropdown__item">
+                            Profile
+                        </div>
+                        <div class="user-dropdown__item">
+                            Notifications
+                        </div>
+                        <div class="user-dropdown__item">
+                            Messages
+                        </div>
+                        <div class="user-dropdown__item">
+                            Settings
+                        </div>
+                        <div class="user-dropdown__item">
+                            Logout
+                        </div>
+                    </div>
+                </div>
             </div>
         </header>
         <div class="secondary-header">
@@ -29,9 +52,12 @@
 <script lang="ts" setup>
     import { useCoreModalStore } from '@/stores/useCoreModalStore';
     import { useAuthStore } from '@/stores/useAuthStore';
+    import { ref } from 'vue';
 
     const { openAuthModal } = useCoreModalStore();
     const { getIsLoggedIn, getUserData } = useAuthStore();
+
+    const isUserPaneShown = ref<boolean>(false);
 
 
 </script>
@@ -119,13 +145,47 @@
         }
     }
 
-    .user-btn{
-        width:4rem;
-        height:4rem;
-        border-radius:90%;
-        display:flex;
-        justify-content:center;
-        align-items:center;
+    .user-dropdown{
+
+        position:relative;
+
+        &__toggle{
+            width:4rem;
+            height:4rem;
+            border-radius:90%;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            border:1px solid #ccc;
+        }
+
+        &__pane{
+            position:absolute;
+            top:5rem;
+            right:0;
+            background:#fff;
+            box-shadow:0 0 .5rem rgba(0,0,0,.24);
+            min-width:15rem;
+        }
+
+        &__item{
+            display:flex;
+            align-items:center;
+            font-size:1.4rem;
+            padding:1rem;
+            transition:background .3s;
+            cursor:pointer;
+
+            i{
+                margin-right:1rem;
+            }
+
+            &:hover{
+                background:#fafafa;
+            }
+        }
+
+
     }
 
 

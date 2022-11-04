@@ -3,7 +3,7 @@ import { ref, computed } from 'vue';
 
 export const useCoreModalStore = defineStore('useCoreModalStore', () => {
 
-    const isAuthModalOpen = ref<boolean>(true);
+    const isAuthModalOpen = ref<boolean>(false);
 
     const isAuthModalShown = computed(() => isAuthModalOpen);
 
