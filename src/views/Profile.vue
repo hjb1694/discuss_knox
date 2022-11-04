@@ -7,8 +7,13 @@
                 </div>
             </template>
             <template v-else-if="!isProfileLoading && isProfileNotFound">
-
-
+                <div class="not-found">
+                    <div class="not-found__content">
+                        <i class="fa fa-times"></i>
+                        <p class="not-found__super-text">Aww Snap!</p>
+                        <p class="not-found__text">Profile Not Found</p>
+                    </div>
+                </div>
             </template>
             <template v-else>
                 <div class="profile-banner">
@@ -149,6 +154,31 @@
 
     .loading-spinner{
         display:block;
+    }
+
+    .not-found{
+        height:70vh;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+
+        &__content{
+            color:#aaa;
+            text-align:center;
+
+            i{
+                font-size:10rem;
+            }
+
+        }
+
+        &__super-text{
+            font-size:2rem;
+        }
+
+        &__text{
+            font-size:4rem;
+        }
     }
 
 
