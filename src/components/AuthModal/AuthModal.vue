@@ -531,6 +531,9 @@
                 openEmailVerifyModal();
             }
 
+            loginFormFields.email = '';
+            loginFormFields.password = '';
+
             closeAuthModal();
 
 
