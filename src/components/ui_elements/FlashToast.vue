@@ -59,6 +59,7 @@
         display:flex;
         align-items:center;
         justify-content:center;
+        animation:fade-in .3s forwards;
 
         &.red {
             background:#f00;
@@ -78,5 +79,11 @@
         }
 
 
+    }
+
+
+    @keyframes fade-in {
+        from{opacity:0;}
+        to{opacity:1;}
     }
 </style>

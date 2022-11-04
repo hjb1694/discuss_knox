@@ -52,16 +52,19 @@
 <script lang="ts" setup>
     import { useCoreModalStore } from '@/stores/useCoreModalStore';
     import { useAuthStore } from '@/stores/useAuthStore';
+    import { useFlashToastStore, MessageTypes } from '@/stores/useFlashToastStore';
     import { ref } from 'vue';
 
     const { openAuthModal } = useCoreModalStore();
     const { getIsLoggedIn, getUserData, logout } = useAuthStore();
+    const { openFlashToast } = useFlashToastStore();
 
     const isUserPaneShown = ref<boolean>(false);
 
     const userLogout = () => {
         logout();
         isUserPaneShown.value = false;
+        openFlashToast(MessageTypes.SUCCESS, 'Logout Successful!');
     }
 
 
