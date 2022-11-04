@@ -148,6 +148,7 @@
     .user-dropdown{
 
         position:relative;
+        z-index:1;
 
         &__toggle{
             width:4rem;

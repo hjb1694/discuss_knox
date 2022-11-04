@@ -215,7 +215,7 @@
     const isForgotPasswordFormShown = ref<boolean>(false);
     const isForgotPasswordProcessing = ref<boolean>(false);
 
-    const { closeAuthModal } = useCoreModalStore();
+    const { closeAuthModal, openEmailVerifyModal } = useCoreModalStore();
     const { login: loginUser } = useAuthStore();
 
     const registrationFormFields = reactive({
@@ -475,6 +475,8 @@
 
             loginUser(token, user_id, username, core_role, moderator_role, account_status);
 
+            openEmailVerifyModal();
+
             closeAuthModal();
 
         }catch(e){
@@ -524,6 +526,11 @@
             const { token, user_id, username, core_role, moderator_role, account_status } = response.data.body;
 
             loginUser(token, user_id, username, core_role, moderator_role, account_status);
+
+            if(account_status === 'NOT_VERIFIED'){
+                openEmailVerifyModal();
+            }
+
             closeAuthModal();
 
 
