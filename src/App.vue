@@ -2,10 +2,19 @@
   import authModal from '@/components/AuthModal/AuthModal.vue';
   import accountVerificationModal from '@/components/AccountVerificationModal/AccountVerificationModal.vue';
   import appHeader from '@/components/Header/Header.vue';
-  import { useCoreModalStore } from '@/stores/useCoreModalStore.ts';
-  import { computed } from 'vue';
+  import { useAuthStore } from '@/stores/useAuthStore';
+  import { useCoreModalStore } from '@/stores/useCoreModalStore';
+  import { computed, onMounted } from 'vue';
 
-  const { isAuthModalShown, closeAuthModal, getIsEmailVerifyModalShown, closeEmailVerifyModal } = useCoreModalStore();
+  const { autoLogin } = useAuthStore();
+  const { isAuthModalShown, closeAuthModal, getIsEmailVerifyModalShown, closeEmailVerifyModal, openEmailVerifyModal } = useCoreModalStore();
+
+  onMounted(() => {
+    const accountStatus = autoLogin();
+    if(accountStatus === 'NOT_VERIFIED'){
+      openEmailVerifyModal();
+    }
+  });
 
 </script>
 

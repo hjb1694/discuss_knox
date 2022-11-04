@@ -55,6 +55,7 @@
         align-items:center;
         justify-content:center;
         padding:2rem;
+        z-index:999;
 
          &__backdrop{
             position:fixed;

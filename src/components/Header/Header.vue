@@ -32,7 +32,7 @@
                         <div class="user-dropdown__item">
                             Settings
                         </div>
-                        <div class="user-dropdown__item">
+                        <div class="user-dropdown__item" @click="logout">
                             Logout
                         </div>
                     </div>
@@ -55,7 +55,7 @@
     import { ref } from 'vue';
 
     const { openAuthModal } = useCoreModalStore();
-    const { getIsLoggedIn, getUserData } = useAuthStore();
+    const { getIsLoggedIn, getUserData, logout } = useAuthStore();
 
     const isUserPaneShown = ref<boolean>(false);
 
