@@ -4,8 +4,8 @@
     class="flash-toast"
     :class="{'red': messageType === 'ERROR', 'green': messageType === 'SUCCESS'}"
     >
-        <i v-if="messageType === 'ERROR'" class="fa fa-times"></i>
-        <i v-else-if="messageType === 'SUCCESS'" class="fa fa-check"></i>
+        <i v-if="messageType === 'ERROR'" class="flash-toast__icon fa fa-times"></i>
+        <i v-else-if="messageType === 'SUCCESS'" class="flash-toast__icon fa fa-check"></i>
         <span class="flash-toast__text">{{ messageText }}</span>
     </div>
 </template>
@@ -43,3 +43,39 @@
 
 
 </script>
+
+
+<style lang="scss" scoped>
+
+    .flash-toast {
+
+        position:fixed;
+        top:0;
+        left:0;
+        width:100%;
+        height:6rem;
+        z-index:2000;
+        color:#fff;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+
+        .red {
+            background:#f00;
+        }
+
+        .green {
+            background:green;
+        }
+
+        &__icon{
+            font-size:3.5rem;
+        }
+
+        &__text{
+            font-size:1.6rem;
+        }
+
+
+    }
+</style>
