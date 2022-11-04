@@ -32,7 +32,7 @@
                         <div class="user-dropdown__item">
                             Settings
                         </div>
-                        <div class="user-dropdown__item" @click="logout">
+                        <div class="user-dropdown__item" @click="userLogout">
                             Logout
                         </div>
                     </div>
@@ -58,6 +58,11 @@
     const { getIsLoggedIn, getUserData, logout } = useAuthStore();
 
     const isUserPaneShown = ref<boolean>(false);
+
+    const userLogout = () => {
+        logout();
+        isUserPaneShown.value = false;
+    }
 
 
 </script>
