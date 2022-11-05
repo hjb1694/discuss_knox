@@ -6,7 +6,16 @@
                     <img class="loading-spinner" src="@/assets/ring-spinner.svg" alt="Loading..."/>
                 </div>
             </template>
-            <template v-else-if="!isProfileLoading && isProfileNotFound">
+            <template v-else-if="isErrorLoadingProfile">
+                <div class="error-loading-profile">
+                    <div class="error-loading-profile__content">
+                        <i class="fa fa-times"></i>
+                        <p class="error-loading-profile__super-text">Aww Snap!</p>
+                        <p class="error-loading-profile__text">Unable to Load Profile</p>
+                    </div>
+                </div>
+            </template>
+            <template v-else-if="isProfileNotFound">
                 <div class="not-found">
                     <div class="not-found__content">
                         <i class="fa fa-times"></i>
@@ -33,11 +42,14 @@
                             </button>
                         </template>
                         <template v-else>
-                            <button class="control-pane__btn">
-                                <span>Block User</span>
+                            <button class="control-pane__btn" @click="follow">
+                                <span>Follow User</span>
                             </button>
                             <button class="control-pane__btn">
-                                <span>Follow User</span>
+                                <span>Send Message</span>
+                            </button>
+                            <button class="control-pane__btn" @click="block">
+                                <span>Block User</span>
                             </button>
                             <button class="control-pane__btn">
                                 <span>Report User</span>
@@ -45,7 +57,39 @@
                         </template>
                     </div>
                     <div class="main-area">
+                        <div class="white-card">
+                            <strong class="white-card__key">Gender:</strong> 
+                            <span v-if="profileData.gender === 'not specified'" class="empty"><em>[Not Specified]</em></span>
+                            <span v-else>{{ gender }}</span>
+                        </div>
+                        <template v-if="getIsLoggedIn && !profileData.isPrivate && !userDeactivated">
+                            <div class="white-card">
+                                <strong class="white-card__key">Occupation:</strong>
+                                <span v-if="!profileData.occupation" class="empty"><em>[Not Specified]</em></span>
+                                <span>{{ profileData.occupation }}</span>
+                            </div>
+                            <div class="white-card">
+                                <strong class="white-card__key">Location:</strong>
+                                <span v-if="!profileData.location" class="empty"><em>[Not Specified]</em></span>
+                                <span>{{ profileData.location }}</span>
+                            </div>
+                            <div class="white-card bio-card">
+                                <div><strong class="white-card__key">Bio:</strong></div>
+                                <div v-if="!profileData.bio" class="empty"><em>[So empty...]</em></div>
+                                <div v-html="profileData.bio"></div>
+                            </div>
 
+
+                        </template>
+                        <div class="white-card" v-if="profileData.isPrivate && !userDeactivated">
+                            Private Profile
+                        </div>
+                        <div class="white-card" v-if="userDeactivated">
+                            User Deactivated
+                        </div>
+                        <div class="white-card" v-if="!profileData.isPrivate && !getIsLoggedIn && !userDeactivated">
+                            Login to see more of {{ username }}'s profile.
+                        </div>
                     </div>
                 </div>
             </template>
@@ -55,20 +99,184 @@
 
 
 <script lang="ts" setup>
-    import { computed, ref } from 'vue';
+    import { computed, ref, reactive, onMounted, watch } from 'vue';
     import { useRoute } from 'vue-router';
     import { useAuthStore } from '@/stores/useAuthStore';
+    import { useCoreModalStore } from '@/stores/useCoreModalStore';
+    import axios from 'axios';
 
     const { params: routeParams } = useRoute();
-    const { getUserData, getIsLoggedIn } = useAuthStore();
+    const { getUserData, getIsLoggedIn, getAuthToken } = useAuthStore();
+    const { openAuthModal, openEmailVerifyModal } = useCoreModalStore();
 
     const isProfileLoading = ref<boolean>(true);
     const isProfileNotFound = ref<boolean>(false);
+    const isErrorLoadingProfile = ref<boolean>(false);
 
     const username = computed(() => routeParams.username );
 
+    const profileData = reactive({
+        isPrivate: null, 
+        accountStatus: null, 
+        coreRole: null, 
+        moderatorRole: null, 
+        gender: null, 
+        isBlocked: null, 
+        bio: null, 
+        location: null, 
+        occupation: null, 
+        profileImage: null
+    });
+
     const isPersonalBtnsShown = computed(() => {
         return getIsLoggedIn.value && username.value === getUserData.username;
+    });
+
+    const userDeactivated = computed(() => {
+        return ['VIOLATION_DEACTIVATION', 'USER_SELF_DEACTIVATION'].includes(profileData.accountStatus);
+    });
+
+    const resetProfileData = () => {
+        for(let key in profileData){
+            profileData[key] = null;
+        }
+    }
+
+    const fetchPublicFacingProfile = async () => {
+        isProfileLoading.value = true;
+        isProfileNotFound.value = false;
+        isErrorLoadingProfile.value = false;
+        resetProfileData();
+
+        try{
+
+            const response = await axios.get(`http://localhost:3001/api/v1/profile/public/${username.value}`);
+
+            console.log(response);
+
+            const { account_status, core_role, moderator_role, is_profile_private, gender} = response.data.body;
+
+            profileData.isPrivate = is_profile_private;
+            profileData.accountStatus = account_status;
+            profileData.coreRole = core_role;
+            profileData.moderatorRole = moderator_role;
+            profileData.gender = gender;
+
+        }catch(e){
+            if(e.response.data?.short_msg){
+                const shortMsg = e.response.data.short_msg;
+
+                if(shortMsg === 'ERR_NOT_FOUND'){
+                    isProfileNotFound.value = true;
+                }
+
+            }else{
+                isErrorLoadingProfile.value = true;
+            }
+
+        }finally{
+            isProfileLoading.value = false;
+        }
+
+    }
+
+    const fetchMemberFacingProfile = async () => {
+        isProfileLoading.value = true;
+        isProfileNotFound.value = false;
+        isErrorLoadingProfile.value = false;
+        resetProfileData();
+
+        try{
+
+            const response = await axios.get(`http://localhost:3001/api/v1/profile/member/${username.value}`, {
+                headers: {
+                    'x-auth-token': getAuthToken.value
+                }
+            });
+
+            console.log('RESPONSE', response);
+
+            const {
+                account_status, 
+                core_role, 
+                moderator_role,
+                is_profile_private, 
+                profile_image, 
+                bio, 
+                location, 
+                gender, 
+                occupation, 
+                is_blocked
+            } = response.data.body;
+
+            profileData.accountStatus = account_status;
+            profileData.isPrivate = is_profile_private;
+            profileData.coreRole = core_role;
+            profileData.moderatorRole = moderator_role;
+            profileData.profileImage = profile_image;
+            profileData.bio = bio;
+            profileData.location = location;
+            profileData.occupation = occupation;
+            profileData.gender = gender;
+            profileData.isBlocked = is_blocked;
+
+        }catch(e){
+
+            console.error(e);
+
+            if(e.data?.short_msg){
+                const shortMsg = e.data.short_msg;
+
+            }else{
+                isErrorLoadingProfile.value = true;
+            }
+
+
+        }finally{
+            isProfileLoading.value = false;
+        }
+
+    }
+
+    const checkAuthStatus = () => {
+        if(!getIsLoggedIn.value){
+            openAuthModal();
+            return false;
+        }else if(!getUserData.account_status === 'NOT_VERIFIED'){
+            openEmailVerifyModal();
+            return false;
+        }
+
+        return true;
+    }
+
+    const block = () => {
+        if(!checkAuthStatus()){
+            return;
+        }
+    }
+
+
+    const follow = () => {
+        if(!checkAuthStatus()){
+            return;
+        }
+    }
+
+    watch(() => getIsLoggedIn, (val) => {
+         if(val === true){
+            fetchMemberFacingProfile();
+        }else{
+            fetchPublicFacingProfile();
+        }
+    });
+
+    onMounted(() => {
+        if(getIsLoggedIn.value === true){
+            fetchMemberFacingProfile();
+        }else{
+            fetchPublicFacingProfile();
+        }
     });
 
 </script>
@@ -115,7 +323,7 @@
 
     .profile-grid {
         display:grid;
-        grid-template-columns:30rem auto;
+        grid-template-columns:20rem auto;
         grid-gap:2rem;
     }
 
@@ -156,7 +364,8 @@
         display:block;
     }
 
-    .not-found{
+    .not-found
+    .error-loading-profile{
         height:70vh;
         display:flex;
         justify-content:center;
@@ -181,6 +390,28 @@
         }
     }
 
+    .white-card{
+        padding:1rem;
+        box-shadow:0 0 .5rem rgba(0,0,0,.24);
+        background:#fff;
+        font-size:1.4rem;
+        border-radius:.5rem;
+        user-select:none;
+        margin:1rem 0;
+
+        &__key{
+            margin-right:.5rem;
+        }
+    }
+
+    .empty{
+        color:#aaa;
+    }
+
+    .bio-card{
+        min-height:22rem;
+    }
+
 
     @media (max-width:700px) {
 
@@ -190,6 +421,34 @@
 
         .container {
             width:100%;
+        }
+
+        .profile-banner{
+            position:static;
+            padding:1rem;
+            height:20rem;
+
+            &__img{
+                position:static;
+                width:10rem;
+                height:10rem;
+                margin:auto;
+                margin-top:2rem;
+            }
+
+            &__username{
+                position:static;
+                text-align:center;
+                margin-top:2rem;
+            }
+        }
+
+        .profile-grid{
+            display:block;
+        }
+
+        .control-pane{
+            margin-top:2rem;
         }
 
     }
