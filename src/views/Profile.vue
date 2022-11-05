@@ -1,6 +1,6 @@
 <template>
     <div class="profile">
-        <private-message-modal :chat-with-username="username" />
+        <private-message-modal v-if="getIsLoggedIn && profileData.userId" :chat-with-username="username" :chat-with-user-id="profileData.userId"/>
         <div class="container">
             <template v-if="isProfileLoading">
                 <div class="loading-spinner-container">

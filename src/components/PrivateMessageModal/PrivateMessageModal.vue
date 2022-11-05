@@ -9,27 +9,120 @@
                 </button>
             </header>
             <section class="private-message-modal__body">
-                <div class="messages-area">
-
-
+                <div class="messages-area" ref="messagesArea">
+                    <template v-if="messages.length">
+                        <div v-for="message in messages" :key="message.message_id" :class="{'right': message.sender_user_id === getUserData.user_id, 'left': message.sender_user_id === chatWithUserId}">
+                            <div class="message-bubble" :class="{'grey': message.sender_user_id === getUserData.user_id, 'green': message.sender_user_id === chatWithUserId}">
+                                {{ message.message_body }}
+                                {{ getUserData.userId }}
+                            </div>
+                        </div>
+                    </template>
                 </div>
-                <textarea class="textarea" placeholder="Your Message Here"></textarea>
+                <textarea v-model="newMessageContent" class="textarea" placeholder="Your Message Here"></textarea>
             </section>
             <footer class="private-message-modal__footer">
-                <button class="send-btn">Send</button>
+                <button class="send-btn" @click="sendMessage" :disabled="isSending">Send</button>
             </footer>
         </div>
     </div>
 </template>
 
 <script lang="ts" setup>
-    import { defineProps } from 'vue';
+    import { defineProps, ref, reactive, onMounted } from 'vue';
+    import axios from 'axios';
+    import { useAuthStore } from '@/stores/useAuthStore';
+    import { usePusherStore } from '@/stores/usePusherStore';
 
     const props = defineProps({
         chatWithUsername: {
             type: String, 
             required: true
+        }, 
+        chatWithUserId: {
+            type: Number, 
+            required: true
         }
+    });
+
+    const messagesArea = ref<HTMLElement>();
+
+    const { getAuthToken, getUserData } = useAuthStore();
+    const { getPusherInstance } = usePusherStore();
+
+    const newMessageContent = ref<string>('');
+    const isSending = ref<boolean>(false);
+    const messages = reactive([]);
+
+    const fetchMostRecentMessages = async () => {
+        
+        try{
+
+            const response = await axios.get(`http://localhost:3001/api/v1/private-message/${props.chatWithUserId}`, {
+                headers: {
+                    'x-auth-token': getAuthToken.value
+                }
+            });
+
+            console.log(response);
+
+            messages.splice(0,messages.length);
+
+            messages.push(...response.data.body.reverse());
+
+            messagesArea.value.scrollIntoView(false);
+
+
+        }catch(e){
+
+            console.error(e);
+
+        }
+
+
+    }
+
+    const sendMessage = async () => {
+        isSending.value = true;
+
+        try{
+
+            await axios.post('http://localhost:3001/api/v1/private-message', {
+                receiver_user_id: props.chatWithUserId, 
+                message: newMessageContent.value
+            }, {
+                headers: {
+                    'x-auth-token': getAuthToken.value
+                }
+            })
+
+            console.log('success');
+
+            newMessageContent.value = '';
+
+        }catch(e){
+
+            console.log(e);
+
+        }finally{
+            isSending.value = false;
+            fetchMostRecentMessages();
+        }
+    }
+
+
+    onMounted(() => {
+        fetchMostRecentMessages();
+
+        getPusherInstance.channel.bind('new-message', data => {
+
+                if(data.sender_user_id === props.chatWithUserId){
+                    fetchMostRecentMessages();
+                }
+
+        });
+
+
     });
 
 </script>
@@ -91,6 +184,7 @@
                 background:#fafafa;
                 border:1px solid #ccc;
                 overflow-y:auto;
+                padding:2rem;
             }
 
             .textarea{
@@ -117,6 +211,34 @@
             font-size:1.6rem;
             font-weight:bold;
             border-radius:.5rem;
+        }
+
+        .left, 
+        .right{
+            display:flex;
+        }
+
+        .left{
+            justify-content:flex-start;
+        }
+
+        .right{
+            justify-content:flex-end;
+        }
+
+        .message-bubble{
+            padding:1rem;
+            border-radius:.5rem;
+            margin-bottom:1rem;
+        }
+
+        .grey{
+            background:#bbb;
+        }
+
+        .green{
+            background:green;
+            color:#fff;
         }
 
 
