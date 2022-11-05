@@ -48,21 +48,27 @@
                         </template>
                         <template v-else>
                             <template v-if="!profileData.isBlocker">
-                                <button class="control-pane__btn" @click="follow">
+                                <button v-if="!profileData.followStatus" class="control-pane__btn" @click="follow" :disabled="isControlButtonsDisabled">
                                     <span>Follow User</span>
+                                </button>
+                                <button v-if="profileData.followStatus === 'PENDING'" class="control-pane__btn" @click="unfollow" :disabled="isControlButtonsDisabled">
+                                    <span>Cancel Follow Request</span>
+                                </button>
+                                <button v-if="profileData.followStatus === 'ACCEPTED'" class="control-pane__btn" @click="unfollow" :disabled="isControlButtonsDisabled">
+                                    <span>Unfollow User</span>
                                 </button>
                                 <button class="control-pane__btn">
                                     <span>Send Message</span>
                                 </button>
                             </template>
                             <template v-if="!isElevatedCoreStatus">
-                                <button v-if="!profileData.isBlocker" class="control-pane__btn" @click="block" :disabled="isControlProcessing.block">
+                                <button v-if="!profileData.isBlocker" class="control-pane__btn" @click="block" :disabled="isControlButtonsDisabled">
                                     <span v-if="!isControlProcessing.block">Block User</span>
                                     <span v-else>
                                         <img class="control-spinner" src="@/assets/ring-spinner.svg" alt="Processing..." />
                                     </span>
                                 </button>
-                                <button v-if="profileData.isBlocker" class="control-pane__btn" @click="unblock" :disabled="isControlProcessing.unblock">
+                                <button v-if="profileData.isBlocker" class="control-pane__btn" @click="unblock" :disabled="isControlButtonsDisabled">
                                     <span v-if="!isControlProcessing.unblock">Unblock</span>
                                     <span v-else>
                                         <img class="control-spinner" src="@/assets/ring-spinner.svg" alt="Processing..." />
@@ -150,13 +156,19 @@
         location: null, 
         occupation: null, 
         profileImage: null, 
-        userId: null
+        userId: null, 
+        followStatus: null
     });
 
     const isControlProcessing = reactive({
         block: false, 
         unblock: false,
-        follow: false
+        follow: false, 
+        unfollow: false
+    });
+
+    const isControlButtonsDisabled = computed(() => {
+        return isControlProcessing.block || isControlProcessing.unblock || isControlProcessing.follow || isControlProcessing.unfollow;
     });
 
     const isPersonalBtnsShown = computed(() => {
@@ -242,7 +254,8 @@
                 occupation, 
                 is_blocked, 
                 is_blocker,
-                user_id
+                user_id, 
+                follow_status
             } = response.data.body;
 
             profileData.accountStatus = account_status;
@@ -257,6 +270,7 @@
             profileData.isBlocked = is_blocked;
             profileData.userId = user_id;
             profileData.isBlocker = is_blocker;
+            profileData.followStatus = follow_status;
 
         }catch(e){
 
@@ -293,6 +307,29 @@
         return true;
     }
 
+    const handleBlockUnblockResponseErrors = (e) => {
+
+        if(e.data?.short_msg){
+
+            const shortMsg = e.data.short_msg;
+
+            if(shortMsg === 'ERR_DEACTIVATION'){
+                openFlashToast(MessageTypes.ERROR, 'Your account has been deactivated.');
+                logout();
+            }else if(shortMsg === 'NOT_VERIFIED'){
+                openEmailVerifyModal();
+            }else if(shortMsg === 'FROZEN'){
+                openFlashToast(MessageTypes.ERROR, 'Your account is frozen and under review.');
+            }else{
+                openFlashToast(MessageTypes.ERROR, 'An unexpected error has occurred.');
+            }
+
+        }else{
+            openFlashToast(MessageTypes.ERROR, 'An unexpected error has occurred.');
+        }
+
+    }
+
     const block = async () => {
         if(!checkAuthStatus()){
             return;
@@ -312,12 +349,13 @@
                 }
             });
 
+            profileData.followStatus = null;
             profileData.isBlocker = true;
             openFlashToast(MessageTypes.SUCCESS, `${username.value} now blocked.`);
 
         }catch(e){
 
-            console.error(e);
+            handleBlockUnblockResponseErrors(e);
 
         }finally{
             isControlProcessing.block = false;
@@ -343,7 +381,7 @@
 
         }catch(e){
 
-            console.error(e);
+            handleBlockUnblockResponseErrors(e);
 
         }finally{
             isControlProcessing.unblock = false;
@@ -352,10 +390,66 @@
     }
 
 
-    const follow = () => {
+    const follow = async () => {
         if(!checkAuthStatus()){
             return;
         }
+
+        isControlProcessing.follow = true;
+
+        try{
+
+            await axios.post('http://localhost:3001/api/v1/user-follow-action', {
+                followed_user_id: profileData.userId, 
+                action: 'follow'
+            }, 
+            {
+                headers: {
+                    'x-auth-token': getAuthToken.value
+                }
+            });
+
+            profileData.followStatus = 'PENDING';
+            openFlashToast(MessageTypes.SUCCESS, 'Follow request has been sent.');
+
+        }catch(e){
+
+            console.error(e);
+
+        }finally{
+            isControlProcessing.follow = false;
+        }
+    }
+
+    const unfollow = async () => {
+        if(!checkAuthStatus()){
+            return;
+        }
+
+        isControlProcessing.unfollow = false;
+
+        try{
+
+            await axios.post('http://localhost:3001/api/v1/user-follow-action', {
+                followed_user_id: profileData.userId, 
+                action: 'unfollow'
+            }, 
+            {
+                headers: {
+                    'x-auth-token': getAuthToken.value
+                }
+            });
+
+            profileData.followStatus = null;
+
+        }catch(e){
+
+            console.error(e);
+
+        }finally{
+            isControlProcessing.unfollow = false;
+        }
+
     }
 
     watch(() => getIsLoggedIn.value, (val) => {
