@@ -581,6 +581,10 @@
                 margin-right:.5rem;
             }
 
+            &:not(:last-child){
+                border-bottom:1px solid #ddd;
+            }
+
             .control-spinner{
                 width:1.5rem;
             }
