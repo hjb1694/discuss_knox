@@ -1,6 +1,12 @@
 <template>
     <div class="profile">
-        <private-message-modal v-if="getIsLoggedIn && profileData.userId" :chat-with-username="username" :chat-with-user-id="profileData.userId"/>
+        <private-message-modal 
+        v-if="profileData.userId"
+        :chat-with-username="username" 
+        :chat-with-user-id="profileData.userId"
+        :is-open="getIsMessagesModalOpen"
+        @close-modal="closeMessagesModal"
+        />
         <div class="container">
             <template v-if="isProfileLoading">
                 <div class="loading-spinner-container">
@@ -58,7 +64,7 @@
                                 <button v-if="profileData.followStatus === 'ACCEPTED'" class="control-pane__btn" @click="unfollow" :disabled="isControlButtonsDisabled">
                                     <span>Unfollow User</span>
                                 </button>
-                                <button class="control-pane__btn">
+                                <button class="control-pane__btn" @click="handleSendMessageBtnClick">
                                     <span>Send Message</span>
                                 </button>
                             </template>
@@ -135,7 +141,7 @@
 
     const { params: routeParams, beforeRouteUpdate } = useRoute();
     const { getUserData, getIsLoggedIn, getAuthToken, logout } = useAuthStore();
-    const { openAuthModal, openEmailVerifyModal } = useCoreModalStore();
+    const { openAuthModal, openEmailVerifyModal, getIsMessagesModalOpen, closeMessagesModal, openMessagesModal } = useCoreModalStore();
     const { openFlashToast } = useFlashToastStore();
 
     const isProfileLoading = ref<boolean>(true);
@@ -455,6 +461,21 @@
         }
 
     }
+
+    const handleSendMessageBtnClick = () => {
+        if(!checkAuthStatus()){
+            return;
+        }
+
+        if(profileData.isBlocked || profileData.isBlocker){
+            openFlashToast(MessageTypes.ERROR, 'You have either blocked this user or are blocked by this user.');
+            return;
+        }
+
+        openMessagesModal();
+
+    }
+
 
     watch(() => getIsLoggedIn.value, (val) => {
          if(val === true){

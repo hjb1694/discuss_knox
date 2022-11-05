@@ -12,7 +12,7 @@ interface UserData {
 
 export const useAuthStore = defineStore('useAuthStore', () => {
 
-    const { createPusherInstance } = usePusherStore();
+    const { createPusherInstance, clearPusherInstance } = usePusherStore();
 
     const isLoggedIn = ref<boolean>(false);
     const authToken = ref<string>('');
@@ -87,6 +87,7 @@ export const useAuthStore = defineStore('useAuthStore', () => {
         userData.account_status = null;
 
         sessionStorage.clear();
+        clearPusherInstance();
 
     }
 

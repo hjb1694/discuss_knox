@@ -1,10 +1,10 @@
 <template>
-    <div class="private-message-modal">
-        <div class="private-message-modal__backdrop"></div>
+    <div v-if="isOpen" class="private-message-modal">
+        <div class="private-message-modal__backdrop" @click="closeModal"></div>
         <div class="private-message-modal__dialog">
             <header class="private-message-modal__header">
                 <h2>Chat with {{ chatWithUsername }}</h2>
-                <button class="private-message-modal__close-btn">
+                <button class="private-message-modal__close-btn" @click="closeModal">
                     <i class="fa fa-close"></i>
                 </button>
             </header>
@@ -29,12 +29,16 @@
 </template>
 
 <script lang="ts" setup>
-    import { defineProps, ref, reactive, onMounted } from 'vue';
+    import { defineProps, defineEmits, ref, reactive, onMounted } from 'vue';
     import axios from 'axios';
     import { useAuthStore } from '@/stores/useAuthStore';
     import { usePusherStore } from '@/stores/usePusherStore';
 
     const props = defineProps({
+        isOpen: {
+            type: Boolean, 
+            default: false
+        },
         chatWithUsername: {
             type: String, 
             required: true
@@ -45,9 +49,11 @@
         }
     });
 
+    const emit = defineEmits(['closeModal']);
+
     const messagesArea = ref<HTMLElement>();
 
-    const { getAuthToken, getUserData } = useAuthStore();
+    const { getAuthToken, getUserData, getIsLoggedIn } = useAuthStore();
     const { getPusherInstance } = usePusherStore();
 
     const newMessageContent = ref<string>('');
@@ -111,16 +117,26 @@
     }
 
 
+    const closeModal = () => {
+        emit('closeModal');
+    }
+
+
     onMounted(() => {
-        fetchMostRecentMessages();
 
-        getPusherInstance.channel.bind('new-message', data => {
+        if(getIsLoggedIn.value){
 
-                if(data.sender_user_id === props.chatWithUserId){
-                    fetchMostRecentMessages();
-                }
+            fetchMostRecentMessages();
 
-        });
+            getPusherInstance.channel.bind('new-message', data => {
+
+                    if(data.sender_user_id === props.chatWithUserId){
+                        fetchMostRecentMessages();
+                    }
+
+            });
+
+        }
 
 
     });

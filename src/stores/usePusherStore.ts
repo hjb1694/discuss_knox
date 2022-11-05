@@ -40,9 +40,15 @@ export const usePusherStore = defineStore('usePusherStore', () => {
         pusherInstance.channel = pusherInstance.instance?.subscribe(`private-user-${userId}`);
     }
 
+    const clearPusherInstance = () => {
+        pusherInstance.instance = null;
+        pusherInstance.channel = null;
+    }
+
     return {
         getPusherInstance, 
-        createPusherInstance
+        createPusherInstance, 
+        clearPusherInstance
     }
 
 });
