@@ -30,7 +30,7 @@
                     <h1 class="profile-banner__username">{{ username }}</h1>
                 </div>
                 <div class="profile-grid">
-                    <div class="control-pane">
+                    <div v-if="!isUserDeactivated" class="control-pane">
                         <template v-if="isPersonalBtnsShown">
                             <button class="control-pane__btn">
                                 <i class="fa fa-edit"></i>
@@ -41,7 +41,7 @@
                                 <span>Account Settings</span>
                             </button>
                         </template>
-                        <template v-else>
+                        <template>
                             <button class="control-pane__btn" @click="follow">
                                 <span>Follow User</span>
                             </button>
@@ -56,13 +56,14 @@
                             </button>
                         </template>
                     </div>
+                    <div v-else></div>
                     <div class="main-area">
-                        <div class="white-card">
+                        <div v-if="!isUserDeactivated" class="white-card">
                             <strong class="white-card__key">Gender:</strong> 
                             <span v-if="profileData.gender === 'not specified'" class="empty"><em>[Not Specified]</em></span>
                             <span v-else>{{ gender }}</span>
                         </div>
-                        <template v-if="getIsLoggedIn && !profileData.isPrivate && !userDeactivated">
+                        <template v-if="getIsLoggedIn && !profileData.isPrivate && !isUserDeactivated">
                             <div class="white-card">
                                 <strong class="white-card__key">Occupation:</strong>
                                 <span v-if="!profileData.occupation" class="empty"><em>[Not Specified]</em></span>
@@ -81,13 +82,13 @@
 
 
                         </template>
-                        <div class="white-card" v-if="profileData.isPrivate && !userDeactivated">
+                        <div class="white-card" v-if="profileData.isPrivate && !isUserDeactivated">
                             Private Profile
                         </div>
-                        <div class="white-card" v-if="userDeactivated">
+                        <div class="white-card" v-if="isUserDeactivated">
                             User Deactivated
                         </div>
-                        <div class="white-card" v-if="!profileData.isPrivate && !getIsLoggedIn && !userDeactivated">
+                        <div class="white-card" v-if="!profileData.isPrivate && !getIsLoggedIn && !isUserDeactivated">
                             Login to see more of {{ username }}'s profile.
                         </div>
                     </div>
@@ -132,7 +133,7 @@
         return getIsLoggedIn.value && username.value === getUserData.username;
     });
 
-    const userDeactivated = computed(() => {
+    const isUserDeactivated = computed(() => {
         return ['VIOLATION_DEACTIVATION', 'USER_SELF_DEACTIVATION'].includes(profileData.accountStatus);
     });
 
@@ -364,7 +365,7 @@
         display:block;
     }
 
-    .not-found
+    .not-found,
     .error-loading-profile{
         height:70vh;
         display:flex;

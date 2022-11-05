@@ -550,7 +550,7 @@
 
                 if(shortMsg === 'ERR_USER_NOT_EXIST' || shortMsg === 'ERR_INVALID_LOGIN_CREDENTIALS'){
                     loginErrors.push('Invalid login credentials.');
-                }else if(shortMsg === 'VIOLATION_DEACTIVATION'){
+                }else if(shortMsg === 'ERR_USER_DEACTIVATED'){
                     loginErrors.push('This user has been deactivated.');
                 }else{
                     loginErrors.push('An unexpected error has occurred.');
