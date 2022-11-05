@@ -254,10 +254,6 @@
     const regStepIsShown = reactive([true, false, false, false, false, false]);
 
 
-    const closeModal = () => {
-        emit('closeModal');
-    }
-
     const registrationValidation = [
         function(){
             return true;
@@ -440,6 +436,12 @@
         registrationErrors.agrees = [];
     }
 
+    const resetLogin = () => {
+        for(let key in loginFormFields){
+            loginFormFields[key] = '';
+        }
+    }
+
     const toggleToLogin = () => {
         isRegistrationShown.value = false;
         isLoginShown.value = true;
@@ -597,6 +599,13 @@
         }
 
 
+    }
+
+    const closeModal = () => {
+        resetRegistration();
+        resetLogin();
+        loginErrors.splice(0,loginErrors.length);
+        emit('closeModal');
     }
 </script>
 
