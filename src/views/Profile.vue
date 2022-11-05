@@ -551,17 +551,34 @@
         &__btn{
             display:block;
             padding:1rem;
-            background:#eee;
-            border:1px solid #aaa;
+            background:linear-gradient(to bottom right, #11998e, #38ef7d);
+            border:none;
             width:100%;
             border-radius:.5rem;
+            font-weight:bold;
+            color:transparent;
+            background-clip:text;
+            -webkit-background-clip:text;
+            position:relative;
+
+
+            &::before{
+                content:"";
+                position:absolute;
+                left:0;
+                top:0;
+                height:100%;
+                width:0;
+                transition:all .5s;
+                background:rgba(56, 239, 126,.08);
+            }
+
+            &:hover::before{
+                width:100%;
+            }
 
             i {
                 margin-right:.5rem;
-            }
-
-            &:not(:last-child){
-                margin-bottom:1rem;
             }
 
             .control-spinner{
