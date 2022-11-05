@@ -47,15 +47,26 @@
                             </button>
                         </template>
                         <template v-else>
-                            <button class="control-pane__btn" @click="follow">
-                                <span>Follow User</span>
-                            </button>
-                            <button class="control-pane__btn">
-                                <span>Send Message</span>
-                            </button>
+                            <template v-if="!profileData.isBlocker">
+                                <button class="control-pane__btn" @click="follow">
+                                    <span>Follow User</span>
+                                </button>
+                                <button class="control-pane__btn">
+                                    <span>Send Message</span>
+                                </button>
+                            </template>
                             <template v-if="!isElevatedCoreStatus">
-                                <button class="control-pane__btn" @click="block">
-                                    <span>Block User</span>
+                                <button v-if="!profileData.isBlocker" class="control-pane__btn" @click="block" :disabled="isControlProcessing.block">
+                                    <span v-if="!isControlProcessing.block">Block User</span>
+                                    <span v-else>
+                                        <img class="control-spinner" src="@/assets/ring-spinner.svg" alt="Processing..." />
+                                    </span>
+                                </button>
+                                <button v-if="profileData.isBlocker" class="control-pane__btn" @click="unblock" :disabled="isControlProcessing.unblock">
+                                    <span v-if="!isControlProcessing.unblock">Unblock</span>
+                                    <span v-else>
+                                        <img class="control-spinner" src="@/assets/ring-spinner.svg" alt="Processing..." />
+                                    </span>
                                 </button>
                                 <button class="control-pane__btn">
                                     <span>Report User</span>
@@ -108,13 +119,13 @@
 
 <script lang="ts" setup>
     import { computed, ref, reactive, onMounted, watch } from 'vue';
-    import { useRoute } from 'vue-router';
+    import { useRoute, onBeforeRouteUpdate } from 'vue-router';
     import { useAuthStore } from '@/stores/useAuthStore';
     import { useCoreModalStore } from '@/stores/useCoreModalStore';
     import { useFlashToastStore, MessageTypes } from '@/stores/useFlashToastStore';
     import axios from 'axios';
 
-    const { params: routeParams } = useRoute();
+    const { params: routeParams, beforeRouteUpdate } = useRoute();
     const { getUserData, getIsLoggedIn, getAuthToken, logout } = useAuthStore();
     const { openAuthModal, openEmailVerifyModal } = useCoreModalStore();
     const { openFlashToast } = useFlashToastStore();
@@ -123,7 +134,9 @@
     const isProfileNotFound = ref<boolean>(false);
     const isErrorLoadingProfile = ref<boolean>(false);
 
-    const username = computed(() => routeParams.username );
+    const username = ref<string>(routeParams.username);
+
+    console.log('USERNAME VAL', routeParams.username);
 
     const profileData = reactive({
         isPrivate: null, 
@@ -132,10 +145,18 @@
         moderatorRole: null, 
         gender: null, 
         isBlocked: null, 
+        isBlocker: null,
         bio: null, 
         location: null, 
         occupation: null, 
-        profileImage: null
+        profileImage: null, 
+        userId: null
+    });
+
+    const isControlProcessing = reactive({
+        block: false, 
+        unblock: false,
+        follow: false
     });
 
     const isPersonalBtnsShown = computed(() => {
@@ -168,13 +189,14 @@
 
             console.log(response);
 
-            const { account_status, core_role, moderator_role, is_profile_private, gender} = response.data.body;
+            const { account_status, core_role, moderator_role, is_profile_private, gender, user_id} = response.data.body;
 
             profileData.isPrivate = is_profile_private;
             profileData.accountStatus = account_status;
             profileData.coreRole = core_role;
             profileData.moderatorRole = moderator_role;
             profileData.gender = gender;
+            profileData.userId = user_id;
 
         }catch(e){
             if(e.response.data?.short_msg){
@@ -218,7 +240,9 @@
                 location, 
                 gender, 
                 occupation, 
-                is_blocked
+                is_blocked, 
+                is_blocker,
+                user_id
             } = response.data.body;
 
             profileData.accountStatus = account_status;
@@ -231,6 +255,8 @@
             profileData.occupation = occupation;
             profileData.gender = gender;
             profileData.isBlocked = is_blocked;
+            profileData.userId = user_id;
+            profileData.isBlocker = is_blocker;
 
         }catch(e){
 
@@ -267,10 +293,62 @@
         return true;
     }
 
-    const block = () => {
+    const block = async () => {
         if(!checkAuthStatus()){
             return;
         }
+
+        isControlProcessing.block = true;
+
+        try{
+
+            await axios.post('http://localhost:3001/api/v1/user-block-action', {
+                action: 'block', 
+                blocked_user_id: profileData.userId
+            }, 
+            {
+                headers: {
+                    'x-auth-token': getAuthToken.value
+                }
+            });
+
+            profileData.isBlocker = true;
+            openFlashToast(MessageTypes.SUCCESS, `${username.value} now blocked.`);
+
+        }catch(e){
+
+            console.error(e);
+
+        }finally{
+            isControlProcessing.block = false;
+        }
+    }
+
+    const unblock = async () => {
+
+        try{
+            isControlProcessing.unblock = true;
+
+             await axios.post('http://localhost:3001/api/v1/user-block-action', {
+                action: 'unblock', 
+                blocked_user_id: profileData.userId
+            }, 
+            {
+                headers: {
+                    'x-auth-token': getAuthToken.value
+                }
+            });
+            profileData.isBlocker = false;
+            openFlashToast(MessageTypes.SUCCESS, `${username.value} has been unblocked.`);
+
+        }catch(e){
+
+            console.error(e);
+
+        }finally{
+            isControlProcessing.unblock = false;
+        }
+
     }
 
 
@@ -288,6 +366,17 @@
         }
     });
 
+    watch(() => routeParams, (val) => {
+        username.value = val.username;
+    });
+
+    onBeforeRouteUpdate((to) => {
+
+        username.value = to.params.username;
+
+    });
+
+
     onMounted(() => {
         if(getIsLoggedIn.value === true){
             fetchMemberFacingProfile();
@@ -295,6 +384,7 @@
             fetchPublicFacingProfile();
         }
     });
+
 
 </script>
 
@@ -376,6 +466,10 @@
 
             &:not(:last-child){
                 margin-bottom:1rem;
+            }
+
+            .control-spinner{
+                width:1.5rem;
             }
         }
 
