@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, reactive, computed } from 'vue';
+import { usePusherStore } from '@/stores/usePusherStore';
 
 interface UserData {
     user_id: number | null, 
@@ -10,6 +11,8 @@ interface UserData {
 }
 
 export const useAuthStore = defineStore('useAuthStore', () => {
+
+    const { createPusherInstance } = usePusherStore();
 
     const isLoggedIn = ref<boolean>(false);
     const authToken = ref<string>('');
@@ -48,6 +51,8 @@ export const useAuthStore = defineStore('useAuthStore', () => {
         sessionStorage.setItem('moderator-role', userData.moderator_role);
         sessionStorage.setItem('account-status', userData.account_status!);
 
+        createPusherInstance(token, userId);
+
     }
 
     const autoLogin = () => {
@@ -63,6 +68,8 @@ export const useAuthStore = defineStore('useAuthStore', () => {
             userData.moderator_role = sessionStorage.getItem('moderator-role');
             userData.account_status = sessionStorage.getItem('account-status');
         }
+
+        createPusherInstance(sessAuthTok!, userData.user_id!);
 
         return userData.account_status;
 
