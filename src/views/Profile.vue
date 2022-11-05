@@ -309,9 +309,11 @@
 
     const handleBlockUnblockResponseErrors = (e) => {
 
-        if(e.data?.short_msg){
+        console.log(e);
 
-            const shortMsg = e.data.short_msg;
+        if(e.response?.data?.short_msg){
+
+            const shortMsg = e.response.data.short_msg;
 
             if(shortMsg === 'ERR_DEACTIVATION'){
                 openFlashToast(MessageTypes.ERROR, 'Your account has been deactivated.');
