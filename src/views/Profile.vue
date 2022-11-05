@@ -1,5 +1,6 @@
 <template>
     <div class="profile">
+        <private-message-modal :chat-with-username="username" />
         <div class="container">
             <template v-if="isProfileLoading">
                 <div class="loading-spinner-container">
@@ -47,7 +48,7 @@
                             </button>
                         </template>
                         <template v-else>
-                            <template v-if="!profileData.isBlocker">
+                            <template v-if="!profileData.isBlocker && !profileData.isBlocked">
                                 <button v-if="!profileData.followStatus" class="control-pane__btn" @click="follow" :disabled="isControlButtonsDisabled">
                                     <span>Follow User</span>
                                 </button>
@@ -130,6 +131,7 @@
     import { useCoreModalStore } from '@/stores/useCoreModalStore';
     import { useFlashToastStore, MessageTypes } from '@/stores/useFlashToastStore';
     import axios from 'axios';
+    import privateMessageModal from '@/components/PrivateMessageModal/PrivateMessageModal.vue';
 
     const { params: routeParams, beforeRouteUpdate } = useRoute();
     const { getUserData, getIsLoggedIn, getAuthToken, logout } = useAuthStore();

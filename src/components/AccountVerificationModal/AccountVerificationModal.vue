@@ -145,7 +145,7 @@
             border-bottom:1px solid #eee;
         }
 
-         &__close-btn{
+        &__close-btn{
             color:#aaa;
             font-size:3rem;
             background:transparent;

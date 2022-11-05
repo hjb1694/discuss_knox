@@ -67,9 +67,9 @@ export const useAuthStore = defineStore('useAuthStore', () => {
             userData.core_role = sessionStorage.getItem('core-role');
             userData.moderator_role = sessionStorage.getItem('moderator-role');
             userData.account_status = sessionStorage.getItem('account-status');
-        }
 
-        createPusherInstance(sessAuthTok!, userData.user_id!);
+            createPusherInstance(sessAuthTok!, userData.user_id!);
+        }
 
         return userData.account_status;
 
