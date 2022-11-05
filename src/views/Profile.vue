@@ -28,6 +28,11 @@
                 <div class="profile-banner">
                     <div class="profile-banner__img"></div>
                     <h1 class="profile-banner__username">{{ username }}</h1>
+                    <template v-if="isElevatedCoreStatus">
+                        <div v-if="profileData.coreRole === 'SUPER_ADMINISTRATOR'" class="profile-banner__role-badge">Super Admin</div>
+                        <div v-if="profileData.coreRole === 'ADMINISTRATOR'" class="profile-banner__role-badge">Admin</div>
+                        <div v-if="profileData.coreRole === 'STAFF'" class="profile-banner__role-badge">Staff</div>
+                    </template>
                 </div>
                 <div class="profile-grid">
                     <div v-if="!isUserDeactivated" class="control-pane">
@@ -41,19 +46,21 @@
                                 <span>Account Settings</span>
                             </button>
                         </template>
-                        <template>
+                        <template v-else>
                             <button class="control-pane__btn" @click="follow">
                                 <span>Follow User</span>
                             </button>
                             <button class="control-pane__btn">
                                 <span>Send Message</span>
                             </button>
-                            <button class="control-pane__btn" @click="block">
-                                <span>Block User</span>
-                            </button>
-                            <button class="control-pane__btn">
-                                <span>Report User</span>
-                            </button>
+                            <template v-if="!isElevatedCoreStatus">
+                                <button class="control-pane__btn" @click="block">
+                                    <span>Block User</span>
+                                </button>
+                                <button class="control-pane__btn">
+                                    <span>Report User</span>
+                                </button>
+                            </template>
                         </template>
                     </div>
                     <div v-else></div>
@@ -104,11 +111,13 @@
     import { useRoute } from 'vue-router';
     import { useAuthStore } from '@/stores/useAuthStore';
     import { useCoreModalStore } from '@/stores/useCoreModalStore';
+    import { useFlashToastStore, MessageTypes } from '@/stores/useFlashToastStore';
     import axios from 'axios';
 
     const { params: routeParams } = useRoute();
-    const { getUserData, getIsLoggedIn, getAuthToken } = useAuthStore();
+    const { getUserData, getIsLoggedIn, getAuthToken, logout } = useAuthStore();
     const { openAuthModal, openEmailVerifyModal } = useCoreModalStore();
+    const { openFlashToast } = useFlashToastStore();
 
     const isProfileLoading = ref<boolean>(true);
     const isProfileNotFound = ref<boolean>(false);
@@ -135,6 +144,10 @@
 
     const isUserDeactivated = computed(() => {
         return ['VIOLATION_DEACTIVATION', 'USER_SELF_DEACTIVATION'].includes(profileData.accountStatus);
+    });
+
+    const isElevatedCoreStatus = computed(() => {
+        return ['SUPER_ADMINISTRATOR', 'ADMINISTRATOR', 'STAFF'].includes(profileData.coreRole);
     });
 
     const resetProfileData = () => {
@@ -195,8 +208,6 @@
                 }
             });
 
-            console.log('RESPONSE', response);
-
             const {
                 account_status, 
                 core_role, 
@@ -227,6 +238,11 @@
 
             if(e.data?.short_msg){
                 const shortMsg = e.data.short_msg;
+
+                if(shortMsg === 'ERR_USER_DEACTIVATED'){
+                    openFlashToast(MessageTypes.ERROR, 'Your account has been deactivated.');
+                    logout();
+                }
 
             }else{
                 isErrorLoadingProfile.value = true;
@@ -264,7 +280,7 @@
         }
     }
 
-    watch(() => getIsLoggedIn, (val) => {
+    watch(() => getIsLoggedIn.value, (val) => {
          if(val === true){
             fetchMemberFacingProfile();
         }else{
@@ -318,6 +334,17 @@
             bottom:1rem;
             left:20rem;
             text-shadow:1px 1px 1px rgba(0,0,0,.24);
+        }
+
+        &__role-badge {
+            position:absolute;
+            right:1rem;
+            top:1rem;
+            padding:.5rem;
+            background:linear-gradient(to bottom right, #2281ab, #3099c7);
+            box-shadow:0 0 .5rem rgba(0,0,0,.24);
+            color:#fff;
+            font-size:1.2rem;
         }
 
     }
@@ -427,7 +454,7 @@
         .profile-banner{
             position:static;
             padding:1rem;
-            height:20rem;
+            height:25rem;
 
             &__img{
                 position:static;
@@ -441,6 +468,14 @@
                 position:static;
                 text-align:center;
                 margin-top:2rem;
+            }
+
+            &__role-badge{
+                position:static;
+                width:10rem;
+                text-align:center;
+                display:block;
+                margin:1rem auto;
             }
         }
 
