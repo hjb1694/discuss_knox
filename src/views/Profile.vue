@@ -518,7 +518,7 @@
     .profile-banner{
 
         height:12rem;
-        background:linear-gradient(to bottom right, #11998e, #38ef7d);
+        background:linear-gradient(30deg, #21bf8f 50%, #33ab87 50%);;
         border-radius:.5rem;
         box-shadow:0 0 .5rem rgba(0,0,0,.24);
         position:relative;
