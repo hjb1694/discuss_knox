@@ -518,7 +518,7 @@
     .profile-banner{
 
         height:12rem;
-        background:linear-gradient(30deg, #21bf8f 50%, #33ab87 50%);;
+        background:linear-gradient(35deg, #21bf8f 50%, #33ab87 50%);;
         border-radius:.5rem;
         box-shadow:0 0 .5rem rgba(0,0,0,.24);
         position:relative;
@@ -542,7 +542,6 @@
             position:absolute;
             bottom:1rem;
             left:20rem;
-            text-shadow:1px 1px 1px rgba(0,0,0,.24);
         }
 
         &__role-badge {
@@ -569,7 +568,7 @@
         padding:1rem;
         margin-top:10rem;
         border-radius:.5rem;
-        box-shadow:0 0 .5rem rgba(0,0,0,.24);
+        box-shadow:0 0 .25rem rgba(0,0,0,.24);
 
         &__btn{
             display:block;
@@ -654,7 +653,7 @@
 
     .white-card{
         padding:1rem;
-        box-shadow:0 0 .5rem rgba(0,0,0,.24);
+        box-shadow:0 0 .25rem rgba(0,0,0,.24);
         background:#fff;
         font-size:1.4rem;
         border-radius:.5rem;
