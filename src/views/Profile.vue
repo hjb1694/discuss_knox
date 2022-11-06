@@ -44,7 +44,7 @@
                 <div class="profile-grid">
                     <div v-if="!isUserDeactivated" class="control-pane">
                         <template v-if="isPersonalBtnsShown">
-                            <button class="control-pane__btn">
+                            <button class="control-pane__btn" @click="goTo('/user/edit-profile')">
                                 <i class="fa fa-edit"></i>
                                 <span>Edit Profile</span>
                             </button>
@@ -132,7 +132,7 @@
 
 <script lang="ts" setup>
     import { computed, ref, reactive, onMounted, watch } from 'vue';
-    import { useRoute, onBeforeRouteUpdate } from 'vue-router';
+    import { useRoute, useRouter, onBeforeRouteUpdate } from 'vue-router';
     import { useAuthStore } from '@/stores/useAuthStore';
     import { useCoreModalStore } from '@/stores/useCoreModalStore';
     import { useFlashToastStore, MessageTypes } from '@/stores/useFlashToastStore';
@@ -140,6 +140,7 @@
     import privateMessageModal from '@/components/PrivateMessageModal/PrivateMessageModal.vue';
 
     const { params: routeParams, beforeRouteUpdate } = useRoute();
+    const { push: routerPush } = useRouter();
     const { getUserData, getIsLoggedIn, getAuthToken, logout } = useAuthStore();
     const { openAuthModal, openEmailVerifyModal, getIsMessagesModalOpen, closeMessagesModal, openMessagesModal } = useCoreModalStore();
     const { openFlashToast } = useFlashToastStore();
@@ -503,6 +504,10 @@
             fetchPublicFacingProfile();
         }
     });
+
+    const goTo = path => {
+        routerPush(path);
+    }
 
 
 </script>
