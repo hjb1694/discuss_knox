@@ -33,7 +33,7 @@
             </template>
             <template v-else>
                 <div class="profile-banner">
-                    <div class="profile-banner__img"></div>
+                    <img class="profile-banner__img" src="@/assets/no_user.png" />
                     <h1 class="profile-banner__username">{{ username }}</h1>
                     <template v-if="isElevatedCoreStatus">
                         <div v-if="profileData.coreRole === 'SUPER_ADMINISTRATOR'" class="profile-banner__role-badge">Super Admin</div>
@@ -690,6 +690,7 @@
             height:25rem;
 
             &__img{
+                display:block;
                 position:static;
                 width:10rem;
                 height:10rem;
