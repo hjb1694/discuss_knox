@@ -30,6 +30,9 @@
                             Messages
                         </div>
                         <div class="user-dropdown__item">
+                            Follows
+                        </div>
+                        <div class="user-dropdown__item">
                             Settings
                         </div>
                         <div class="user-dropdown__item" @click="userLogout">
