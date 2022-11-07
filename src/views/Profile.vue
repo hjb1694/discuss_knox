@@ -92,7 +92,7 @@
                         <div v-if="!isUserDeactivated" class="white-card">
                             <strong class="white-card__key">Gender:</strong> 
                             <span v-if="profileData.gender === 'not specified'" class="empty"><em>[Not Specified]</em></span>
-                            <span v-else>{{ gender }}</span>
+                            <span v-else class="capitalize">{{ profileData.gender }}</span>
                         </div>
                         <template v-if="getIsLoggedIn && !profileData.isPrivate && !isUserDeactivated">
                             <div class="white-card">
@@ -493,6 +493,12 @@
     onBeforeRouteUpdate((to) => {
 
         username.value = to.params.username;
+
+        if(getIsLoggedIn.value === true){
+            fetchMemberFacingProfile();
+        }else{
+            fetchPublicFacingProfile();
+        }
 
     });
 

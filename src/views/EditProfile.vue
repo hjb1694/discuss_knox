@@ -23,6 +23,7 @@
                     theme="snow"
                     content-type="html"
                     v-model:content="bioContent"
+                    ref="quill"
                     />
                 </div>
                 <div class="fgrp">
@@ -37,7 +38,7 @@
 </template>
 
 <script lang="ts" setup>
-    import { ref, reactive } from "vue";
+    import { ref, reactive, onMounted } from "vue";
     import appMultiSelect from 'vue-multiselect';
     import TextInput from '@/components/ui_elements/TextInput.vue';
     import zipcodes from 'zipcodes';
@@ -50,7 +51,7 @@
     import { useAuthStore } from '@/stores/useAuthStore';
     import { useFlashToastStore, MessageTypes } from '@/stores/useFlashToastStore';
 
-    const { getAuthToken } = useAuthStore();
+    const { getAuthToken, getUserData } = useAuthStore();
     const { openFlashToast } = useFlashToastStore();
 
     const genderVal = ref<string>('');
@@ -58,6 +59,7 @@
     const zipVal = ref<string>('');
     const cityState = ref<string>('');
     const bioContent = ref<string>('');
+    const quill = ref();
 
     const zipHasError = ref<boolean>(false);
     const submissionErrors = reactive<string[]>([]);
@@ -169,7 +171,7 @@
 
             await axios.patch('http://localhost:3001/api/v1/edit-profile', {
                 bio: sanitizeBio(bioContent.value), 
-                gender: genderVal.value || 'not specified', 
+                gender: genderVal.value.toLowerCase() || 'not specified', 
                 occupation: occVal.value || '', 
                 location: cityState.value || ''
             }, 
@@ -186,6 +188,42 @@
         }
 
     }
+
+    const capitalize = (value: string) => {
+        const splitted = value.split('');
+        splitted[0] = splitted[0].toUpperCase();
+        return splitted.join('');
+    }
+
+    const fetchProfileData = async () => {
+
+        try{
+
+            const response = await axios.get(`http://localhost:3001/api/v1/profile/member/${getUserData.username}`, {
+                headers: {
+                    'x-auth-token': getAuthToken.value
+                }
+            })
+
+            const { gender, bio, occupation } = response.data.body;
+
+            bioContent.value = bio;
+            genderVal.value = gender === 'not specified' ? '' : capitalize(gender);
+            occVal.value = occupation || '';
+            quill.value.setHTML(bioContent.value);
+
+        }catch(e){
+            console.error(e);
+
+        }
+        
+    }
+
+    onMounted(() => {
+        fetchProfileData();
+    });
+
+
 
 </script>
 
