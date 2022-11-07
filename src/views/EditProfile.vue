@@ -1,16 +1,65 @@
 <template>
     <div>
         <div class="container">
-            <form class="edit-profile-form">
-                <v-select label="Occupation" :options="occupationOptions"/>
-
-
+            <form class="edit-profile-form" @submit.prevent>
+                <div class="fgrp">
+                    <label class="label">Gender</label>
+                    <app-multi-select v-model="genderVal" :options="genderOptions"></app-multi-select>
+                </div>
+                <div class="fgrp">
+                    <label class="label">Occupation</label>
+                    <app-multi-select v-model="occVal" :options="occupationOptions"></app-multi-select>
+                </div>
+                <div class="location">
+                    <label>Location</label>
+                    <text-input v-model="zipVal" input-type="number" @input="checkZip" label="Enter Zip Code" max="99999" :error="zipHasError"/>
+                    <div v-if="cityState" class="city-state-display">
+                        <strong>Your Location: </strong> {{ cityState }}
+                    </div>
+                </div>
+                <div class="fgrp">
+                    <label>Bio</label>
+                    <quill-editor 
+                    theme="snow"
+                    content-type="html"
+                    v-model:content="bioContent"
+                    />
+                </div>
+                <div class="fgrp">
+                    <button @click="submit" class="btn">Update</button>
+                </div>
+                <div v-if="submissionErrors.length" class="errbox">
+                    <p v-for="error in submissionErrors" :key="error">{{ error }}</p>
+                </div>
             </form>
         </div>
     </div>
 </template>
 
 <script lang="ts" setup>
+    import { ref, reactive } from "vue";
+    import appMultiSelect from 'vue-multiselect';
+    import TextInput from '@/components/ui_elements/TextInput.vue';
+    import zipcodes from 'zipcodes';
+    import { QuillEditor } from '@vueup/vue-quill';
+    import '@vueup/vue-quill/dist/vue-quill.snow.css';
+    import { decode as htmlEntitiesDecode } from 'html-entities';
+    import sanitizeHTML from 'sanitize-html';
+    import stringLength from 'string-length';
+    import axios from 'axios';
+
+
+    const genderVal = ref<string>('');
+    const occVal = ref<string>('');
+    const zipVal = ref<string>('');
+    const cityState = ref<string>('');
+    const bioContent = ref<string>('');
+
+    const zipHasError = ref<boolean>(false);
+    const submissionErrors = reactive<string[]>([]);
+
+    const genderOptions = ['Male','Female'];
+
     const occupationOptions = [
         'Finance', 
         'Healthcare', 
@@ -25,6 +74,97 @@
         'Public Safety + Security', 
         'Retail'
     ];
+
+    const checkZip = () => {
+        zipHasError.value = false;
+
+        if(zipVal.value.length === 0){
+            cityState.value = '';
+            return;
+        }
+
+        if((zipVal.value.length > 0 && zipVal.value.length < 5) || zipVal.value.length > 5){
+            zipHasError.value = true;
+            cityState.value = '';
+            return;
+        }
+
+        const result = zipcodes.lookup(+zipVal.value);
+
+        if(!result){
+            zipHasError.value = true;
+            cityState.value = '';
+            return;
+        }
+
+        cityState.value = `${result.city}, ${result.state}, ${result.country}`;
+
+    }
+
+    const sanitizeBio = (value) => {
+
+        let sanitized = sanitizeHTML(value, {
+            allowedTags: ['b', 'strong', 'u', 'i', 'em', 'br', 'a', 'h1', 'h2', 'h3', 'h4', 'ol', 'ul', 'li', 'p'], 
+            allowedAtrributes: {
+                'a': ['href']
+            }, 
+            allowedSchemes: ['http', 'https', 'mailto']
+        });
+        sanitized = sanitized.replace(/(\<p\>\<br \/\>\<\/p\>){2,}/, '<br>');
+        sanitized = sanitized.trim();
+        return sanitized;
+
+    }
+
+
+    const validateBio = () => {
+
+        let stripped = sanitizeHTML(bioContent.value, {
+            allowedTags: []
+        })
+        let valToCheck = htmlEntitiesDecode(stripped);
+
+        console.log(valToCheck);
+
+        if(stringLength(valToCheck) > 3000){
+            submissionErrors.push('Bio is too long.');
+            return false;
+        }
+
+        return true;
+
+    }
+
+    const validate = () => {
+
+        submissionErrors.splice(0,submissionErrors.length);
+
+        let isValid = true;
+
+        if(!validateBio()){
+            isValid = false;
+        };
+
+        if(zipHasError.value === true){
+            isValid = false;
+            submissionErrors.push('Invalid zip code');
+        }
+
+        return isValid;
+
+
+    }
+
+    const submit = () => {
+
+        if(!validate()){
+            return;
+        }
+
+
+
+    }
+
 </script>
 
 <style lang="scss" scoped>
@@ -40,6 +180,33 @@
         box-shadow: 0 0 .25rem rgba(0,0,0,.24);
         padding:2rem;
         font-size:1.6rem;
+    }
+
+    .fgrp{
+        margin:2rem 0;
+    }
+
+    .bio-textarea{
+        display:block;
+        height:10rem;
+        width:100%;
+        resize:none;
+        padding:3px;
+    }
+
+    label{
+        display:block;
+    }
+
+    .btn{
+        display:block;
+        background:#21bf8f;
+        border:none;
+        padding:.8rem 1.2rem;
+        color:#fff;
+        font-size:1.6rem;
+        font-weight:bold;
+        border-radius:.5rem;
     }
 
 

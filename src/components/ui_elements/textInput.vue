@@ -5,6 +5,7 @@
         class="textual-input__field" 
         placeholder=" "
         :max-length="maxLength"
+        :max="max"
         :disabled="disabled"
         :value="modelValue"
         @input="$emit('update:modelValue', $event.target.value)"
@@ -23,7 +24,7 @@
             type: String, 
             default: 'text', 
             validator(value){
-                return ['text','password','email','url','tel','search'].includes(value);
+                return ['text', 'number', 'password','email','url','tel','search'].includes(value);
             }
         }, 
         label: {
@@ -31,9 +32,12 @@
             required: true
         }, 
         maxLength: {
-            type: Number, 
-            default: 100
+            type: String, 
+            default: "100"
         }, 
+        max: {
+            type: String
+        },
         disabled: {
             type: Boolean, 
             default: false
