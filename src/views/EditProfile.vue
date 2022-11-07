@@ -47,7 +47,11 @@
     import sanitizeHTML from 'sanitize-html';
     import stringLength from 'string-length';
     import axios from 'axios';
+    import { useAuthStore } from '@/stores/useAuthStore';
+    import { useFlashToastStore, MessageTypes } from '@/stores/useFlashToastStore';
 
+    const { getAuthToken } = useAuthStore();
+    const { openFlashToast } = useFlashToastStore();
 
     const genderVal = ref<string>('');
     const occVal = ref<string>('');
@@ -155,13 +159,31 @@
 
     }
 
-    const submit = () => {
+    const submit = async () => {
 
         if(!validate()){
             return;
         }
 
+        try{ 
 
+            await axios.patch('http://localhost:3001/api/v1/edit-profile', {
+                bio: sanitizeBio(bioContent.value), 
+                gender: genderVal.value || 'not specified', 
+                occupation: occVal.value || '', 
+                location: cityState.value || ''
+            }, 
+            {
+                headers: {
+                    'x-auth-token': getAuthToken.value
+                }
+            });
+
+            openFlashToast(MessageTypes.SUCCESS, 'Profile updated!');
+
+        }catch(e){
+            console.error(e);
+        }
 
     }
 
