@@ -24,6 +24,19 @@
             </div>
             <div class="follows-side-drawer__followers section">
                 <h2>Your Followers</h2>
+                <template v-if="getFirstFiveFollowers.length">
+                    <div v-for="follower in getFirstFiveFollowers" class="item">
+                        <div>{{ request.follower_username }}</div>
+                        <div>
+                            <button class="deny-btn">
+                                <i class="fa fa-close"></i> Block
+                            </button>
+                        </div>
+                    </div>
+                </template>
+                <div class="no-exist" v-else>
+                    You have no followers.
+                </div>
                 <button class="more-btn">See All</button>
             </div>
             <div class="follows-side-drawer__following section">
@@ -38,12 +51,14 @@
     import { computed, onMounted } from 'vue';
     import { useFollowsStore } from '@/stores/useFollowsStore';
 
-    const { fetchPendingFollowRequests, getPendingRequests, closeFollowDrawer } = useFollowsStore();
+    const { fetchPendingFollowRequests, fetchFollowers, getPendingRequests, getFollowers, closeFollowDrawer } = useFollowsStore();
 
     const getFirstFivePendingRequests = computed(() => getPendingRequests.slice(0,5));
+    const getFirstFiveFollowers = computed(() => getFollowers.slice(0,5));
 
     onMounted(() => {
         fetchPendingFollowRequests();
+        fetchFollowers();
     });
 
 
@@ -114,6 +129,7 @@
         margin-bottom:3px;
         padding:1rem;
         white-space:nowrap;
+        background:#f1f1f1;
     }
 
     .accept-btn, 

@@ -9,7 +9,7 @@ export const useFollowsStore = defineStore('useFollowsStore', () => {
 
     const followDrawerIsOpen = ref<boolean>(false);
     const followings = reactive([]);
-    const followers = reactive([]);
+    const followers = reactive<object[]>([]);
     const pendingRequests = reactive<object[]>([]);
 
     const getFollowings = computed(() => followings);
@@ -23,10 +23,26 @@ export const useFollowsStore = defineStore('useFollowsStore', () => {
             headers: {
                 'x-auth-token': getAuthToken.value
             }
-        })
+        });
 
         pendingRequests.splice(0,pendingRequests.length);
         pendingRequests.push(...response.data.body);
+
+    }
+
+    const fetchFollowers = async () => {
+
+        const response = await axios.get('http://localhost:3001/api/v1/followers', {
+            headers: {
+                'x-auth-token': getAuthToken.value
+            }
+        });
+
+        console.log(response);
+
+        followers.splice(0,followers.length);
+        followers.push(...response.data.body);
+
 
     }
 
@@ -52,6 +68,7 @@ export const useFollowsStore = defineStore('useFollowsStore', () => {
         openFollowDrawer,
         closeFollowDrawer,
         fetchPendingFollowRequests, 
+        fetchFollowers,
         clearAll
     }
 
