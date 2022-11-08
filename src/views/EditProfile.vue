@@ -1,6 +1,10 @@
 <template>
     <div>
         <div class="container">
+            <div class="edit-profile-image-area">
+                <img class="current-profile-image" src="@/assets/no_user.png" alt="profile image" />
+                <button class="btn">Change Profile Image</button>
+            </div>
             <form class="edit-profile-form" @submit.prevent>
                 <div class="fgrp">
                     <label class="label">Gender</label>
@@ -233,6 +237,23 @@
         width:60%;
         margin:2rem auto;
         padding:1rem;
+    }
+
+    .edit-profile-image-area{
+        padding:2rem;
+        margin-bottom:2rem;
+        background:#fff;
+        box-shadow: 0 0 .25rem rgba(0,0,0,.24);
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+    }
+
+    .current-profile-image{
+        width:12rem;
+        height:12rem;
+        border-radius:90%;
+        margin-bottom:2rem;
     }
 
     .edit-profile-form{

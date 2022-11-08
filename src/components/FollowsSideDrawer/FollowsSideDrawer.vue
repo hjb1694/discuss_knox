@@ -20,7 +20,7 @@
                 <div class="no-exist" v-else>
                     You have no pending followers.
                 </div>
-                <button class="more-btn">See All</button>
+                <button v-if="getPendingRequests.length > 5" class="more-btn">See All</button>
             </div>
             <div class="follows-side-drawer__followers section">
                 <h2>Your Followers ({{ followerCount }})</h2>
@@ -32,11 +32,19 @@
                 <div class="no-exist" v-else>
                     You have no followers.
                 </div>
-                <button class="more-btn">See All</button>
+                <button v-if="getFollowers.length > 5" class="more-btn">See All</button>
             </div>
             <div class="follows-side-drawer__following section">
-                <h2>Who You Follow</h2>
-                <button class="more-btn">See All</button>
+                <h2>Who You Follow ({{ followingCount }})</h2>
+                <template v-if="getFirstFiveFollowings.length">
+                    <div v-for="followed in getFirstFiveFollowings" class="item">
+                        <div @click="goTo('/user/profile/' + followed.following_username)"><i class="fa fa-user"></i> {{ followed.followed_username }}</div>
+                    </div>
+                </template>
+                <div class="no-exist" v-else>
+                    You are not following anyone.
+                </div>
+                <button v-if="getFollowings.length > 5" class="more-btn">See All</button>
             </div>
         </div>
     </div>
@@ -51,15 +59,19 @@
     const { 
         fetchPendingFollowRequests, 
         fetchFollowers, 
+        fetchFollowings,
         getPendingRequests, 
         getFollowers, 
+        getFollowings,
         closeFollowDrawer, 
         acceptDenyRequest 
     } = useFollowsStore();
 
     const getFirstFivePendingRequests = computed(() => getPendingRequests.slice(0,5));
     const getFirstFiveFollowers = computed(() => getFollowers.slice(0,5));
+    const getFirstFiveFollowings = computed(() => getFollowings.slice(0,5));
     const followerCount = computed(() => getFollowers.length);
+    const followingCount = computed(() => getFollowings.length);
 
     const goTo = (path) => {
         closeFollowDrawer();
@@ -69,6 +81,7 @@
     onMounted(() => {
         fetchPendingFollowRequests();
         fetchFollowers();
+        fetchFollowings();
     });
 
 
