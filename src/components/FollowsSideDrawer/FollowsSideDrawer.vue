@@ -59,6 +59,7 @@
 
     h2{
         padding:.5rem 0;
+        white-space:nowrap;
     }
 
     .follows-side-drawer{
@@ -68,8 +69,6 @@
         width:100%;
         height:100%;
         z-index:999;
-        overflow-x:hidden;
-        overflow-y:auto;
 
         &__backdrop{
             position:fixed;
@@ -85,10 +84,13 @@
             position:fixed;
             top:0;
             left:0;
-            width:30rem;
+            width:0;
             height:100%;
             z-index:1001;
             background:#fff;
+            overflow-x:hidden;
+            overflow-y:auto;
+            animation: slide-out .5s forwards;
         }
     }
 
@@ -96,12 +98,14 @@
         border:none;
         background:transparent;
         padding:.5rem 0;
+        white-space:nowrap;
     }
 
     .no-exist{
         color:#bbb;
         font-size:1.4rem;
         margin:1rem 0;
+        white-space:nowrap;
     }
 
     .item{
@@ -111,6 +115,7 @@
         border-radius:.5rem;
         margin-bottom:3px;
         padding:1rem;
+        white-space:nowrap;
     }
 
     .accept-btn, 
@@ -127,5 +132,10 @@
 
     .deny-btn{
         color:#f00;
+    }
+
+    @keyframes slide-out {
+        from{width:0;}
+        to{width:30rem;}
     }
 </style>
