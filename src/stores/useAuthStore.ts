@@ -14,7 +14,6 @@ interface UserData {
 export const useAuthStore = defineStore('useAuthStore', () => {
 
     const { createPusherInstance, clearPusherInstance } = usePusherStore();
-    const { clearAll: followsClearAll } = useFollowsStore();
 
     const isLoggedIn = ref<boolean>(false);
     const authToken = ref<string>('');
@@ -79,6 +78,8 @@ export const useAuthStore = defineStore('useAuthStore', () => {
 
 
     const logout = () => {
+
+        const { clearAll: followsClearAll } = useFollowsStore();
 
         isLoggedIn.value = false;
         authToken.value = '';

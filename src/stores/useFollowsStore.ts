@@ -19,15 +19,14 @@ export const useFollowsStore = defineStore('useFollowsStore', () => {
 
     const fetchPendingFollowRequests = async () => {
 
-        return axios.get('http://localhost:3001/api/v1/pending-follow-requests', {
+        const response = await axios.get('http://localhost:3001/api/v1/pending-follow-requests', {
             headers: {
                 'x-auth-token': getAuthToken.value
             }
-        }).then(response => {
-            pendingRequests.splice(0,pendingRequests.length);
-            pendingRequests.push(...response.data.body);
-        });
+        })
 
+        pendingRequests.splice(0,pendingRequests.length);
+        pendingRequests.push(...response.data.body);
 
     }
 

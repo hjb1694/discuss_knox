@@ -43,9 +43,7 @@
     const getFirstFivePendingRequests = computed(() => getPendingRequests.slice(0,5));
 
     onMounted(() => {
-        fetchPendingFollowRequests().then(resp => {
-            
-        });
+        fetchPendingFollowRequests();
     });
 
 
