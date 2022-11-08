@@ -46,6 +46,23 @@ export const useFollowsStore = defineStore('useFollowsStore', () => {
 
     }
 
+    const acceptDenyRequest = async (action: 'accept' | 'deny', followerUserId: number) => {
+
+        await axios.patch('http://localhost:3001/api/v1/followers', {
+            action, 
+            follower_user_id: followerUserId
+        }, 
+        {
+            headers: {
+                'x-auth-token': getAuthToken.value
+            }
+        });
+
+        fetchPendingFollowRequests();
+        fetchFollowers();
+
+    }
+
     const openFollowDrawer = () => {
         followDrawerIsOpen.value = true;
     }
@@ -65,6 +82,7 @@ export const useFollowsStore = defineStore('useFollowsStore', () => {
         getFollowers, 
         getPendingRequests,
         getFollowDrawerIsOpen, 
+        acceptDenyRequest,
         openFollowDrawer,
         closeFollowDrawer,
         fetchPendingFollowRequests, 
