@@ -29,7 +29,7 @@
                         <div class="user-dropdown__item">
                             Messages
                         </div>
-                        <div class="user-dropdown__item">
+                        <div class="user-dropdown__item" @click="handleFollowsButtonClick">
                             Follows
                         </div>
                         <div class="user-dropdown__item">
@@ -56,12 +56,14 @@
     import { useCoreModalStore } from '@/stores/useCoreModalStore';
     import { useAuthStore } from '@/stores/useAuthStore';
     import { useFlashToastStore, MessageTypes } from '@/stores/useFlashToastStore';
+    import { useFollowsStore } from '@/stores/useFollowsStore';
     import { ref } from 'vue';
     import { useRouter } from 'vue-router';
 
     const { openAuthModal } = useCoreModalStore();
     const { getIsLoggedIn, getUserData, logout } = useAuthStore();
     const { openFlashToast } = useFlashToastStore();
+    const { openFollowDrawer } = useFollowsStore();
     const { push: routerPush } = useRouter();
 
     const isUserPaneShown = ref<boolean>(false);
@@ -70,6 +72,11 @@
         logout();
         isUserPaneShown.value = false;
         openFlashToast(MessageTypes.SUCCESS, 'Logout Successful!');
+    }
+
+    const handleFollowsButtonClick = () => {
+        isUserPaneShown.value = false;
+        openFollowDrawer();
     }
 
     const goToProfile = () => {
