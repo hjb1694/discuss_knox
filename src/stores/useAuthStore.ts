@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, reactive, computed } from 'vue';
 import { usePusherStore } from '@/stores/usePusherStore';
+import { useFollowsStore } from '@/stores/useFollowsStore';
 
 interface UserData {
     user_id: number | null, 
@@ -13,6 +14,7 @@ interface UserData {
 export const useAuthStore = defineStore('useAuthStore', () => {
 
     const { createPusherInstance, clearPusherInstance } = usePusherStore();
+    const { clearAll: followsClearAll } = useFollowsStore();
 
     const isLoggedIn = ref<boolean>(false);
     const authToken = ref<string>('');
@@ -88,6 +90,7 @@ export const useAuthStore = defineStore('useAuthStore', () => {
 
         sessionStorage.clear();
         clearPusherInstance();
+        followsClearAll();
 
     }
 

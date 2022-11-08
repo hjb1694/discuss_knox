@@ -39,6 +39,12 @@ export const useFollowsStore = defineStore('useFollowsStore', () => {
         followDrawerIsOpen.value = false;
     }
 
+    const clearAll = () => {
+        followings.splice(0,followings.length);
+        followers.splice(0,followers.length);
+        pendingRequests.splice(0,pendingRequests.length);
+    }
+
     return {
         getFollowings, 
         getFollowers, 
@@ -46,7 +52,8 @@ export const useFollowsStore = defineStore('useFollowsStore', () => {
         getFollowDrawerIsOpen, 
         openFollowDrawer,
         closeFollowDrawer,
-        fetchPendingFollowRequests
+        fetchPendingFollowRequests, 
+        clearAll
     }
 
 });
