@@ -24,8 +24,12 @@
     import { ref, onMounted } from 'vue';
     import Cropper from 'cropperjs';
     import 'cropperjs/dist/cropper.css';
+    import axios from 'axios';
+    import { useAuthStore } from '@/stores/useAuthStore';
 
     const emit = defineEmits(['closeModal']);
+
+    const { getAuthToken } = useAuthStore();
 
     const imageUploadInput = ref(null);
     const modalBody = ref(null);
@@ -37,26 +41,63 @@
         emit('closeModal');
     }
 
+    const updateProfileImage = async (data) => {
+
+        try{
+
+            await axios.patch('http://localhost:3001/api/v1/profile-image', {
+                data
+            }, {
+                headers: {
+                    'x-auth-token': getAuthToken.value
+                }
+            })
+
+            emit('closeModal');
+
+        }catch(e){
+            console.error(e);
+        }
+
+
+    }
+
     onMounted(() => {
 
         imageUploadInput.value.addEventListener('change', () => {
 
             const fileReader = new FileReader();
-            let cropper;
+            let cropper = '';
 
             fileReader.onload = e => {
-                let img = document.createElement('img');
-                img.id = 'cropper';
-                img.src = e.target.result;
 
-                modalBody.value.insertAdjacentElement('afterBegin', img);
-                cropper = new Cropper(img, {
-                    aspectRatio: 1 / 1,
-                    cropBoxResizable: false, 
-                    viewMode: 3
-                });
-                imageUploadLabel.value.style.display = 'none';
-                cropSaveBtn.value.classList.add('show');
+                if(e.target.result){
+
+                    let img = document.createElement('img');
+                    img.id = 'cropper';
+                    img.src = e.target.result;
+
+                    modalBody.value.insertAdjacentElement('afterBegin', img);
+                    cropper = new Cropper(img, {
+                        aspectRatio: 1 / 1,
+                        cropBoxResizable: false, 
+                        viewMode: 3, 
+                        ready(){
+                            
+                            cropSaveBtn.value.addEventListener('click', () => {
+
+                                let imgData = cropper.getCroppedCanvas({width: 100}).toDataURL();
+
+                                updateProfileImage(imgData);
+
+                            });
+
+                        }
+                    });
+                    imageUploadLabel.value.style.display = 'none';
+                    cropSaveBtn.value.classList.add('show');
+
+                }
 
             }
 
@@ -64,13 +105,6 @@
 
         });
 
-        cropSaveBtn.value.addEventListener('click', () => {
-
-            let imgData = cropper.src;
-
-            console.log(imgData);
-
-        });
 
     });
 
