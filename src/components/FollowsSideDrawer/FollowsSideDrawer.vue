@@ -38,7 +38,7 @@
                 <h2>Who You Follow ({{ followingCount }})</h2>
                 <template v-if="getFirstFiveFollowings.length">
                     <div v-for="followed in getFirstFiveFollowings" class="item">
-                        <div @click="goTo('/user/profile/' + followed.following_username)"><i class="fa fa-user"></i> {{ followed.followed_username }}</div>
+                        <div @click="goTo('/user/profile/' + followed.followed_username)"><i class="fa fa-user"></i> {{ followed.followed_username }}</div>
                     </div>
                 </template>
                 <div class="no-exist" v-else>

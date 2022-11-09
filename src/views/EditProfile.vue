@@ -1,9 +1,10 @@
 <template>
     <div>
+        <change-image-modal v-if="isChangeImageModalShown" @close-modal="isChangeImageModalShown = false"/>
         <div class="container">
             <div class="edit-profile-image-area">
                 <img class="current-profile-image" src="@/assets/no_user.png" alt="profile image" />
-                <button class="btn">Change Profile Image</button>
+                <button class="btn" @click="isChangeImageModalShown = true">Change Profile Image</button>
             </div>
             <form class="edit-profile-form" @submit.prevent>
                 <div class="fgrp">
@@ -54,9 +55,12 @@
     import axios from 'axios';
     import { useAuthStore } from '@/stores/useAuthStore';
     import { useFlashToastStore, MessageTypes } from '@/stores/useFlashToastStore';
+    import ChangeImageModal from '@/components/ChangeImageModal/ChangeImageModal.vue';
 
     const { getAuthToken, getUserData } = useAuthStore();
     const { openFlashToast } = useFlashToastStore();
+
+    const isChangeImageModalShown = ref<boolean>(false);
 
     const genderVal = ref<string>('');
     const occVal = ref<string>('');
