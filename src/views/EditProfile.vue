@@ -1,9 +1,9 @@
 <template>
     <div>
-        <change-image-modal v-if="isChangeImageModalShown" @close-modal="isChangeImageModalShown = false"/>
+        <change-image-modal v-if="isChangeImageModalShown" @close-modal="closeChangeImageModal"/>
         <div class="container">
             <div class="edit-profile-image-area">
-                <img class="current-profile-image" src="@/assets/no_user.png" alt="profile image" />
+                <img class="current-profile-image" :src="profileImgSrc" alt="profile image" />
                 <button class="btn" @click="isChangeImageModalShown = true">Change Profile Image</button>
             </div>
             <form class="edit-profile-form" @submit.prevent>
@@ -43,7 +43,7 @@
 </template>
 
 <script lang="ts" setup>
-    import { ref, reactive, onMounted } from "vue";
+    import { ref, reactive, onMounted, computed } from "vue";
     import appMultiSelect from 'vue-multiselect';
     import TextInput from '@/components/ui_elements/TextInput.vue';
     import zipcodes from 'zipcodes';
@@ -68,9 +68,19 @@
     const cityState = ref<string>('');
     const bioContent = ref<string>('');
     const quill = ref();
+    const profileImgURI = ref<string | null>(null);
 
     const zipHasError = ref<boolean>(false);
     const submissionErrors = reactive<string[]>([]);
+
+    const profileImgSrc = computed(() => {
+        console.log(profileImgURI.value);
+        if(!profileImgURI.value){
+            return '../assets/no_user.png';
+        }else{
+            return `http://localhost:3001/profile_img/${profileImgURI.value}`;
+        }
+    });
 
     const genderOptions = ['Male','Female'];
 
@@ -227,8 +237,33 @@
         
     }
 
+    const fetchProfileImage = async () => {
+
+        try{
+
+            const response = await axios.get(`http://localhost:3001/api/v1/profile-img/${getUserData.user_id}`);
+
+            console.log(response);
+
+            profileImgURI.value = response.data.body.profile_img;
+
+        }catch(e){
+
+            console.error(e);
+        }
+
+    }
+
+
+    const closeChangeImageModal = () => {
+        isChangeImageModalShown.value = false;
+        fetchProfileImage();
+
+    }
+
     onMounted(() => {
         fetchProfileData();
+        fetchProfileImage();
     });
 
 

@@ -14,7 +14,7 @@
                     <input ref="imageUploadInput" class="image-upload-input" type="file" accept="image/*" />
                 </label>
                 <button class="crop-save-btn" ref="cropSaveBtn">Crop and Save</button>
-                <button>Use Default Image</button>
+                <button @click="updateProfileImage(null)">Use Default Image</button>
             </section>
         </div>
     </div>
