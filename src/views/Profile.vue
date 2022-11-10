@@ -33,7 +33,10 @@
             </template>
             <template v-else>
                 <div class="profile-banner">
-                    <img class="profile-banner__img" src="@/assets/no_user.png" />
+                    <img 
+                    class="profile-banner__img" 
+                    :src="profileData.profileImage ? 'http://66.42.81.246/profile_img/' + profileData.profileImage : '@/assets/no_user.png'" 
+                    />
                     <h1 class="profile-banner__username">{{ username }}</h1>
                     <template v-if="isElevatedCoreStatus">
                         <div v-if="profileData.coreRole === 'SUPER_ADMINISTRATOR'" class="profile-banner__role-badge">Super Admin</div>
@@ -206,11 +209,11 @@
 
         try{
 
-            const response = await axios.get(`http://localhost:3001/api/v1/profile/public/${username.value}`);
+            const response = await axios.get(`http://66.42.81.246/api/v1/profile/public/${username.value}`);
 
             console.log(response);
 
-            const { account_status, core_role, moderator_role, is_profile_private, gender, user_id} = response.data.body;
+            const { account_status, core_role, moderator_role, is_profile_private, gender, user_id, profile_img} = response.data.body;
 
             profileData.isPrivate = is_profile_private;
             profileData.accountStatus = account_status;
@@ -218,6 +221,7 @@
             profileData.moderatorRole = moderator_role;
             profileData.gender = gender;
             profileData.userId = user_id;
+            profileData.profileImage = profile_img || null;
 
         }catch(e){
             if(e.response.data?.short_msg){
@@ -245,7 +249,7 @@
 
         try{
 
-            const response = await axios.get(`http://localhost:3001/api/v1/profile/member/${username.value}`, {
+            const response = await axios.get(`http://66.42.81.246/api/v1/profile/member/${username.value}`, {
                 headers: {
                     'x-auth-token': getAuthToken.value
                 }
@@ -350,7 +354,7 @@
 
         try{
 
-            await axios.post('http://localhost:3001/api/v1/user-block-action', {
+            await axios.post('http://66.42.81.246/api/v1/user-block-action', {
                 action: 'block', 
                 blocked_user_id: profileData.userId
             }, 
@@ -378,7 +382,7 @@
         try{
             isControlProcessing.unblock = true;
 
-             await axios.post('http://localhost:3001/api/v1/user-block-action', {
+             await axios.post('http://66.42.81.246/api/v1/user-block-action', {
                 action: 'unblock', 
                 blocked_user_id: profileData.userId
             }, 
@@ -410,7 +414,7 @@
 
         try{
 
-            await axios.post('http://localhost:3001/api/v1/user-follow-action', {
+            await axios.post('http://66.42.81.246/api/v1/user-follow-action', {
                 followed_user_id: profileData.userId, 
                 action: 'follow'
             }, 
@@ -441,7 +445,7 @@
 
         try{
 
-            await axios.post('http://localhost:3001/api/v1/user-follow-action', {
+            await axios.post('http://66.42.81.246/api/v1/user-follow-action', {
                 followed_user_id: profileData.userId, 
                 action: 'unfollow'
             }, 

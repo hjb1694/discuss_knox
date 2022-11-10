@@ -45,7 +45,7 @@
 
         try{
 
-            await axios.patch('http://localhost:3001/api/v1/profile-image', {
+            await axios.patch('http://66.42.81.246/api/v1/profile-image', {
                 data
             }, {
                 headers: {

@@ -6,7 +6,7 @@
                 <h2>Pending Follower Requests</h2>
                 <template v-if="getFirstFivePendingRequests.length">
                     <div v-for="request in getFirstFivePendingRequests" class="item">
-                        <div><i class="fa fa-user"></i> {{ request.username }}</div>
+                        <div class="pointer" @click="goTo('/user/profile/' + follower.follower_username)"><i class="fa fa-user"></i> {{ request.username }}</div>
                         <div class="response-buttons">
                             <button class="accept-btn" @click="acceptDenyRequest('accept', request.follower_user_id)">
                                 <i class="fa fa-check"></i> Accept
@@ -26,7 +26,7 @@
                 <h2>Your Followers ({{ followerCount }})</h2>
                 <template v-if="getFirstFiveFollowers.length">
                     <div v-for="follower in getFirstFiveFollowers" class="item">
-                        <div @click="goTo('/user/profile/' + follower.follower_username)"><i class="fa fa-user"></i> {{ follower.follower_username }}</div>
+                        <div class="pointer" @click="goTo('/user/profile/' + follower.follower_username)"><i class="fa fa-user"></i> {{ follower.follower_username }}</div>
                     </div>
                 </template>
                 <div class="no-exist" v-else>
@@ -38,7 +38,7 @@
                 <h2>Who You Follow ({{ followingCount }})</h2>
                 <template v-if="getFirstFiveFollowings.length">
                     <div v-for="followed in getFirstFiveFollowings" class="item">
-                        <div @click="goTo('/user/profile/' + followed.followed_username)"><i class="fa fa-user"></i> {{ followed.followed_username }}</div>
+                        <div class="pointer" @click="goTo('/user/profile/' + followed.followed_username)"><i class="fa fa-user"></i> {{ followed.followed_username }}</div>
                     </div>
                 </template>
                 <div class="no-exist" v-else>
@@ -173,6 +173,10 @@
 
     .response-buttons{
         margin-top:1rem;
+    }
+
+    .pointer{
+        cursor:pointer;
     }
 
     @keyframes slide-out {
