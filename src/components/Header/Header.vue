@@ -32,7 +32,7 @@
                         <div class="user-dropdown__item" @click="handleFollowsButtonClick">
                             Follows
                         </div>
-                        <div class="user-dropdown__item">
+                        <div class="user-dropdown__item" @click="goToAccountSettings">
                             Settings
                         </div>
                         <div class="user-dropdown__item" @click="userLogout">
@@ -86,6 +86,13 @@
             params: {
                 username: getUserData.username
             }
+        });
+    }
+
+    const goToAccountSettings = () => {
+        isUserPaneShown.value = false;
+        routerPush({
+            name: 'account-settings'
         });
     }
 

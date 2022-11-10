@@ -51,7 +51,7 @@
                                 <i class="fa fa-edit"></i>
                                 <span>Edit Profile</span>
                             </button>
-                            <button class="control-pane__btn">
+                            <button class="control-pane__btn" @click="goTo('/user/account-settings')">
                                 <i class="fa fa-cogs"></i>
                                 <span>Account Settings</span>
                             </button>
