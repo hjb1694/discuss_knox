@@ -5,6 +5,7 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import HomeView from '@/views/Home.vue';
 import ProfileView from '@/views/Profile.vue';
 import EditProfileView from '@/views/EditProfile.vue';
+import AccountSettings from '@/views/AccountSettings.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -23,6 +24,14 @@ const router = createRouter({
       path: '/user/edit-profile', 
       name: 'edit-profile', 
       component: EditProfileView, 
+      meta: {
+        isAuthRequired: true
+      }
+    }, 
+    {
+      path: '/user/account-settings', 
+      name: 'account-settings', 
+      component: AccountSettings, 
       meta: {
         isAuthRequired: true
       }
