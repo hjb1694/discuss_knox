@@ -75,8 +75,10 @@
     const updateProfilePrivacy = async () => {
         try{
 
+            console.log(isProfilePrivate.value);
+
             await axios.patch('http://66.42.81.246:8080/api/v1/profile-privacy', {
-                is_private: isProfilePrivate.value ? 'yes' : 'no'
+                is_private: isProfilePrivate.value === true ? 'yes' : 'no'
             }, 
             {
                headers: {

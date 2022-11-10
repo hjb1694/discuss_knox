@@ -5,8 +5,8 @@
         class="checkbox-input__field" 
         :id="inputId" 
         :value="modelValue"
-        @input="$emit('update:modelValue', !!$event.target.value)"
-        :checked="modelValue"
+        @change="checkboxOnChange"
+        :checked="modelValue === true"
         />
         <div class="checkbox-input__box">
             <i class="checkbox-input__check fa fa-check"></i>
@@ -36,6 +36,10 @@
 
 
     const emit = defineEmits(['update:modelValue']);
+
+    const checkboxOnChange = (e) => {
+        emit('update:modelValue', !!e.target.value !== props.modelValue);
+    }
 
 </script>
 
