@@ -3,10 +3,10 @@
         <div class="pane">
             <header class="pane__header">Privacy</header>
             <section class="pane__body">
-                <checkbox-input input-id="private-profile" label="Set Profile Private"/>
+                <checkbox-input v-model="isProfilePrivate" input-id="private-profile" label="Set Profile Private"/>
             </section>
             <footer class="pane__footer">
-                <button class="btn">Save Changes</button>
+                <button class="btn" @click="updateProfilePrivacy">Save Changes</button>
             </footer>
         </div>
         <div class="pane">
@@ -61,6 +61,55 @@
 <script lang="ts" setup>
     import CheckboxInput from '@/components/ui_elements/CheckboxInput.vue';
     import TextInput from '@/components/ui_elements/TextInput.vue';
+    import { ref, onMounted } from 'vue';
+    import axios from 'axios';
+    import { useAuthStore } from '@/stores/useAuthStore';
+    import { useFlashToastStore, MessageTypes } from '@/stores/useFlashToastStore';
+
+    const { getAuthToken, getUserData } = useAuthStore();
+    const { openFlashToast } = useFlashToastStore();
+
+    const isProfilePrivate = ref<boolean>(false);
+
+
+    const updateProfilePrivacy = async () => {
+        try{
+
+            await axios.patch('http://66.42.81.246:8080/api/v1/profile-privacy', {
+                is_private: isProfilePrivate.value ? 'yes' : 'no'
+            }, 
+            {
+               headers: {
+                   'x-auth-token': getAuthToken.value
+               }
+            });
+
+            openFlashToast(MessageTypes.SUCCESS, 'Profile privacy updated.');
+
+        }catch(e){
+            console.error(e);
+        }
+    }
+
+    const fetchProfilePrivacy = async () => {
+
+        try{
+
+            const response = await axios.get(`http://66.42.81.246:8080/api/v1/profile-privacy/${getUserData.user_id}`);
+
+            isProfilePrivate.value = response.data.body.is_profile_private;
+
+        }catch(e){
+            console.error(e);
+        }
+
+
+    }
+
+    onMounted(() => {
+        fetchProfilePrivacy();
+    });
+
 </script>
 
 <style lang="scss" scoped>

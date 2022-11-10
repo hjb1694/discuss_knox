@@ -6,6 +6,7 @@
         :id="inputId" 
         :value="modelValue"
         @input="$emit('update:modelValue', !!$event.target.value)"
+        :checked="modelValue"
         />
         <div class="checkbox-input__box">
             <i class="checkbox-input__check fa fa-check"></i>
