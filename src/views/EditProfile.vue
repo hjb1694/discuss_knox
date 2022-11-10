@@ -78,7 +78,7 @@
         if(!profileImgURI.value){
             return '../assets/no_user.png';
         }else{
-            return `http://66.42.81.246/profile_img/${profileImgURI.value}`;
+            return `http://66.42.81.246:8080/profile_img/${profileImgURI.value}`;
         }
     });
 
@@ -187,7 +187,7 @@
 
         try{ 
 
-            await axios.patch('http://66.42.81.246/api/v1/edit-profile', {
+            await axios.patch('http://66.42.81.246:8080/api/v1/edit-profile', {
                 bio: sanitizeBio(bioContent.value), 
                 gender: genderVal.value.toLowerCase() || 'not specified', 
                 occupation: occVal.value || '', 
@@ -217,7 +217,7 @@
 
         try{
 
-            const response = await axios.get(`http://66.42.81.246/api/v1/profile/member/${getUserData.username}`, {
+            const response = await axios.get(`http://66.42.81.246:8080/api/v1/profile/member/${getUserData.username}`, {
                 headers: {
                     'x-auth-token': getAuthToken.value
                 }
@@ -241,7 +241,7 @@
 
         try{
 
-            const response = await axios.get(`http://66.42.81.246/api/v1/profile-img/${getUserData.user_id}`);
+            const response = await axios.get(`http://66.42.81.246:8080/api/v1/profile-img/${getUserData.user_id}`);
 
             console.log(response);
 

@@ -64,7 +64,7 @@
         
         try{
 
-            const response = await axios.get(`http://66.42.81.246/api/v1/private-message/${props.chatWithUserId}`, {
+            const response = await axios.get(`http://66.42.81.246:8080/api/v1/private-message/${props.chatWithUserId}`, {
                 headers: {
                     'x-auth-token': getAuthToken.value
                 }
@@ -93,7 +93,7 @@
 
         try{
 
-            await axios.post('http://66.42.81.246/api/v1/private-message', {
+            await axios.post('http://66.42.81.246:8080/api/v1/private-message', {
                 receiver_user_id: props.chatWithUserId, 
                 message: newMessageContent.value
             }, {

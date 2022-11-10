@@ -35,7 +35,7 @@
                 <div class="profile-banner">
                     <img 
                     class="profile-banner__img" 
-                    :src="profileData.profileImage ? 'http://66.42.81.246/profile_img/' + profileData.profileImage : '@/assets/no_user.png'" 
+                    :src="profileData.profileImage ? 'http://66.42.81.246:8080/profile_img/' + profileData.profileImage : '@/assets/no_user.png'" 
                     />
                     <h1 class="profile-banner__username">{{ username }}</h1>
                     <template v-if="isElevatedCoreStatus">
@@ -209,7 +209,7 @@
 
         try{
 
-            const response = await axios.get(`http://66.42.81.246/api/v1/profile/public/${username.value}`);
+            const response = await axios.get(`http://66.42.81.246:8080/api/v1/profile/public/${username.value}`);
 
             console.log(response);
 
@@ -249,7 +249,7 @@
 
         try{
 
-            const response = await axios.get(`http://66.42.81.246/api/v1/profile/member/${username.value}`, {
+            const response = await axios.get(`http://66.42.81.246:8080/api/v1/profile/member/${username.value}`, {
                 headers: {
                     'x-auth-token': getAuthToken.value
                 }
@@ -354,7 +354,7 @@
 
         try{
 
-            await axios.post('http://66.42.81.246/api/v1/user-block-action', {
+            await axios.post('http://66.42.81.246:8080/api/v1/user-block-action', {
                 action: 'block', 
                 blocked_user_id: profileData.userId
             }, 
@@ -382,7 +382,7 @@
         try{
             isControlProcessing.unblock = true;
 
-             await axios.post('http://66.42.81.246/api/v1/user-block-action', {
+             await axios.post('http://66.42.81.246:8080/api/v1/user-block-action', {
                 action: 'unblock', 
                 blocked_user_id: profileData.userId
             }, 
@@ -414,7 +414,7 @@
 
         try{
 
-            await axios.post('http://66.42.81.246/api/v1/user-follow-action', {
+            await axios.post('http://66.42.81.246:8080/api/v1/user-follow-action', {
                 followed_user_id: profileData.userId, 
                 action: 'follow'
             }, 
@@ -445,7 +445,7 @@
 
         try{
 
-            await axios.post('http://66.42.81.246/api/v1/user-follow-action', {
+            await axios.post('http://66.42.81.246:8080/api/v1/user-follow-action', {
                 followed_user_id: profileData.userId, 
                 action: 'unfollow'
             }, 

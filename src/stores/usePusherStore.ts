@@ -20,7 +20,7 @@ export const usePusherStore = defineStore('usePusherStore', () => {
     const createPusherInstance = (userToken: string, userId: number) => {
         pusherInstance.instance = new Pusher('f5ea34c17095fbb4548a', {
             channelAuthorization: {
-                endpoint: `http://66.42.81.246/api/v1/pusher/auth`, 
+                endpoint: `http://66.42.81.246:8080/api/v1/pusher/auth`, 
                 transport: 'ajax',
                 headers: {
                     'x-auth-token': userToken
