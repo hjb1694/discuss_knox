@@ -259,7 +259,31 @@
         isDeactivationModalOpen.value = false;
         isDeactivationProcessing.value = true;
         
+        try{
 
+            await axios.patch('http://66.42.81.246:8080/api/v1/self-deactivation', {
+                reason_other_users: deactivateReasonOtherUsers.value, 
+                reason_taking_break: deactivateReasonTakingBreak.value, 
+                reason_bugs: deactivateReasonBugs.value, 
+                reason_dont_use: deactivateReasonDontUse.value, 
+                reason_other: deactivateReasonAnotherReason.value
+            }, 
+            {
+                headers: {
+                    'x-auth-token': getAuthToken.value
+                }
+            });
+
+            openFlashToast(MessageTypes.SUCCESS, 'Account successfully deactivated!');
+            logout();
+
+        }catch(e){
+
+            openFlashToast(MessageTypes.ERROR, 'An error has occurred.');
+
+        }finally{
+            isDeactivationProcessing.value = false;
+        }
     }
 
     watch(getIsLoggedIn, (val) => {
