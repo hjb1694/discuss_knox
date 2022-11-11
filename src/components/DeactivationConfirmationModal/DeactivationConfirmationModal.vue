@@ -1,10 +1,10 @@
 <template>
     <div v-if="isOpen" class="deactivation-confirmation-modal">
-        <div class="deactivation-confirmation-modal__backdrop"></div>
+        <div class="deactivation-confirmation-modal__backdrop" @click="$emit('selection', false)"></div>
         <div class="deactivation-confirmation-modal__dialog">
             <header class="deactivation-confirmation-modal__header">
                 <h2>Are you sure?</h2>
-                <button class="deactivation-confirmation-modal__close-btn">
+                <button class="deactivation-confirmation-modal__close-btn" @click="$emit('selection', false)">
                     <i class="fa fa-close"></i>
                 </button>
             </header>
