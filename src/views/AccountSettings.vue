@@ -1,5 +1,6 @@
 <template>
     <div class="container">
+        <processing-overlay v-if="isDeactivationProcessing"/>
         <deactivation-confirmation-modal :is-open="isDeactivationModalOpen" @selection="deactivateAccount($event)" />
         <div class="pane">
             <header class="pane__header">Privacy</header>
@@ -78,6 +79,7 @@
     import { useFlashToastStore, MessageTypes } from '@/stores/useFlashToastStore';
     import stringLength from 'string-length';
     import DeactivationConfirmationModal from '@/components/DeactivationConfirmationModal/DeactivationConfirmationModal.vue';
+    import ProcessingOverlay from '@/components/ProcessingOverlay/ProcessingOverlay.vue';
 
     const { getAuthToken, getUserData, getIsLoggedIn, logout } = useAuthStore();
     const { openFlashToast } = useFlashToastStore();
@@ -100,6 +102,8 @@
     const deactivationErrors = reactive<string[]>([]);
 
     const isDeactivationModalOpen = ref<boolean>(false);
+
+    const isDeactivationProcessing = ref<boolean>(false);
 
 
     const updateProfilePrivacy = async () => {
@@ -253,8 +257,8 @@
 
     const deactivateAccount = (value) => {
         isDeactivationModalOpen.value = false;
-
-        console.log(value);
+        isDeactivationProcessing.value = true;
+        
 
     }
 
