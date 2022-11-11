@@ -3,7 +3,8 @@
         <change-image-modal v-if="isChangeImageModalShown" @close-modal="closeChangeImageModal"/>
         <div class="container">
             <div class="edit-profile-image-area">
-                <img class="current-profile-image" :src="profileImgSrc" alt="profile image" />
+                <img v-if="!profileImgURI" class="current-profile-image" src="@/assets/no_user.png" alt="profile image" />
+                <img v-else class="current-profile-image" :src="`http://66.42.81.246:8080/profile_img/${profileImgURI}`" alt="profile image" />
                 <button class="btn" @click="isChangeImageModalShown = true">Change Profile Image</button>
             </div>
             <form class="edit-profile-form" @submit.prevent>

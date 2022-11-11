@@ -76,6 +76,8 @@
                     let img = document.createElement('img');
                     img.id = 'cropper';
                     img.src = e.target.result;
+                    img.style.display = 'block';
+                    img.style.width = '100%';
 
                     modalBody.value.insertAdjacentElement('afterBegin', img);
                     cropper = new Cropper(img, {
