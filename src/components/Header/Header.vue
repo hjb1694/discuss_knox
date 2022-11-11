@@ -46,7 +46,21 @@
             <div class="container">
                 <button>Add Post</button>
                 <button>Live Feed</button>
-                <button>Channels</button>
+                <div class="dropdown">
+                    <button @click="toggleChannelDropdown">Channels</button>
+                    <div v-if="isChannelDropdownShown" class="dropdown__area dropdown__area--channels">
+                        <app-multi-select v-model="channelSelection" :options="channelSelectOpts" placeholder="Search or Select Channel" :style="{fontSize: '1.2rem'}"/>
+                        <div class="recommended-channels">
+                            <h3>Recommended Channels</h3>
+                            <ul>
+                                <li>c/new_to_knoxville</li>
+                                <li>c/campus_life</li>
+                                <li>c/prospective_residents</li>
+                                <li>c/social</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -59,6 +73,7 @@
     import { useFollowsStore } from '@/stores/useFollowsStore';
     import { ref } from 'vue';
     import { useRouter } from 'vue-router';
+    import AppMultiSelect from 'vue-multiselect';
 
     const { openAuthModal } = useCoreModalStore();
     const { getIsLoggedIn, getUserData, logout } = useAuthStore();
@@ -67,6 +82,12 @@
     const { push: routerPush } = useRouter();
 
     const isUserPaneShown = ref<boolean>(false);
+
+    const isChannelDropdownShown = ref<boolean>(false);
+    const channelSelection = ref<string>('');
+    const channelSelectOpts = [
+        'c/new_to_knoxville'
+    ];
 
     const userLogout = () => {
         logout();
@@ -94,6 +115,10 @@
         routerPush({
             name: 'account-settings'
         });
+    }
+
+    const toggleChannelDropdown = () => {
+        isChannelDropdownShown.value = !isChannelDropdownShown.value;
     }
 
 
@@ -226,6 +251,41 @@
 
     }
 
+    .dropdown{
+        position:relative;
+
+        &__area{
+            position:absolute;
+            padding:1rem;
+            background:#fff;
+            top:3.2rem;
+            box-shadow:0 0 .5rem rgba(0,0,0,.24);
+
+            &--channels{
+                left:-75%;
+                width:47rem;
+            }
+        }
+    }
+
+    .recommended-channels{
+        margin-top:2rem;
+
+        h3{
+            font-size:1.4rem;
+        }
+
+        ul{
+            list-style:none;
+            margin-top:1rem;
+
+            li{
+                font-size:1.4rem;
+                margin-top:.5rem;
+            }
+        }
+    }
+
 
     @media (max-width:700px) {
 
@@ -235,6 +295,19 @@
 
         .primary-header__logo{
             width:20rem;
+        }
+
+        .dropdown{
+
+            &__area{
+                
+                &--channels{
+                    left:-17rem;
+                    width:32rem;
+                }
+
+            }
+
         }
 
 

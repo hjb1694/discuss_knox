@@ -45,7 +45,7 @@
 <script lang="ts" setup>
     import { ref, reactive, onMounted, computed, watch } from "vue";
     import { useRouter } from 'vue-router';
-    import appMultiSelect from 'vue-multiselect';
+    import AppMultiSelect from 'vue-multiselect';
     import TextInput from '@/components/ui_elements/TextInput.vue';
     import zipcodes from 'zipcodes';
     import { QuillEditor } from '@vueup/vue-quill';
