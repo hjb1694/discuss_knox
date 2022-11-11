@@ -682,7 +682,8 @@
             min-height:38rem;
 
             .registration-part{
-                height:30rem;
+                height:38rem;
+                overflow-y:auto;
             }
         }
 
