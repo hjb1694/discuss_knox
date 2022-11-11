@@ -1,5 +1,6 @@
 <template>
     <div class="container">
+        <deactivation-confirmation-modal :is-open="isDeactivationModalOpen" @selection="deactivateAccount($event)" />
         <div class="pane">
             <header class="pane__header">Privacy</header>
             <section class="pane__body">
@@ -41,24 +42,27 @@
                 <form @submit.prevent>
                     <h3>Please provide reason(s):</h3>
                     <div class="fgrp">
-                        <checkbox-input input-id="other-users" label="Other users"/>
+                        <checkbox-input v-model="deactivateReasonOtherUsers" input-id="other-users" label="Other users"/>
                     </div>
                     <div class="fgrp">
-                        <checkbox-input input-id="taking-break" label="Taking a break"/>
+                        <checkbox-input v-model="deactivateReasonTakingBreak" input-id="taking-break" label="Taking a break"/>
                     </div>
                     <div class="fgrp">
-                        <checkbox-input input-id="bugs" label="Technical problems/bugs on the platform"/>
+                        <checkbox-input v-model="deactivateReasonBugs" input-id="bugs" label="Technical problems/bugs on the platform"/>
                     </div>
                     <div class="fgrp">
-                        <checkbox-input input-id="little-use" label="Don't use this platform enough"/>
+                        <checkbox-input v-model="deactivateReasonDontUse" input-id="little-use" label="Don't use this platform enough"/>
                     </div>
                     <div class="fgrp">
-                        <checkbox-input input-id="other-reason" label="Another reason not listed"/>
+                        <checkbox-input v-model="deactivateReasonAnotherReason" input-id="other-reason" label="Another reason not listed"/>
                     </div>
                 </form>
+                <div v-if="deactivationErrors.length" class="errbox">
+                    <p v-for="error in deactivationErrors" :key="error">{{ error }}</p>
+                </div>
             </section>
             <footer class="pane__footer">
-                <button type="button" class="btn">Deactivate My Account</button>
+                <button type="button" class="btn" @click="openConfirmationModal">Deactivate My Account</button>
             </footer>
         </div>
     </div>
@@ -73,6 +77,7 @@
     import { useAuthStore } from '@/stores/useAuthStore';
     import { useFlashToastStore, MessageTypes } from '@/stores/useFlashToastStore';
     import stringLength from 'string-length';
+    import DeactivationConfirmationModal from '@/components/DeactivationConfirmationModal/DeactivationConfirmationModal.vue';
 
     const { getAuthToken, getUserData, getIsLoggedIn, logout } = useAuthStore();
     const { openFlashToast } = useFlashToastStore();
@@ -85,6 +90,16 @@
     const confirmNewPassword = ref<string>('');
     const changePasswordErrors = reactive<string[]>([]);
     const changePasswordProcessing = ref<boolean>(false);
+
+    const deactivateReasonOtherUsers = ref<boolean>(false);
+    const deactivateReasonTakingBreak = ref<boolean>(false);
+    const deactivateReasonBugs = ref<boolean>(false);
+    const deactivateReasonDontUse = ref<boolean>(false);
+    const deactivateReasonAnotherReason = ref<boolean>(false);
+
+    const deactivationErrors = reactive<string[]>([]);
+
+    const isDeactivationModalOpen = ref<boolean>(false);
 
 
     const updateProfilePrivacy = async () => {
@@ -205,6 +220,41 @@
         }finally{
             changePasswordProcessing.value = false;
         }
+
+    }
+
+    const deactivationValidation = () => {
+
+        deactivationErrors.splice(0,deactivationErrors.length);
+
+        if(
+            !deactivateReasonOtherUsers.value &&
+            !deactivateReasonTakingBreak.value &&
+            !deactivateReasonBugs.value &&
+            !deactivateReasonDontUse.value && 
+            !deactivateReasonAnotherReason.value
+        ){
+            deactivationErrors.push('Please select at least one reason.');
+            return false;
+        }
+
+        return true;
+
+    }
+
+    const openConfirmationModal = () => {
+
+        if(!deactivationValidation()){
+            return;
+        }
+
+        isDeactivationModalOpen.value = true;
+    }
+
+    const deactivateAccount = (value) => {
+        isDeactivationModalOpen.value = false;
+
+        console.log(value);
 
     }
 
