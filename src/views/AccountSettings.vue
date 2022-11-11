@@ -14,13 +14,13 @@
             <section class="pane__body">
                 <form @submit.prevent>
                     <div class="fgrp">
-                        <text-input label="Current Password"/>
+                        <text-input v-model="currentPassword" input-type="password" label="Current Password"/>
                     </div>
                     <div class="fgrp">
-                        <text-input label="New Password"/>
+                        <text-input v-model="newPassword" input-type="password" label="New Password"/>
                     </div>
                     <div class="fgrp">
-                        <text-input label="Confirm New Password"/>
+                        <text-input v-model="confirmNewPassword" input-type="password" label="Confirm New Password"/>
                     </div>
                 </form>
             </section>
@@ -72,6 +72,10 @@
     const { push: routerPush} = useRouter();
 
     const isProfilePrivate = ref<boolean>(false);
+
+    const currentPassword = ref<string>('');
+    const newPassword = ref<string>('');
+    const confirmNewPassword = ref<string>('');
 
 
     const updateProfilePrivacy = async () => {
