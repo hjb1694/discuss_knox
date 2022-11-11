@@ -92,26 +92,34 @@
                     </div>
                     <div v-else></div>
                     <div class="main-area">
-                        <div v-if="!isUserDeactivated" class="white-card">
-                            <strong class="white-card__key">Gender:</strong> 
-                            <span v-if="profileData.gender === 'not specified'" class="empty"><em>[Not Specified]</em></span>
-                            <span v-else class="capitalize">{{ profileData.gender }}</span>
+                        <div v-if="!isUserDeactivated" class="pane">
+                            <header class="pane__header">Gender</header> 
+                            <section class="pane__body">
+                                <span v-if="profileData.gender === 'not specified'" class="empty"><em>[Not Specified]</em></span>
+                                <span v-else class="capitalize">{{ profileData.gender }}</span>
+                            </section>
                         </div>
                         <template v-if="getIsLoggedIn && !profileData.isPrivate && !isUserDeactivated">
-                            <div class="white-card">
-                                <strong class="white-card__key">Occupation:</strong>
-                                <span v-if="!profileData.occupation" class="empty"><em>[Not Specified]</em></span>
-                                <span>{{ profileData.occupation }}</span>
+                            <div class="pane">
+                                <header class="pane__header">Occupation</header>
+                                <section class="pane__body">
+                                    <span v-if="!profileData.occupation" class="empty"><em>[Not Specified]</em></span>
+                                    <span>{{ profileData.occupation }}</span>
+                                </section>
                             </div>
-                            <div class="white-card">
-                                <strong class="white-card__key">Location:</strong>
-                                <span v-if="!profileData.location" class="empty"><em>[Not Specified]</em></span>
-                                <span>{{ profileData.location }}</span>
+                            <div class="pane">
+                                <header class="pane__header">Location</header>
+                                <section class="pane__body">
+                                    <span v-if="!profileData.location" class="empty"><em>[Not Specified]</em></span>
+                                    <span>{{ profileData.location }}</span>
+                                </section>
                             </div>
-                            <div class="white-card bio-card">
-                                <div><strong class="white-card__key">Bio:</strong></div>
-                                <div v-if="!profileData.bio" class="empty"><em>[So empty...]</em></div>
-                                <div v-html="profileData.bio"></div>
+                            <div class="pane">
+                                <header class="pane__header">Bio</header>
+                                <div class="pane__body bio-body">
+                                    <div v-if="!profileData.bio" class="empty"><em>[So empty...]</em></div>
+                                    <div v-html="profileData.bio"></div>
+                                </div>
                             </div>
 
 
@@ -627,6 +635,10 @@
 
     }
 
+    .main-area{
+        padding:2rem 0;
+    }
+
     .loading-spinner-container{
         display:flex;
         height:70vh;
@@ -680,10 +692,49 @@
 
     .empty{
         color:#aaa;
+        font-size:1.4rem;
     }
 
-    .bio-card{
+    .bio-body{
         min-height:22rem;
+    }
+
+    .pane{
+        box-shadow:0 0 .5rem rgba(0,0,0,.24);
+        border-radius:.5rem;
+        overflow:hidden;
+
+        &__header{
+            padding:1rem;
+            background:#33ab87;
+            color:#fff;
+            font-size:1.6rem;
+        }
+
+        &__body{
+            background:#fff;
+            padding:1rem;
+        }
+
+        &__footer{
+            padding:1rem;
+            background:#fff;
+            border-top:1px solid #ccc;
+        }
+
+        span, p{
+            font-size:1.4rem;
+        }
+
+        h3{
+            font-size:1.4rem;
+            margin:1rem 0;
+        }
+
+        &:not(:last-child){
+            margin-bottom:2rem;
+        }
+
     }
 
 
