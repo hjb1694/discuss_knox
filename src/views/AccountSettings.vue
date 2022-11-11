@@ -255,7 +255,7 @@
         isDeactivationModalOpen.value = true;
     }
 
-    const deactivateAccount = (value) => {
+    const deactivateAccount = async (value) => {
         isDeactivationModalOpen.value = false;
 
         if(value === false){
