@@ -43,7 +43,8 @@
 </template>
 
 <script lang="ts" setup>
-    import { ref, reactive, onMounted, computed } from "vue";
+    import { ref, reactive, onMounted, computed, watch } from "vue";
+    import { useRouter } from 'vue-router';
     import appMultiSelect from 'vue-multiselect';
     import TextInput from '@/components/ui_elements/TextInput.vue';
     import zipcodes from 'zipcodes';
@@ -57,8 +58,9 @@
     import { useFlashToastStore, MessageTypes } from '@/stores/useFlashToastStore';
     import ChangeImageModal from '@/components/ChangeImageModal/ChangeImageModal.vue';
 
-    const { getAuthToken, getUserData } = useAuthStore();
+    const { getAuthToken, getUserData, getIsLoggedIn } = useAuthStore();
     const { openFlashToast } = useFlashToastStore();
+    const { push: routerPush } = useRouter();
 
     const isChangeImageModalShown = ref<boolean>(false);
 
@@ -260,6 +262,14 @@
         fetchProfileImage();
 
     }
+
+    watch(getIsLoggedIn, (val) => {
+
+        if(val === false){
+            routerPush('/');
+        }
+
+    });
 
     onMounted(() => {
         fetchProfileData();

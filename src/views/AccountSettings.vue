@@ -61,13 +61,15 @@
 <script lang="ts" setup>
     import CheckboxInput from '@/components/ui_elements/CheckboxInput.vue';
     import TextInput from '@/components/ui_elements/TextInput.vue';
-    import { ref, onMounted } from 'vue';
+    import { ref, onMounted, watch } from 'vue';
+    import { useRouter } from 'vue-router';
     import axios from 'axios';
     import { useAuthStore } from '@/stores/useAuthStore';
     import { useFlashToastStore, MessageTypes } from '@/stores/useFlashToastStore';
 
-    const { getAuthToken, getUserData } = useAuthStore();
+    const { getAuthToken, getUserData, getIsLoggedIn } = useAuthStore();
     const { openFlashToast } = useFlashToastStore();
+    const { push: routerPush} = useRouter();
 
     const isProfilePrivate = ref<boolean>(false);
 
@@ -107,6 +109,14 @@
 
 
     }
+
+    watch(getIsLoggedIn, (val) => {
+
+        if(val === false){
+            routerPush('/');
+        }
+
+    });
 
     onMounted(() => {
         fetchProfilePrivacy();
