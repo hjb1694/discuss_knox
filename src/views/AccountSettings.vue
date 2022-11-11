@@ -257,6 +257,11 @@
 
     const deactivateAccount = (value) => {
         isDeactivationModalOpen.value = false;
+
+        if(value === false){
+            return;
+        }
+
         isDeactivationProcessing.value = true;
         
         try{
