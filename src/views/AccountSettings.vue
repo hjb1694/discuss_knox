@@ -10,22 +10,28 @@
             </footer>
         </div>
         <div class="pane">
-            <header class="pane__header">Reset Password</header>
+            <header class="pane__header">Change Password</header>
             <section class="pane__body">
                 <form @submit.prevent>
                     <div class="fgrp">
-                        <text-input v-model="currentPassword" input-type="password" label="Current Password"/>
+                        <text-input v-model="currentPassword" input-type="password" label="Current Password" :disabled="changePasswordProcessing"/>
                     </div>
                     <div class="fgrp">
-                        <text-input v-model="newPassword" input-type="password" label="New Password"/>
+                        <text-input v-model="newPassword" input-type="password" label="New Password" :disabled="changePasswordProcessing"/>
                     </div>
                     <div class="fgrp">
-                        <text-input v-model="confirmNewPassword" input-type="password" label="Confirm New Password"/>
+                        <text-input v-model="confirmNewPassword" input-type="password" label="Confirm New Password" :disabled="changePasswordProcessing"/>
                     </div>
                 </form>
+                <div v-if="changePasswordErrors.length" class="errbox">
+                    <p v-for="error in changePasswordErrors" :key="error">{{ error }}</p>
+                </div>
             </section>
             <footer class="pane__footer">
-                <button type="button" class="btn">Reset Password</button>
+                <button type="button" class="btn" @click="changePassword" :disabled="changePasswordProcessing">
+                    <span v-if="!changePasswordProcessing">Submit</span>
+                    <span v-else>Processing...</span>
+                </button>
             </footer>
         </div>
         <div class="pane">
@@ -61,13 +67,14 @@
 <script lang="ts" setup>
     import CheckboxInput from '@/components/ui_elements/CheckboxInput.vue';
     import TextInput from '@/components/ui_elements/TextInput.vue';
-    import { ref, onMounted, watch } from 'vue';
+    import { ref, onMounted, watch, reactive } from 'vue';
     import { useRouter } from 'vue-router';
     import axios from 'axios';
     import { useAuthStore } from '@/stores/useAuthStore';
     import { useFlashToastStore, MessageTypes } from '@/stores/useFlashToastStore';
+    import stringLength from 'string-length';
 
-    const { getAuthToken, getUserData, getIsLoggedIn } = useAuthStore();
+    const { getAuthToken, getUserData, getIsLoggedIn, logout } = useAuthStore();
     const { openFlashToast } = useFlashToastStore();
     const { push: routerPush} = useRouter();
 
@@ -76,6 +83,8 @@
     const currentPassword = ref<string>('');
     const newPassword = ref<string>('');
     const confirmNewPassword = ref<string>('');
+    const changePasswordErrors = reactive<string[]>([]);
+    const changePasswordProcessing = ref<boolean>(false);
 
 
     const updateProfilePrivacy = async () => {
@@ -111,6 +120,91 @@
             console.error(e);
         }
 
+
+    }
+
+    const validateChangePassword = () => {
+        changePasswordErrors.splice(0,changePasswordErrors.length);
+        let isValid = true;
+
+        const passwordRegs = {
+            uppercase: /[A-Z]/, 
+            lowercase: /[a-z]/, 
+            numeric: /[0-9]/
+        }
+
+        if(stringLength(currentPassword.value) < 1){
+            changePasswordErrors.push('Please enter your current password.'); 
+            isValid = false;
+        }
+
+        if(
+                !passwordRegs.uppercase.test(newPassword.value) ||
+                !passwordRegs.lowercase.test(newPassword.value) ||
+                !passwordRegs.numeric.test(newPassword.value) ||
+                stringLength(newPassword.value) < 8 || 
+                stringLength(newPassword.value) > 50
+        ){
+            changePasswordErrors.push('Password must be between 8 and 50 characters and contain at least 1 uppercase letter, one lowercase letter, and one number.');
+            isValid = false;
+        }
+
+        if(newPassword.value !== confirmNewPassword.value){
+            changePasswordErrors.push('Confirm password does not match.');
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
+
+    const changePassword = async () => {
+
+        if(!validateChangePassword()){
+            return;
+        }
+
+        changePasswordProcessing.value = true;
+
+        try{
+
+            await axios.patch('http://66.42.81.246:8080/api/v1/change-password', {
+                current_password: currentPassword.value, 
+                new_password: newPassword.value
+            }, 
+            {
+                headers: {
+                    'x-auth-token': getAuthToken.value
+                }
+            });
+
+            currentPassword.value = '';
+            newPassword.value = '';
+            confirmNewPassword.value = '';
+            openFlashToast(MessageTypes.SUCCESS, 'Password successfully changed!');
+
+        }catch(e){
+
+            if(e.response?.data?.short_msg){
+
+                const shortMsg = e.response.data.short_msg;
+
+                if(shortMsg === 'ERR_DEACTIVATED'){
+                    openFlashToast(MessageTypes.ERROR, 'Your account has been deactivated.');
+                    logout();
+                }else if(shortMsg === 'ERR_PASSWORD_NOT_MATCHES'){
+                    changePasswordErrors.push('Incorrect current password.');
+                }else{
+                    openFlashToast(MessageTypes.ERROR, 'An unexpected error has occurred.');
+                }
+
+            }else{
+                openFlashToast(MessageTypes.ERROR, 'An unexpected error has occurred.');
+            }
+
+        }finally{
+            changePasswordProcessing.value = false;
+        }
 
     }
 
@@ -185,6 +279,16 @@
 
     .fgrp{
         margin:1rem 0;
+    }
+
+    .errbox{
+        color:#f00;
+        margin-top:2rem;
+        font-size:1.4rem;
+        background:#ffe0de;
+        border:1px solid #f00;
+        padding:1rem;
+        border-radius:.5rem;
     }
 
     @media (max-width:700px){

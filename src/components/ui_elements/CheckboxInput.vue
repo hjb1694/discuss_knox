@@ -48,6 +48,7 @@
     .checkbox-input{
         display:flex;
         align-items:center;
+        cursor:pointer;
 
         &__field{
             display:none;

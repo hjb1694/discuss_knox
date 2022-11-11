@@ -322,8 +322,6 @@
 
     const handleBlockUnblockResponseErrors = (e) => {
 
-        console.log(e);
-
         if(e.response?.data?.short_msg){
 
             const shortMsg = e.response.data.short_msg;
