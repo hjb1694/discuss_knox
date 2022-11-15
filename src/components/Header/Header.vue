@@ -71,9 +71,10 @@
     import { useAuthStore } from '@/stores/useAuthStore';
     import { useFlashToastStore, MessageTypes } from '@/stores/useFlashToastStore';
     import { useFollowsStore } from '@/stores/useFollowsStore';
-    import { ref } from 'vue';
+    import { ref, reactive, computed, onMounted } from 'vue';
     import { useRouter } from 'vue-router';
     import AppMultiSelect from 'vue-multiselect';
+    import axios from 'axios';
 
     const { openAuthModal } = useCoreModalStore();
     const { getIsLoggedIn, getUserData, logout } = useAuthStore();
@@ -85,9 +86,7 @@
 
     const isChannelDropdownShown = ref<boolean>(false);
     const channelSelection = ref<string>('');
-    const channelSelectOpts = [
-        'c/new_to_knoxville'
-    ];
+    const channelSelectOpts = reactive([]);
 
     const userLogout = () => {
         logout();
@@ -120,6 +119,29 @@
     const toggleChannelDropdown = () => {
         isChannelDropdownShown.value = !isChannelDropdownShown.value;
     }
+
+    const fetchChannels = async () => {
+
+        try{
+
+            const response = await axios.get('http://localhost:3002/api/v1/channels');
+
+            const opts = response.data.body.channels.map(channel => `c/${channel.channel_slug}`);
+
+            channelSelectOpts.push(...opts);
+
+        }catch(e){
+            console.error(e);
+        }
+
+
+    }
+
+    onMounted(() => {
+        fetchChannels();
+    });
+
+
 
 
 </script>
