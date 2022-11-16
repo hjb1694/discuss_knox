@@ -52,11 +52,8 @@
                         <app-multi-select v-model="channelSelection" :options="channelSelectOpts" placeholder="Search or Select Channel" :style="{fontSize: '1.2rem'}"/>
                         <div class="recommended-channels">
                             <h3>Recommended Channels</h3>
-                            <ul>
-                                <li>c/new_to_knoxville</li>
-                                <li>c/campus_life</li>
-                                <li>c/prospective_residents</li>
-                                <li>c/social</li>
+                            <ul v-if="recommendedChannels.length">
+                                <li v-for="channel in recommendedChannels" :key="channel.id">c/{{ channel.channel_slug }}</li>
                             </ul>
                         </div>
                     </div>
@@ -87,6 +84,8 @@
     const isChannelDropdownShown = ref<boolean>(false);
     const channelSelection = ref<string>('');
     const channelSelectOpts = reactive([]);
+
+    const recommendedChannels = reactive([]);
 
     const userLogout = () => {
         logout();
@@ -127,8 +126,11 @@
             const response = await axios.get('http://localhost:3002/api/v1/channels');
 
             const opts = response.data.body.channels.map(channel => `c/${channel.channel_slug}`);
+            const rec = response.data.body.channels.filter(channel => channel.is_featured === true);
 
             channelSelectOpts.push(...opts);
+
+            recommendedChannels.push(...rec);
 
         }catch(e){
             console.error(e);
