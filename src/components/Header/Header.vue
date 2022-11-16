@@ -49,7 +49,7 @@
                 <div class="dropdown">
                     <button @click="toggleChannelDropdown">Channels</button>
                     <div v-if="isChannelDropdownShown" class="dropdown__area dropdown__area--channels">
-                        <app-multi-select v-model="channelSelection" :options="channelSelectOpts" placeholder="Search or Select Channel" :style="{fontSize: '1.2rem'}"/>
+                        <app-multi-select v-model="channelSelection" :options="channelSelectOpts" @select="channelSelect($event)" placeholder="Search or Select Channel" :style="{fontSize: '1.2rem'}"/>
                         <div class="recommended-channels">
                             <h3>Recommended Channels</h3>
                             <ul v-if="recommendedChannels.length">
@@ -136,6 +136,15 @@
             console.error(e);
         }
 
+
+    }
+
+    const channelSelect = (selectedOption) => {
+
+        routerPush(`/channel/${selectedOption.substring(2)}`);
+
+        channelSelection.value = null;
+        isChannelDropdownShown.value = false;
 
     }
 
