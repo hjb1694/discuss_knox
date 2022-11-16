@@ -6,6 +6,7 @@ import HomeView from '@/views/Home.vue';
 import ProfileView from '@/views/Profile.vue';
 const EditProfileView = () => import('@/views/EditProfile.vue');
 const AccountSettings = () => import('@/views/AccountSettings.vue');
+const NewThread = () => import('@/views/NewThread.vue');
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -32,6 +33,14 @@ const router = createRouter({
       path: '/user/account-settings', 
       name: 'account-settings', 
       component: AccountSettings, 
+      meta: {
+        isAuthRequired: true
+      }
+    }, 
+    {
+      path: '/new-thread', 
+      name: 'new-thread', 
+      component: NewThread, 
       meta: {
         isAuthRequired: true
       }
