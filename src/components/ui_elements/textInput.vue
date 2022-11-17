@@ -56,11 +56,12 @@
 <style lang="scss" scoped>
 
     .textual-input{
-        border:1px solid #ccc;
+        border:1px solid #ddd;
         border-radius:5px;
         position:relative;
         height:4.5rem;
         transition:border .3s;
+        background:#fff;
 
         &.error, 
         &:focus-within.error{
@@ -73,13 +74,14 @@
 
         &__field{
             display:block;
-            font-size:2rem;
+            font-size:1.7rem;
             width:calc(100% - 3px);
             position:absolute;
             bottom:3px;
             left:3px;
             border:none;
             outline:none;
+            color:#35495E;
 
             &:focus + .textual-input__label, 
             &:not(:placeholder-shown) + .textual-input__label {

@@ -1,30 +1,33 @@
 <template>
     <div class="container">
-        <div class="pane">
-            <text-input 
-            label="Headline" 
-            input-type="text"
-            v-model="headlineInput"
-            max-length="125"
-            />
-        </div>
-        <div class="pane">
-            <app-multi-select 
-            placeholder="Search or Select Channel" 
-            :options="channelOpts"
-            v-model="channelInput"
-            />
-        </div>
-        <div class="pane">
-            <quill-editor 
-            theme="snow" 
-            :toolbar="editorToolbar" 
-            placeholder="Write something interesting..."
-            content-type="html"
-            v-model:content="contentInput"
-            />
-        </div>
-        <button @click="submit">Submit</button>
+        <form class="form" @submit.prevent>
+            <div class="fgrp">
+                <text-input 
+                label="Headline" 
+                input-type="text"
+                v-model="headlineInput"
+                max-length="125"
+                />
+            </div>
+            <div class="fgrp">
+                <app-multi-select 
+                placeholder="Search or Select Channel" 
+                :options="channelOpts"
+                v-model="channelInput"
+                />
+            </div>
+            <div class="fgrp">
+                <quill-editor 
+                theme="snow" 
+                :toolbar="editorToolbar" 
+                placeholder="Write something interesting..."
+                content-type="html"
+                v-model:content="contentInput"
+                />
+            </div>
+            <button @click="submit('publish')">Publish</button>
+            <button @click="submit('draft')">Save As Draft</button>
+        </form>
     </div>
 </template>
 
@@ -38,6 +41,9 @@
     import sanitizeHTML from 'sanitize-html';
     import stringLength from 'string-length';
     import { decode as htmlEntitiesDecode } from 'html-entities'; 
+    import { useAuthStore } from '@/stores/useAuthStore';
+
+    const { getAuthToken } = useAuthStore();
 
     const channelOpts = reactive([]);
     
@@ -126,10 +132,31 @@
     }
 
 
-    const submit = async () => {
+    const submit = async (action: string) => {
 
         if(!validate()){
             return;
+        }
+
+        try{
+
+            await axios.post(
+                'http://localhost:3002/api/v1/thread', 
+                {
+                    action, 
+                    headline: headlineInput.value.trim(), 
+                    channel: channelInput.value.substring(2), 
+                    content: contentInput.value.trim()
+                }, 
+                {
+                    headers: {
+                        'x-auth-token': getAuthToken.value
+                    }
+                }
+            );
+
+        }catch(e){
+            console.error(e);
         }
         
 
@@ -146,15 +173,17 @@
     .container{
         width:60%;
         margin:2rem auto;
+        padding:1rem;
     }
 
-    .pane{
-        background:#fff;
+    .form{
         padding:1rem;
+        background:#fff;
+        box-shadow:0 0 .5rem rgba(0,0,0,.24);
+    }
 
-        &:not(:last-child){
-            margin-bottom:2rem;
-        }
+    .fgrp{
+        margin:2rem 0;
     }
 
     @media (max-width:700px){
