@@ -5,7 +5,7 @@
         </div>
         <header class="primary-header">
             <div class="container">
-                <img class="primary-header__logo" src="@/assets/knox_discuss_logo.png"/>
+                <img @click="routerPush('/')" class="primary-header__logo" src="@/assets/knox_discuss_logo.png"/>
                 <button v-if="!getIsLoggedIn" class="auth-btn" @click="openAuthModal">
                     <div class="auth-btn__icon-container">
                         <i class="auth-btn__icon fa fa-user"></i>
@@ -48,7 +48,7 @@
                     <i class="menu-icon fa fa-plus"></i>
                     <span>New Thread</span>
                 </button>
-                <button>
+                <button @click="routerPush('/')">
                     <i class="menu-icon fa fa-refresh"></i>
                     <span>Live Feed</span>
                 </button>
@@ -125,7 +125,7 @@
     }
 
     const goToNewThreadPage = () => {
-        if(!getIsLoggedIn){
+        if(getIsLoggedIn.value === false){
             openAuthModal();
         }else if(getUserData.account_status === 'NOT_VERIFIED'){
             openEmailVerifyModal();

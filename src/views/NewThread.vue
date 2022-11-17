@@ -36,7 +36,7 @@
 <script lang="ts" setup>
     import TextInput from '@/components/ui_elements/TextInput.vue';
     import AppMultiSelect from 'vue-multiselect';
-    import { ref, reactive, onMounted } from 'vue';
+    import { ref, reactive, onMounted, watch } from 'vue';
     import axios from 'axios';
     import { QuillEditor } from '@vueup/vue-quill';
     import '@vueup/vue-quill/dist/vue-quill.snow.css';
@@ -45,9 +45,11 @@
     import { decode as htmlEntitiesDecode } from 'html-entities'; 
     import { useAuthStore } from '@/stores/useAuthStore';
     import { useFlashToastStore, MessageTypes } from '@/stores/useFlashToastStore';
+    import { useRouter } from 'vue-router';
 
-    const { getAuthToken, logout } = useAuthStore();
+    const { getIsLoggedIn, getAuthToken, logout } = useAuthStore();
     const { openFlashToast } = useFlashToastStore();
+    const { push: routerPush } = useRouter();
 
     const channelOpts = reactive([]);
     
@@ -185,6 +187,14 @@
         
 
     }
+
+    watch(getIsLoggedIn, (value) => {
+
+        if(value === false){
+            routerPush('/');
+        }
+
+    });
 
 
     onMounted(() => {
