@@ -1,15 +1,30 @@
 <template>
     <div class="container">
         <div class="pane">
-            <text-input label="Headline" input-type="text"/>
+            <text-input 
+            label="Headline" 
+            input-type="text"
+            v-model="headlineInput"
+            max-length="125"
+            />
         </div>
         <div class="pane">
-            <app-multi-select placeholder="Search or Select Channel" :options="channelOpts"/>
+            <app-multi-select 
+            placeholder="Search or Select Channel" 
+            :options="channelOpts"
+            v-model="channelInput"
+            />
         </div>
         <div class="pane">
-            <quill-editor theme="snow" :toolbar="editorToolbar" placeholder="Write something interesting..."/>
+            <quill-editor 
+            theme="snow" 
+            :toolbar="editorToolbar" 
+            placeholder="Write something interesting..."
+            content-type="html"
+            v-model:content="contentInput"
+            />
         </div>
-        <button>Submit</button>
+        <button @click="submit">Submit</button>
     </div>
 </template>
 
@@ -20,10 +35,19 @@
     import axios from 'axios';
     import { QuillEditor } from '@vueup/vue-quill';
     import '@vueup/vue-quill/dist/vue-quill.snow.css';
+    import sanitizeHTML from 'sanitize-html';
+    import stringLength from 'string-length';
 
     const channelOpts = reactive([]);
+    
+
+    const headlineInput = ref<string>('');
+    const channelInput = ref<string>('');
+    const contentInput = ref<string>('');
 
     const editorToolbar = ['bold', 'italic', 'underline', 'image'];
+
+    const errors = reactive<string[]>([]);
 
     const fetchChannels = async () => {
 
@@ -39,6 +63,69 @@
             console.error(e);
 
         }
+
+    }
+
+    const stripTags = value => {
+
+        return sanitizeHTML(value, {
+            allowedTags: []
+        });
+
+    }
+
+    const stripAllWS = value => {
+        let stripped = value.replace(/ +/g,'');
+        stripped = value.replace(/\n+/g,'');
+        stripped = value.replace(/\s+/g,'');
+        return stripped;
+    }
+
+    const validate = () => {
+
+        let isValid = true;
+        errors.splice(0,errors.length);
+
+        if(stringLength(stripAllWS(stripTags(headlineInput.value))) < 15){
+            isValid = false;
+            errors.push('Headline is too short.');
+        }
+
+        if(!channelInput.value){
+            isValid = false;
+            errors.push('Please select a channel.');
+        }
+
+        if(stringLength(stripAllWS(stripTags(contentInput.value))) < 100){
+            isValid = false;
+            errors.push('Content is too short.');
+        }
+
+        if(stringLength(stripAllWS(stripTags(contentInput.value))) > 4000){
+            isValid = false;
+            errors.push('Content is too long.');
+        }
+
+        return isValid;
+
+
+    }
+
+
+    const submit = async () => {
+
+        if(!validate()){
+            return;
+        }
+
+        // console.log(contentInput.value);
+
+        // const parser = new DOMParser();
+
+        // const dom = parser.parseFromString(contentInput.value, 'text/html');
+
+        // console.log(dom.querySelectorAll('img').length);
+        
 
     }
 

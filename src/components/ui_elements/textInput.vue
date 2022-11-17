@@ -4,7 +4,7 @@
         :type="inputType" 
         class="textual-input__field" 
         placeholder=" "
-        :max-length="maxLength"
+        :maxlength="maxLength"
         :max="max"
         :disabled="disabled"
         :value="modelValue"
