@@ -97,7 +97,7 @@
             position:absolute;
             bottom:0;
             left:3px;
-            color:#555;
+            color:#ADADAD;
             pointer-events:none;
             transition:all .3s;
         }

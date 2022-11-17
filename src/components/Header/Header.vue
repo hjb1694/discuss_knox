@@ -44,10 +44,19 @@
         </header>
         <div class="secondary-header">
             <div class="container">
-                <button>Add Post</button>
-                <button>Live Feed</button>
+                <button>
+                    <i class="menu-icon fa fa-plus"></i>
+                    <span>New Thread</span>
+                </button>
+                <button>
+                    <i class="menu-icon fa fa-refresh"></i>
+                    <span>Live Feed</span>
+                </button>
                 <div class="dropdown">
-                    <button @click="toggleChannelDropdown">Channels</button>
+                    <button @click="toggleChannelDropdown">
+                        <i class="menu-icon fa fa-list"></i>
+                        <span>Channels</span>
+                    </button>
                     <div v-if="isChannelDropdownShown" class="dropdown__area dropdown__area--channels">
                         <app-multi-select v-model="channelSelection" :options="channelSelectOpts" @select="channelSelect($event)" placeholder="Search or Select Channel" :style="{fontSize: '1.2rem'}"/>
                         <div class="recommended-channels">
@@ -318,6 +327,10 @@
                 margin-top:.5rem;
             }
         }
+    }
+
+    .menu-icon{
+        margin-right:.5rem;
     }
 
 

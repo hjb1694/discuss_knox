@@ -25,8 +25,10 @@
                 v-model:content="contentInput"
                 />
             </div>
-            <button @click="submit('publish')">Publish</button>
-            <button @click="submit('draft')">Save As Draft</button>
+            <div class="fgrp">
+                <button class="subbut" @click="submit('publish')">Publish</button>
+                <button class="subbut" @click="submit('draft')">Save As Draft</button>
+            </div>
         </form>
     </div>
 </template>
@@ -187,7 +189,7 @@
 <style lang="scss" scoped>
 
     .container{
-        width:60%;
+        width:65%;
         margin:2rem auto;
         padding:1rem;
     }
@@ -202,7 +204,22 @@
         margin:2rem 0;
     }
 
-    @media (max-width:700px){
+    .subbut{
+        display:inline-block;
+        background:#21bf8f;
+        border:none;
+        padding:.8rem 1.2rem;
+        color:#fff;
+        font-size:1.6rem;
+        font-weight:bold;
+        border-radius:.5rem;
+
+        &:not(:last-child){
+            margin-right:1rem;
+        }
+    }
+
+    @media (max-width:800px){
         .container{
             padding:1rem;
             width:100%;
