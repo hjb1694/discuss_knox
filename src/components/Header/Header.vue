@@ -289,6 +289,7 @@
 
         &__area{
             position:absolute;
+            z-index:999;
             padding:1rem;
             background:#fff;
             top:3.2rem;
