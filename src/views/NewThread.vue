@@ -46,7 +46,7 @@
     import { useAuthStore } from '@/stores/useAuthStore';
     import { useFlashToastStore, MessageTypes } from '@/stores/useFlashToastStore';
 
-    const { getAuthToken } = useAuthStore();
+    const { getAuthToken, logout } = useAuthStore();
     const { openFlashToast } = useFlashToastStore();
 
     const channelOpts = reactive([]);
@@ -167,6 +167,12 @@
 
                 if(shortMsg === 'ERR_MAX_THREADS'){
                     openFlashToast(MessageTypes.ERROR, 'You have reached your peak limit for new threads for today.');
+                }else if(shortMsg === 'ERR_DEACTIVATED'){
+                    openFlashToast(MessageTypes.ERROR, 'Account deactivated.')
+                    logout();
+                    routerPush('/');
+                }else if(shortMsg === 'ERR_FROZEN'){
+                    openFlashToast(MessageTypes.ERROR, 'Your account has been frozen and under review by admins.');
                 }else{
                     openFlashToast(MessageTypes.ERROR, 'An unexpected error has occurred.');
                 }
