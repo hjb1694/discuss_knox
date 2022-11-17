@@ -37,6 +37,7 @@
     import '@vueup/vue-quill/dist/vue-quill.snow.css';
     import sanitizeHTML from 'sanitize-html';
     import stringLength from 'string-length';
+    import { decode as htmlEntitiesDecode } from 'html-entities'; 
 
     const channelOpts = reactive([]);
     
@@ -45,7 +46,7 @@
     const channelInput = ref<string>('');
     const contentInput = ref<string>('');
 
-    const editorToolbar = ['bold', 'italic', 'underline', 'image'];
+    const editorToolbar = ['bold', 'italic', 'underline', 'image', {'list': 'ordered'}, {'list': 'bullet'}];
 
     const errors = reactive<string[]>([]);
 
@@ -86,7 +87,7 @@
         let isValid = true;
         errors.splice(0,errors.length);
 
-        if(stringLength(stripAllWS(stripTags(headlineInput.value))) < 15){
+        if(stringLength(stripAllWS(stripTags(htmlEntitiesDecode(headlineInput.value)))) < 15){
             isValid = false;
             errors.push('Headline is too short.');
         }
@@ -96,12 +97,12 @@
             errors.push('Please select a channel.');
         }
 
-        if(stringLength(stripAllWS(stripTags(contentInput.value))) < 100){
+        if(stringLength(stripAllWS(htmlEntitiesDecode(stripTags(contentInput.value)))) < 100){
             isValid = false;
             errors.push('Content is too short.');
         }
 
-        if(stringLength(stripAllWS(stripTags(contentInput.value))) > 4000){
+        if(stringLength(stripAllWS(htmlEntitiesDecode(stripTags(contentInput.value)))) > 4000){
             isValid = false;
             errors.push('Content is too long.');
         }
@@ -130,14 +131,6 @@
         if(!validate()){
             return;
         }
-
-        // console.log(contentInput.value);
-
-        // const parser = new DOMParser();
-
-        // const dom = parser.parseFromString(contentInput.value, 'text/html');
-
-        // console.log(dom.querySelectorAll('img').length);
         
 
     }

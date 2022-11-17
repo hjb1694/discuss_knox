@@ -137,7 +137,7 @@
             }, 
             allowedSchemes: ['http', 'https', 'mailto']
         });
-        sanitized = sanitized.replace(/(\<p\>\<br \/\>\<\/p\>){2,}/, '<br>');
+        sanitized = sanitized.replace(/(\<p\>\<br \/\>\<\/p\>){2,}/g, '<br>');
         sanitized = sanitized.trim();
         return sanitized;
 
