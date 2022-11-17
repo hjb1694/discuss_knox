@@ -42,8 +42,10 @@
     import stringLength from 'string-length';
     import { decode as htmlEntitiesDecode } from 'html-entities'; 
     import { useAuthStore } from '@/stores/useAuthStore';
+    import { useFlashToastStore, MessageTypes } from '@/stores/useFlashToastStore';
 
     const { getAuthToken } = useAuthStore();
+    const { openFlashToast } = useFlashToastStore();
 
     const channelOpts = reactive([]);
     
@@ -67,7 +69,8 @@
             channelOpts.push(...opts);
 
         }catch(e){
-            console.error(e);
+            
+            openFlashToast(MessageTypes.ERROR, 'An unexpected error has occurred.');
 
         }
 
@@ -156,7 +159,20 @@
             );
 
         }catch(e){
-            console.error(e);
+            if(e.response?.data?.short_msg){
+
+                const shortMsg = e.response.data.short_msg;
+
+                if(shortMsg === 'ERR_MAX_THREADS'){
+                    openFlashToast(MessageTypes.ERROR, 'You have reached your peak limit for new threads for today.');
+                }else{
+                    openFlashToast(MessageTypes.ERROR, 'An unexpected error has occurred.');
+                }
+
+
+            }else{
+                openFlashToast(MessageTypes.ERROR, 'An unexpected error has occurred.');
+            }
         }
         
 
