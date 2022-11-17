@@ -106,6 +106,19 @@
             errors.push('Content is too long.');
         }
 
+        const parser = new DOMParser();
+
+        const dom = parser.parseFromString(contentInput.value, 'text/html');
+
+        const imgCount = dom.querySelectorAll('img').length;
+
+        if(imgCount > 2){
+            isValid = false;
+            errors.push('Only 2 images allowed.');
+        }
+
+
+
         return isValid;
 
 
