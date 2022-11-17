@@ -44,7 +44,7 @@
         </header>
         <div class="secondary-header">
             <div class="container">
-                <button>
+                <button @click="goToNewThreadPage">
                     <i class="menu-icon fa fa-plus"></i>
                     <span>New Thread</span>
                 </button>
@@ -82,7 +82,7 @@
     import AppMultiSelect from 'vue-multiselect';
     import axios from 'axios';
 
-    const { openAuthModal } = useCoreModalStore();
+    const { openAuthModal, openEmailVerifyModal } = useCoreModalStore();
     const { getIsLoggedIn, getUserData, logout } = useAuthStore();
     const { openFlashToast } = useFlashToastStore();
     const { openFollowDrawer } = useFollowsStore();
@@ -122,6 +122,16 @@
         routerPush({
             name: 'account-settings'
         });
+    }
+
+    const goToNewThreadPage = () => {
+        if(!getIsLoggedIn){
+            openAuthModal();
+        }else if(getUserData.account_status === 'NOT_VERIFIED'){
+            openEmailVerifyModal();
+        }else{
+            routerPush('/new-thread');
+        }
     }
 
     const toggleChannelDropdown = () => {
@@ -344,12 +354,18 @@
             width:20rem;
         }
 
+        .secondary-header{
+            button{
+                font-size:1.4rem;
+            }
+        }
+
         .dropdown{
 
             &__area{
                 
                 &--channels{
-                    left:-17rem;
+                    left:-20rem;
                     width:32rem;
                 }
 
