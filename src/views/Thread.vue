@@ -29,6 +29,9 @@
         <div class="auth-prompt" v-if="isAuthPromptShown">
             <p><a @click="openAuthModal">Login or Register</a> to add your opinion.</p>
         </div>
+        <div v-if="isClosedPromptShown" class="closed-prompt">
+            <p>This thread is closed.</p>
+        </div>
         <div class="opinions">
             <h2>Opinions (0)</h2>
 
@@ -66,11 +69,17 @@
     const isResponseFormShown = computed(() => {
         return getIsLoggedIn.value === true && 
         threadData.author_user_id !== getUserData.user_id &&
+        threadData.status !== 'CLOSED' &&
         !authUserOpinion.username;
     });
 
     const isAuthPromptShown = computed(() => {
-        return getIsLoggedIn.value === false;
+        return getIsLoggedIn.value === false &&
+        threadData.status !== 'CLOSED';
+    });
+
+    const isClosedPromptShown = computed(() => {
+        return threadData.status === 'CLOSED';
     });
 
     const fetchThread = async () => {
@@ -249,7 +258,8 @@
         margin:1rem 0;
     }
 
-    .auth-prompt{
+    .auth-prompt, 
+    .closed-prompt{
         font-size:1.6rem;
 
         a{
