@@ -130,7 +130,7 @@
         }else if(getUserData.account_status === 'NOT_VERIFIED'){
             openEmailVerifyModal();
         }else{
-            routerPush('/new-thread');
+            routerPush('/thread/new');
         }
     }
 

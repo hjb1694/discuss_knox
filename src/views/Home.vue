@@ -4,12 +4,12 @@
             <div v-for="thread in shownThreads" :key="thread.id" class="thread-tile">
                 <img src="@/assets/no_image.jpeg" class="thread-tile__image"/>
                 <div class="thread-tile__body">
-                    <h2>{{ thread.headline.substring(0,75) }}...</h2>
+                    <h2 @click="routerPush('/thread/' + thread.slug)">{{ thread.headline.substring(0,75) }}...</h2>
                 </div>
                 <div class="thread-tile__footer">
                     <button @click="routerPush('/user/profile/' + thread.author_username)" class="thread-tile__author">
                         <i class="user-icon fa fa-user"></i>
-                        <span>{{ thread.author_username }}</span>
+                        <span>u/{{ thread.author_username }}</span>
                     </button>
                 </div>
             </div>
@@ -87,20 +87,23 @@
 
         &__body{
             padding:1rem;
+            background:#fff;
 
             h2{
                 color:#888;
+                cursor:pointer;
             }
         }
 
         &__author{
             border:none;
             background:transparent;
+            color:#555;
         }
 
         &__footer{
             padding:1rem;
-            border-top:1px solid #ccc;
+            background:#fafafa;
 
             .user-icon{
                 margin-right:.5rem;
