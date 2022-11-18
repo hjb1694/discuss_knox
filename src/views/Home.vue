@@ -2,7 +2,7 @@
     <div class="container">
         <div class="threads">
             <div v-for="thread in shownThreads" :key="thread.id" class="thread-tile">
-                <img src="@/assets/no_image.jpeg" class="thread-tile__image"/>
+                <img src="@/assets/sunsphere_tower.jpg" class="thread-tile__image"/>
                 <div class="thread-tile__body">
                     <h2 @click="routerPush('/thread/' + thread.slug)">{{ thread.headline.substring(0,75) }}...</h2>
                 </div>

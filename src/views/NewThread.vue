@@ -1,33 +1,36 @@
 <template>
     <div class="container">
-        <form class="form" @submit.prevent>
-            <div class="fgrp">
-                <text-input 
-                label="Headline" 
-                input-type="text"
-                v-model="headlineInput"
-                max-length="125"
-                />
-            </div>
-            <div class="fgrp">
-                <app-multi-select 
-                placeholder="Search or Select Channel" 
-                :options="channelOpts"
-                v-model="channelInput"
-                />
-            </div>
-            <div class="fgrp">
-                <quill-editor 
-                theme="snow" 
-                :toolbar="editorToolbar" 
-                placeholder="Write something interesting..."
-                content-type="html"
-                v-model:content="contentInput"
-                />
-            </div>
-            <div class="fgrp">
-                <button class="subbut" @click="submit('publish')">Publish</button>
-                <button class="subbut" @click="submit('draft')">Save As Draft</button>
+        <form class="form pane" @submit.prevent>
+            <h2 class="pane__heading">Compose New Thread</h2>
+            <div class="pane__body">
+                <div class="fgrp">
+                    <text-input 
+                    label="Headline" 
+                    input-type="text"
+                    v-model="headlineInput"
+                    max-length="125"
+                    />
+                </div>
+                <div class="fgrp">
+                    <app-multi-select 
+                    placeholder="Search or Select Channel" 
+                    :options="channelOpts"
+                    v-model="channelInput"
+                    />
+                </div>
+                <div class="fgrp">
+                    <quill-editor 
+                    theme="snow" 
+                    :toolbar="editorToolbar" 
+                    placeholder="Write something interesting..."
+                    content-type="html"
+                    v-model:content="contentInput"
+                    />
+                </div>
+                <div class="fgrp">
+                    <button class="subbut" @click="submit('publish')">Publish</button>
+                    <button class="subbut" @click="submit('draft')">Save As Draft</button>
+                </div>
             </div>
         </form>
     </div>
@@ -210,10 +213,21 @@
         padding:1rem;
     }
 
-    .form{
-        padding:1rem;
-        background:#fff;
+    .pane{
         box-shadow:0 0 .5rem rgba(0,0,0,.24);
+        border-radius:.5rem;
+        overflow:hidden;
+
+        &__heading{
+            background:#33ab87;
+            color:#fff;
+            padding:1rem;
+        }
+
+        &__body{
+            padding:1rem;
+            background:#fff;
+        }
     }
 
     .fgrp{
