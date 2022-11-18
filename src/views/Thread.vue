@@ -21,7 +21,10 @@
             placeholder="Write something interesting..."
             v-model:content="opinionInput"
             />
-            <button @click="submitOpinion" class="btn">Submit</button>
+            <button @click="submitOpinion" class="btn" :disabled="isOpinionSubmissionProcessing">
+              <span v-if="!isOpinionSubmissionProcessing">Submit</span>
+              <span v-else>Processing...</span>
+            </button>
         </form>
         <div class="auth-prompt" v-if="isAuthPromptShown">
             <p><a @click="openAuthModal">Login or Register</a> to add your opinion.</p>
@@ -41,15 +44,20 @@
     import '@vueup/vue-quill/dist/vue-quill.snow.css';
     import { useAuthStore } from '@/stores/useAuthStore';
     import { useCoreModalStore } from '@/stores/useCoreModalStore';
+    import sanitizeHTML from 'sanitize-html';
+    import stringLength from 'string-length';
+    import { decode as htmlEntityDecode } from 'html-entities';
 
     const { params: routeParams } = useRoute();
     const { push: routerPush } = useRouter();
-    const { getIsLoggedIn, getUserData } = useAuthStore();
+    const { getIsLoggedIn, getUserData, getAuthToken } = useAuthStore();
     const { openAuthModal } = useCoreModalStore();
 
     const slug = ref<string>(routeParams.slug);
     const threadData = reactive({});
     const authUserOpinion = reactive({});
+    const opinionSubmitErrors = reactive([]);
+    const isOpinionSubmissionProcessing = ref<boolean>(false);
 
     const opinionInput = ref<string>('');
 
@@ -101,8 +109,64 @@
 
     }
 
+    const stripTags = value => {
+        return sanitizeHTML(value, {
+            allowedTags: []
+        })
+    }
+
+    const stripAllWS = value => {
+        let stripped = value.replace(/ +/g,'');
+        stripped = value.replace(/\n+/g,'');
+        stripped = value.replace(/\s+/g,'');
+        return stripped;
+    }
+
+    const opinionValidation = () => {
+
+        opinionSubmitErrors.splice(0,opinionSubmitErrors.length);
+        let isValid = true;
+
+        if(stringLength(htmlEntityDecode(stripAllWS(stripTags(contentInput.value)))) < 20){
+            isValid = false;
+            opinionSubmitErrors.push('Opinion is too short.');
+        }
+
+        if(stringLength(htmlEntityDecode(stripAllWS(stripTags(contentInput.value)))) > 3000){
+            isValid = false;
+            opinionSubmitErrors.push('Opinion is too long.');
+        }
+
+        return isValid;
+
+    }
+
     const submitOpinion = async () => {
 
+        if(!opinionValidation()){
+            return;
+        }
+
+        isOpinionSubmissionProcessing.value = true;
+
+        try{
+
+            await axios.post('http://localhost:3002/api/v1/opinions', 
+            {
+                thread_id: threadData.id, 
+                content: contentInput.value
+            }, 
+            {
+                headers: {
+                    'x-auth-token': getAuthToken.value
+                }
+            });
+
+        }catch(e){
+            console.error(e);
+        }finally{
+            isOpinionSubmissionProcessing.value = false;
+        }
 
 
     }
