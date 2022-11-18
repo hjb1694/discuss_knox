@@ -13,16 +13,17 @@
                 <div class="thread__content" v-html="threadData.content"></div>
             </section>
         </div>
-        <form class="opinion-form" v-if="showResponseForm" @submit.prevent>
+        <form class="opinion-form" v-if="isResponseFormShown" @submit.prevent>
             <h2>Add an Opinion</h2>
             <quill-editor 
             theme="snow"
             :toolbar="toolbar"
             placeholder="Write something interesting..."
+            v-model:content="opinionInput"
             />
-            <button class="btn">Submit</button>
+            <button @click="submitOpinion" class="btn">Submit</button>
         </form>
-        <div class="auth-prompt" v-if="showAuthPrompt">
+        <div class="auth-prompt" v-if="isAuthPromptShown">
             <p><a @click="openAuthModal">Login or Register</a> to add your opinion.</p>
         </div>
         <div class="opinions">
@@ -48,14 +49,19 @@
 
     const slug = ref<string>(routeParams.slug);
     const threadData = reactive({});
+    const authUserOpinion = reactive({});
+
+    const opinionInput = ref<string>('');
 
     const toolbar = ['bold', 'italic', 'underline', {'list': 'ordered'}, {'list': 'bullet'}];
 
-    const showResponseForm = computed(() => {
-        return getIsLoggedIn.value === true && threadData.author_user_id !== getUserData.user_id;
+    const isResponseFormShown = computed(() => {
+        return getIsLoggedIn.value === true && 
+        threadData.author_user_id !== getUserData.user_id &&
+        !authUserOpinion.username;
     });
 
-    const showAuthPrompt = computed(() => {
+    const isAuthPromptShown = computed(() => {
         return getIsLoggedIn.value === false;
     });
 
@@ -92,6 +98,12 @@
         }catch(e){
             console.error(e);
         }
+
+    }
+
+    const submitOpinion = async () => {
+
+
 
     }
 
