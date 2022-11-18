@@ -5,6 +5,7 @@
                 <button @click="routerPush('/user/profile/' + threadData.author_username)" class="thread__author">
                     <i class="user-icon fa fa-user"></i>
                     <span>u/{{ threadData.author_username }}</span>
+                    <strong v-if="getIsLoggedIn && (threadData.author_user_id === getUserData.user_id)" class="you">(You)</strong>
                 </button>
             </header>
             <section class="thread__body">
@@ -186,6 +187,10 @@
         h2{
             font-size:2.2rem;
         }
+    }
+
+    .you{
+        margin-left:.5rem;
     }
 
     @media (max-width: 800px) {
