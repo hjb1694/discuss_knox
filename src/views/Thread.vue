@@ -288,6 +288,9 @@
 
         if(value === false){
             authUserOpinion.exists = false;
+            authUserOpinion.username = null;
+            authUserOpinion.userId = null;
+            authUserOpinion.content = null;
         }
 
         fetchThread();
