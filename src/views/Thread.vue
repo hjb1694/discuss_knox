@@ -67,7 +67,8 @@
                         </div>
                         <div v-if="authUserOpinion.replyBoxShown" class="reply-box">
                             <h4>Reply</h4>
-                            <textarea class="reply-textarea"></textarea>
+                            <textarea v-model="replyInput" class="reply-textarea"></textarea>
+                            <button @click="submitReply(authUserOpinion.opinionId)" class="btn">Submit</button>
                         </div>
                     </template>
                     <h3 v-if="authUserOpinion.exists">Other User's Opinions</h3>
@@ -93,7 +94,8 @@
                             </div> 
                             <div v-if="opinion.replyBoxShown" class="reply-box">
                                 <h4>Reply</h4>
-                                <textarea class="reply-textarea"></textarea>
+                                <textarea v-model="replyInput" class="reply-textarea"></textarea>
+                                <button @click="submitReply(opinion.id)" class="btn">Submit</button>
                             </div>
                         </div>
                     </template>
@@ -132,13 +134,16 @@
         username: null, 
         userId: null, 
         content: null, 
-        replyBoxShown: false
+        replyBoxShown: false, 
+        replies: []
     });
     const opinionSubmitErrors = reactive([]);
     const isOpinionSubmissionProcessing = ref<boolean>(false);
     const isThreadLoading = ref<boolean>(true);
     const isOpinionsLoading = ref<boolean>(true);
     const opinions = reactive([]);
+
+    const replyInput = ref<string>('');
 
     const pusher = reactive({
         instance: null, 
@@ -172,8 +177,6 @@
 
             if(getIsLoggedIn.value === true){
 
-                console.log('AUTHOR_USER_ID', +data.author_user_id);
-
                 if(+data.author_user_id === getUserData.user_id){
 
                     authUserOpinion.exists = true;
@@ -198,6 +201,32 @@
 
     }
 
+    const listenForNewReplies = () => {
+
+        pusher.channel.bind('new-reply', data => {
+
+            if(getIsLoggedIn.value){
+
+                if(authUserOpinion.exists && +data.opinion_id === authUserOpinion.opinionId){
+                    authUserOpinion.replies.push(data);
+                }else{
+
+                    const idx = opinions.findIndex(op => op.id === +data.opinion_id)
+                    opinions.push(data);
+
+                }
+
+            }else{
+
+                const idx = opinions.findIndex(op => op.id === +data.opinion_id)
+                opinions.push(data);
+
+            }
+
+        });
+
+    }
+
 
 
     const createPusherInstance = () => {
@@ -207,6 +236,7 @@
         pusher.channel = pusher.instance.subscribe(`thread-${slug.value}`);
 
         listenForNewOpinions();
+        listenForNewReplies();
 
     }
 
@@ -335,6 +365,7 @@
                     authUserOpinion.userId = authOp[0].author_user_id;
                     authUserOpinion.content = authOp[0].content;
                     authUserOpinion.opinionId = authOp[0].id;
+                    authUserOpinion.replies = authOp[0].replies;
                     authUserOpinion.replyBoxShown = false;
 
                     let otherOps = response.data.body.opinions.filter(op => op.author_user_id !== getUserData.user_id);
@@ -363,6 +394,21 @@
 
     }
 
+    const closeOtherReplyBoxes = (opinionId) => {
+
+        replyInput.value = '';
+
+        for(let opinion of opinions){
+
+            if(opinion.id !== opinionId){
+
+                opinion.replyBoxShown = false;
+
+            }
+        }
+
+    }
+
     const toggleReplyBox = (opinionId) => {
 
         if(getIsLoggedIn.value === true && 
@@ -371,10 +417,34 @@
         ){
 
             authUserOpinion.replyBoxShown = !authUserOpinion.replyBoxShown;
+            closeOtherReplyBoxes();
 
         }else{
             const matchingOpinion = opinions.findIndex(op => op.id === opinionId);
             opinions[matchingOpinion].replyBoxShown = !opinions[matchingOpinion].replyBoxShown;
+            closeOtherReplyBoxes();
+        }
+
+    }
+
+    const submitReply = async (opinionId) => {
+
+        try{
+
+            await axios.post('http://localhost:3002/api/v1/opinion-replies', 
+            {
+                opinion_id: opinionId, 
+                content: replyInput.value, 
+                thread_slug: slug.value
+            },
+            {
+                headers: {
+                    'x-auth-token': getAuthToken.value
+                }
+            });
+
+        }catch(e){
+            console.error(e);
         }
 
     }
@@ -545,7 +615,7 @@
         margin-right:.5rem;
     }
 
-    .reply-btn{
+    .reply-btn {
         background:transparent;
         border:none;
         color:#11998e;
@@ -559,12 +629,14 @@
 
         h4{
             font-size:1.4rem;
+            margin-bottom:1rem;
         }
 
         .reply-textarea{
             width:100%;
             display:block;
             padding:3px;
+            resize:none;
         }
     }
 
