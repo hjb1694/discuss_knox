@@ -23,12 +23,16 @@
                 theme="snow"
                 :toolbar="toolbar"
                 placeholder="Write something interesting..."
+                content-type="html"
                 v-model:content="opinionInput"
                 />
                 <button @click="submitOpinion" class="btn" :disabled="isOpinionSubmissionProcessing">
-                <span v-if="!isOpinionSubmissionProcessing">Submit</span>
-                <span v-else>Processing...</span>
+                    <span v-if="!isOpinionSubmissionProcessing">Submit</span>
+                    <span v-else>Processing...</span>
                 </button>
+                <div v-if="opinionSubmitErrors.length" class="errbox">
+                    <p v-for="error in opinionSubmitErrors" :key="error">{{ error }}</p>
+                </div>
             </form>
             <div class="auth-prompt" v-if="isAuthPromptShown">
                 <p><a @click="openAuthModal">Login or Register</a> to add your opinion.</p>
@@ -37,22 +41,37 @@
                 <p>This thread is closed.</p>
             </div>
             <div class="opinions">
-                <h2>Opinions ({{ opinions.length }})</h2>
+                <h2>Opinions ({{ authUserOpinion.exists ? opinions.length + 1 : opinions.length }})</h2>
                 <div v-if="isOpinionsLoading" class="opinions-loading-container">
                     <img src="@/assets/ring-spinner.svg" class="opinions-loading-spinner" />
                 </div>
                 <template v-else>
+                    <template v-if="authUserOpinion.exists">
+                        <h3>Your Opinion</h3>
+                        <div class="opinion">
+                            <header class="opinion__header">
+                                <button @click="routerPush('/user/profile/' + authUserOpinion.username)" class="opinion__author">
+                                    <i class="user-icon fa fa-user"></i>
+                                    <span>u/{{ authUserOpinion.username }}</span>
+                                </button>
+                            </header>
+                             <section class="opinion__body">
+                                <div class="opinion__content" v-html="authUserOpinion.content"></div>
+                            </section>
+                        </div>
+                    </template>
+                    <h3 v-if="authUserOpinion.exists">Other User's Opinions</h3>
                     <template v-if="opinions.length">
                         <div v-for="opinion of opinions" class="opinion">
                             <header class="opinion__header">
-                                <button class="opinion__author">
+                                <button @click="routerPush('/user/profile/' + opinion.author_username)" class="opinion__author">
                                     <i class="user-icon fa fa-user"></i>
-                                    <span>u/usernamehere</span>
-                                    <strong class="you">(You)</strong>
+                                    <span>u/{{ opinion.author_username }}</span>
+                                    <strong v-if="getIsLoggedIn && (+opinion.author_user_id === getUserData.user_id)" class="you">(You)</strong>
                                 </button>
                             </header>
                             <section class="opinion__body">
-                                <div class="opinion__content"></div>
+                                <div class="opinion__content" v-html="opinion.content"></div>
                             </section>
                         </div>
                     </template>
@@ -66,7 +85,7 @@
 </template>
 
 <script lang="ts" setup>
-    import { ref, reactive, onMounted, computed } from 'vue';
+    import { ref, reactive, onMounted, computed, watch } from 'vue';
     import axios from 'axios';
     import { useRoute, useRouter } from 'vue-router';
     import { QuillEditor } from '@vueup/vue-quill';
@@ -84,7 +103,12 @@
 
     const slug = ref<string>(routeParams.slug);
     const threadData = reactive({});
-    const authUserOpinion = reactive({});
+    const authUserOpinion = reactive({
+        exists: false,
+        username: null, 
+        userId: null, 
+        content: null
+    });
     const opinionSubmitErrors = reactive([]);
     const isOpinionSubmissionProcessing = ref<boolean>(false);
     const isThreadLoading = ref<boolean>(true);
@@ -99,7 +123,7 @@
         return getIsLoggedIn.value === true && 
         threadData.author_user_id !== getUserData.user_id &&
         threadData.status !== 'CLOSED' &&
-        !authUserOpinion.username;
+        !authUserOpinion.exists;
     });
 
     const isAuthPromptShown = computed(() => {
@@ -168,15 +192,16 @@
 
     const opinionValidation = () => {
 
+
         opinionSubmitErrors.splice(0,opinionSubmitErrors.length);
         let isValid = true;
 
-        if(stringLength(htmlEntityDecode(stripAllWS(stripTags(contentInput.value)))) < 20){
+        if(stringLength(htmlEntityDecode(stripAllWS(stripTags(opinionInput.value)))) < 20){
             isValid = false;
             opinionSubmitErrors.push('Opinion is too short.');
         }
 
-        if(stringLength(htmlEntityDecode(stripAllWS(stripTags(contentInput.value)))) > 3000){
+        if(stringLength(htmlEntityDecode(stripAllWS(stripTags(opinionInput.value)))) > 3000){
             isValid = false;
             opinionSubmitErrors.push('Opinion is too long.');
         }
@@ -198,7 +223,7 @@
             await axios.post('http://localhost:3002/api/v1/opinions', 
             {
                 thread_id: threadData.id, 
-                content: contentInput.value
+                content: opinionInput.value
             }, 
             {
                 headers: {
@@ -220,12 +245,36 @@
     const fetchOpinions = async () => {
 
         isOpinionsLoading.value = true;
+        opinions.splice(0, opinions.length);
 
         try{
 
             const response = await axios.get(`http://localhost:3002/api/v1/opinions/${threadData.id}`);
 
-            opinions.push(...response.data.body.opinions);
+            if(getIsLoggedIn.value === true){
+
+                const authOp = response.data.body.opinions.filter(op => op.author_user_id === getUserData.user_id);
+
+                if(authOp.length){
+                    authUserOpinion.exists = true;
+                    authUserOpinion.username = authOp[0].author_username;
+                    authUserOpinion.userId = authOp[0].author_user_id;
+                    authUserOpinion.content = authOp[0].content;
+
+                    const otherOps = response.data.body.opinions.filter(op => op.author_user_id !== getUserData.user_id);
+
+                    opinions.push(...otherOps);
+                }else{
+                    
+                    opinions.push(...response.data.body.opinions);
+
+                }
+
+            }else{
+
+                opinions.push(...response.data.body.opinions);
+
+            }
 
         }catch(e){
             console.error(e);
@@ -234,6 +283,16 @@
         }
 
     }
+
+    watch(getIsLoggedIn, (value) => {
+
+        if(value === false){
+            authUserOpinion.exists = false;
+        }
+
+        fetchThread();
+
+    })
 
     onMounted(() => {
         fetchThread();
@@ -352,7 +411,23 @@
         color:#888;
         text-align:center;
         margin-top:2rem;
+        font-size:2rem;
+    }
+
+    h3{
+        font-size:1.8rem;
+        border-bottom:1px solid #ccc;
+        margin-top:2rem;
+    }
+
+    .errbox{
+        color:#f00;
+        margin-top:2rem;
         font-size:1.4rem;
+        background:#ffe0de;
+        border:1px solid #f00;
+        padding:1rem;
+        border-radius:.5rem;
     }
 
     @media (max-width: 800px) {

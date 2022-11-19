@@ -28,8 +28,11 @@
                     />
                 </div>
                 <div class="fgrp">
-                    <button class="subbut" @click="submit('publish')">Publish</button>
-                    <button class="subbut" @click="submit('draft')">Save As Draft</button>
+                    <button class="subbut" @click="submit('publish')" :disabled="isSubmissionProcessing">Publish</button>
+                    <button class="subbut" @click="submit('draft')" :disabled="isSubmissionProcessing">Save As Draft</button>
+                </div>
+                <div v-if="errors.length" class="errbox">
+                    <p v-for="error in errors" :key="error">{{ error }}</p>
                 </div>
             </div>
         </form>
@@ -60,6 +63,7 @@
     const headlineInput = ref<string>('');
     const channelInput = ref<string>('');
     const contentInput = ref<string>('');
+    const isSubmissionProcessing = ref<boolean>(false);
 
     const editorToolbar = ['bold', 'italic', 'underline', 'image', {'list': 'ordered'}, {'list': 'bullet'}];
 
@@ -150,7 +154,7 @@
 
         try{
 
-            await axios.post(
+            const response = await axios.post(
                 'http://localhost:3002/api/v1/thread', 
                 {
                     action, 
@@ -164,6 +168,8 @@
                     }
                 }
             );
+
+            routerPush(`/thread/${response.data.body.slug}`);
 
         }catch(e){
             if(e.response?.data?.short_msg){
@@ -247,6 +253,16 @@
         &:not(:last-child){
             margin-right:1rem;
         }
+    }
+
+    .errbox{
+        color:#f00;
+        margin-top:2rem;
+        font-size:1.4rem;
+        background:#ffe0de;
+        border:1px solid #f00;
+        padding:1rem;
+        border-radius:.5rem;
     }
 
     @media (max-width:800px){
