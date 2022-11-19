@@ -85,7 +85,7 @@
 </template>
 
 <script lang="ts" setup>
-    import { ref, reactive, onMounted, computed, watch } from 'vue';
+    import { ref, reactive, onMounted, computed, watch, onUnmounted } from 'vue';
     import axios from 'axios';
     import { useRoute, useRouter } from 'vue-router';
     import { QuillEditor } from '@vueup/vue-quill';
@@ -95,6 +95,7 @@
     import sanitizeHTML from 'sanitize-html';
     import stringLength from 'string-length';
     import { decode as htmlEntityDecode } from 'html-entities';
+    import Pusher from 'pusher-js';
 
     const { params: routeParams } = useRoute();
     const { push: routerPush } = useRouter();
@@ -115,6 +116,11 @@
     const isOpinionsLoading = ref<boolean>(true);
     const opinions = reactive([]);
 
+    const pusher = reactive({
+        instance: null, 
+        channel: null
+    });
+
     const opinionInput = ref<string>('');
 
     const toolbar = ['bold', 'italic', 'underline', {'list': 'ordered'}, {'list': 'bullet'}];
@@ -134,6 +140,49 @@
     const isClosedPromptShown = computed(() => {
         return threadData.status === 'CLOSED';
     });
+
+
+    const listenForNewOpinions = () => {
+
+        pusher.channel.bind('new_opinion', data => {
+
+            if(getIsLoggedIn.value === true){
+
+                console.log('AUTHOR_USER_ID', +data.author_user_id);
+
+                if(+data.author_user_id === getUserData.user_id){
+
+                    authUserOpinion.exists = true;
+                    authUserOpinion.username = data.author_username;
+                    authUserOpinion.userId = data.author_user_id;
+                    authUserOpinion.content = data.content;
+
+                }else{
+                    opinions.unshift(data);
+                }
+
+            }else{
+
+                opinions.unshift(data);
+
+            }
+
+
+        });
+
+    }
+
+
+
+    const createPusherInstance = () => {
+
+        pusher.instance = new Pusher('f5ea34c17095fbb4548a');
+
+        pusher.channel = pusher.instance.subscribe(`thread-${slug.value}`);
+
+        listenForNewOpinions();
+
+    }
 
     const fetchThread = async () => {
 
@@ -167,6 +216,7 @@
             }
 
             fetchOpinions();
+            createPusherInstance();
 
 
         }catch(e){
@@ -231,8 +281,6 @@
                 }
             });
 
-            fetchOpinions();
-
         }catch(e){
             console.error(e);
         }finally{
@@ -284,6 +332,7 @@
 
     }
 
+
     watch(getIsLoggedIn, (value) => {
 
         if(value === false){
@@ -299,6 +348,11 @@
 
     onMounted(() => {
         fetchThread();
+    });
+
+    onUnmounted(() => {
+        pusher.channel = null;
+        pusher.instance.unsubscribe();
     });
 
 
