@@ -70,6 +70,17 @@
                             <textarea v-model="replyInput" class="reply-textarea"></textarea>
                             <button @click="submitReply(authUserOpinion.opinionId)" class="btn">Submit</button>
                         </div>
+                        <div class="replies">
+                            <div class="reply" v-for="reply in authUserOpinion.replies">
+                                <div 
+                                @click="routerPush('/user/profile/' + reply.author_username)" 
+                                class="reply__author"
+                                >
+                                    <i class="user-icon fa fa-user"></i> u/{{ reply.author_username}}
+                                </div>
+                                <div class="reply__content">{{ reply.content }}</div>
+                            </div>
+                        </div>
                     </template>
                     <h3 v-if="authUserOpinion.exists">Other User's Opinions</h3>
                     <template v-if="opinions.length">
@@ -96,6 +107,12 @@
                                 <h4>Reply</h4>
                                 <textarea v-model="replyInput" class="reply-textarea"></textarea>
                                 <button @click="submitReply(opinion.id)" class="btn">Submit</button>
+                            </div>
+                            <div class="replies">
+                                <div class="reply" v-for="reply in opinion.replies">
+                                    <div @click="routerPush('/user/profile/' + reply.author_username)" class="reply__author"><i class="user-icon fa fa-user"></i> u/{{ reply.author_username}}</div>
+                                    <div class="reply__content">{{ reply.content }}</div>
+                                </div>
                             </div>
                         </div>
                     </template>
@@ -427,7 +444,18 @@
 
     }
 
+    const closeAllReplyBoxes = () => {
+
+        for(opinion of opinions){
+            opinion.replyBoxShown = false;
+        }
+        authUserOpinion.replyBoxShown = false;
+        replyInput.value = '';
+
+    }
+
     const submitReply = async (opinionId) => {
+
 
         try{
 
@@ -442,6 +470,8 @@
                     'x-auth-token': getAuthToken.value
                 }
             });
+
+            closeAllReplyBoxes();
 
         }catch(e){
             console.error(e);
@@ -637,6 +667,23 @@
             display:block;
             padding:3px;
             resize:none;
+        }
+    }
+
+    .reply{
+        background:#fff;
+        padding:1rem;
+        box-shadow:0 0 .5rem rgba(0,0,0,.24);
+        width:85%;
+        margin-right:0;
+        margin-left:auto;
+        font-size:1.4rem;
+        margin-top:1rem;
+        margin-bottom:1rem;
+
+        &__author{
+            font-weight:bold;
+            margin-bottom:1rem;
         }
     }
 
