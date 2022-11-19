@@ -1,41 +1,67 @@
 <template>
     <div class="container">
-        <div class="thread">
-            <header class="thread__header">
-                <button @click="routerPush('/user/profile/' + threadData.author_username)" class="thread__author">
-                    <i class="user-icon fa fa-user"></i>
-                    <span>u/{{ threadData.author_username }}</span>
-                    <strong v-if="getIsLoggedIn && (threadData.author_user_id === getUserData.user_id)" class="you">(You)</strong>
+        <div v-if="isThreadLoading" class="spinner-container">
+            <img class="spinner" src="@/assets/ring-spinner.svg" />
+        </div>
+        <template v-else>
+            <div class="thread">
+                <header class="thread__header">
+                    <button @click="routerPush('/user/profile/' + threadData.author_username)" class="thread__author">
+                        <i class="user-icon fa fa-user"></i>
+                        <span>u/{{ threadData.author_username }}</span>
+                        <strong v-if="getIsLoggedIn && (threadData.author_user_id === getUserData.user_id)" class="you">(You)</strong>
+                    </button>
+                </header>
+                <section class="thread__body">
+                    <h2 class="thread__headline">{{ threadData.headline }}</h2>
+                    <div class="thread__content" v-html="threadData.content"></div>
+                </section>
+            </div>
+            <form class="opinion-form" v-if="isResponseFormShown" @submit.prevent>
+                <h2>Add an Opinion</h2>
+                <quill-editor 
+                theme="snow"
+                :toolbar="toolbar"
+                placeholder="Write something interesting..."
+                v-model:content="opinionInput"
+                />
+                <button @click="submitOpinion" class="btn" :disabled="isOpinionSubmissionProcessing">
+                <span v-if="!isOpinionSubmissionProcessing">Submit</span>
+                <span v-else>Processing...</span>
                 </button>
-            </header>
-            <section class="thread__body">
-                <h2 class="thread__headline">{{ threadData.headline }}</h2>
-                <div class="thread__content" v-html="threadData.content"></div>
-            </section>
-        </div>
-        <form class="opinion-form" v-if="isResponseFormShown" @submit.prevent>
-            <h2>Add an Opinion</h2>
-            <quill-editor 
-            theme="snow"
-            :toolbar="toolbar"
-            placeholder="Write something interesting..."
-            v-model:content="opinionInput"
-            />
-            <button @click="submitOpinion" class="btn" :disabled="isOpinionSubmissionProcessing">
-              <span v-if="!isOpinionSubmissionProcessing">Submit</span>
-              <span v-else>Processing...</span>
-            </button>
-        </form>
-        <div class="auth-prompt" v-if="isAuthPromptShown">
-            <p><a @click="openAuthModal">Login or Register</a> to add your opinion.</p>
-        </div>
-        <div v-if="isClosedPromptShown" class="closed-prompt">
-            <p>This thread is closed.</p>
-        </div>
-        <div class="opinions">
-            <h2>Opinions (0)</h2>
-
-        </div>
+            </form>
+            <div class="auth-prompt" v-if="isAuthPromptShown">
+                <p><a @click="openAuthModal">Login or Register</a> to add your opinion.</p>
+            </div>
+            <div v-if="isClosedPromptShown" class="closed-prompt">
+                <p>This thread is closed.</p>
+            </div>
+            <div class="opinions">
+                <h2>Opinions ({{ opinions.length }})</h2>
+                <div v-if="isOpinionsLoading" class="opinions-loading-container">
+                    <img src="@/assets/ring-spinner.svg" class="opinions-loading-spinner" />
+                </div>
+                <template v-else>
+                    <template v-if="opinions.length">
+                        <div v-for="opinion of opinions" class="opinion">
+                            <header class="opinion__header">
+                                <button class="opinion__author">
+                                    <i class="user-icon fa fa-user"></i>
+                                    <span>u/usernamehere</span>
+                                    <strong class="you">(You)</strong>
+                                </button>
+                            </header>
+                            <section class="opinion__body">
+                                <div class="opinion__content"></div>
+                            </section>
+                        </div>
+                    </template>
+                    <div v-else class="none">
+                        No Opinions Just Yet :(
+                    </div>
+                </template>
+            </div>
+        </template>
     </div>
 </template>
 
@@ -61,6 +87,9 @@
     const authUserOpinion = reactive({});
     const opinionSubmitErrors = reactive([]);
     const isOpinionSubmissionProcessing = ref<boolean>(false);
+    const isThreadLoading = ref<boolean>(true);
+    const isOpinionsLoading = ref<boolean>(true);
+    const opinions = reactive([]);
 
     const opinionInput = ref<string>('');
 
@@ -85,6 +114,8 @@
     const fetchThread = async () => {
 
         try{
+
+            isThreadLoading.value = true;
 
             const response = await axios.get(`http://localhost:3002/api/v1/thread/${slug.value}`);
 
@@ -111,9 +142,13 @@
                 threadData[key] = thread[key];
             }
 
+            fetchOpinions();
+
 
         }catch(e){
             console.error(e);
+        }finally{
+            isThreadLoading.value = false;
         }
 
     }
@@ -171,12 +206,32 @@
                 }
             });
 
+            fetchOpinions();
+
         }catch(e){
             console.error(e);
         }finally{
             isOpinionSubmissionProcessing.value = false;
         }
 
+
+    }
+
+    const fetchOpinions = async () => {
+
+        isOpinionsLoading.value = true;
+
+        try{
+
+            const response = await axios.get(`http://localhost:3002/api/v1/opinions/${threadData.id}`);
+
+            opinions.push(...response.data.body.opinions);
+
+        }catch(e){
+            console.error(e);
+        }finally{
+            isOpinionsLoading.value = false;
+        }
 
     }
 
@@ -194,10 +249,24 @@
         margin:2rem auto;
     }
 
-    .thread{
+    .spinner-container{
+        display:flex;
+        height:70rem;
+        justify-content:center;
+        align-items:center;
+    }
+
+    .opinions-loading-container{
+        display:flex;
+        justify-content:center;
+    }
+
+    .thread, 
+    .opinion {
         box-shadow:0 0 .5rem rgba(0,0,0,.24);
         border-radius:.5rem;
         overflow:hidden;
+        margin:1rem 0;
 
         &__header{
             background:#33ab87;
@@ -277,6 +346,13 @@
 
     .you{
         margin-left:.5rem;
+    }
+
+    .none{
+        color:#888;
+        text-align:center;
+        margin-top:2rem;
+        font-size:1.4rem;
     }
 
     @media (max-width: 800px) {
