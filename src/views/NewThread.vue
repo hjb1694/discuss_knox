@@ -53,7 +53,7 @@
     import { useFlashToastStore, MessageTypes } from '@/stores/useFlashToastStore';
     import { useRouter } from 'vue-router';
 
-    const { getIsLoggedIn, getAuthToken, logout } = useAuthStore();
+    const { getIsLoggedIn, getAuthToken, logout, getUserData } = useAuthStore();
     const { openFlashToast } = useFlashToastStore();
     const { push: routerPush } = useRouter();
 
@@ -169,7 +169,18 @@
                 }
             );
 
-            routerPush(`/thread/${response.data.body.slug}`);
+            const shortMsg = response.data.short_msg;
+
+            if(shortMsg === 'SUCCESS_PUBLISHED'){
+
+                routerPush(`/thread/${response.data.body.slug}`);
+
+            }else if(shortMsg === 'SUCCESS_DRAFT_SAVED'){
+
+                openFlashToast(MessageTypes.SUCCESS, 'Draft saved.');
+                routerPush(`/user/profile/${getUserData.username}`);
+
+            }
 
         }catch(e){
             if(e.response?.data?.short_msg){
