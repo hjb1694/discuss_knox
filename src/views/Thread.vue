@@ -58,21 +58,43 @@
                              <section class="opinion__body">
                                 <div class="opinion__content" v-html="authUserOpinion.content"></div>
                             </section>
+                            <footer class="opinion__footer">
+                                <button v-if="getIsLoggedIn" @click="toggleReplyBox(authUserOpinion.opinionId)" class="reply-btn">
+                                    <i class="reply-icon fa fa-reply"></i>
+                                    <span>Reply</span>
+                                </button>
+                            </footer>
+                        </div>
+                        <div v-if="authUserOpinion.replyBoxShown" class="reply-box">
+                            <h4>Reply</h4>
+                            <textarea class="reply-textarea"></textarea>
                         </div>
                     </template>
                     <h3 v-if="authUserOpinion.exists">Other User's Opinions</h3>
                     <template v-if="opinions.length">
-                        <div v-for="opinion of opinions" class="opinion">
-                            <header class="opinion__header">
-                                <button @click="routerPush('/user/profile/' + opinion.author_username)" class="opinion__author">
-                                    <i class="user-icon fa fa-user"></i>
-                                    <span>u/{{ opinion.author_username }}</span>
-                                    <strong v-if="getIsLoggedIn && (+opinion.author_user_id === getUserData.user_id)" class="you">(You)</strong>
-                                </button>
-                            </header>
-                            <section class="opinion__body">
-                                <div class="opinion__content" v-html="opinion.content"></div>
-                            </section>
+                        <div v-for="opinion of opinions">
+                            <div class="opinion">
+                                <header class="opinion__header">
+                                    <button @click="routerPush('/user/profile/' + opinion.author_username)" class="opinion__author">
+                                        <i class="user-icon fa fa-user"></i>
+                                        <span>u/{{ opinion.author_username }}</span>
+                                        <strong v-if="getIsLoggedIn && (+opinion.author_user_id === getUserData.user_id)" class="you">(You)</strong>
+                                    </button>
+                                </header>
+                                <section class="opinion__body">
+                                    <div class="opinion__content" v-html="opinion.content"></div>
+                                </section>
+                                <footer class="opinion__footer">
+                                    <button v-if="getIsLoggedIn" @click="toggleReplyBox(opinion.id)" class="reply-btn">
+                                        <i class="reply-icon fa fa-reply"></i>
+                                        <span>Reply</span>
+                                    </button>
+                                </footer>
+                            </div> 
+                            <div v-if="opinion.replyBoxShown" class="reply-box">
+                                <h4>Reply</h4>
+                                <textarea class="reply-textarea"></textarea>
+                            </div>
                         </div>
                     </template>
                     <div v-else class="none">
@@ -106,9 +128,11 @@
     const threadData = reactive({});
     const authUserOpinion = reactive({
         exists: false,
+        opinionId: null,
         username: null, 
         userId: null, 
-        content: null
+        content: null, 
+        replyBoxShown: false
     });
     const opinionSubmitErrors = reactive([]);
     const isOpinionSubmissionProcessing = ref<boolean>(false);
@@ -156,14 +180,16 @@
                     authUserOpinion.username = data.author_username;
                     authUserOpinion.userId = data.author_user_id;
                     authUserOpinion.content = data.content;
+                    authUserOpinion.id = data.id;
+                    authUserOpinon.replyBoxShown = false;
 
                 }else{
-                    opinions.unshift(data);
+                    opinions.unshift({...data, replyBoxShown: false});
                 }
 
             }else{
 
-                opinions.unshift(data);
+                opinions.unshift({...data, replyBoxShown: false});
 
             }
 
@@ -308,19 +334,24 @@
                     authUserOpinion.username = authOp[0].author_username;
                     authUserOpinion.userId = authOp[0].author_user_id;
                     authUserOpinion.content = authOp[0].content;
+                    authUserOpinion.opinionId = authOp[0].id;
+                    authUserOpinion.replyBoxShown = false;
 
-                    const otherOps = response.data.body.opinions.filter(op => op.author_user_id !== getUserData.user_id);
+                    let otherOps = response.data.body.opinions.filter(op => op.author_user_id !== getUserData.user_id);
+                    otherOps = otherOps.map(op => ({...op, replyBoxShown: false}));
 
                     opinions.push(...otherOps);
                 }else{
                     
-                    opinions.push(...response.data.body.opinions);
+                    let otherOps = response.data.body.opinions.map(op => ({...op, replyBoxShown: false}));
+                    opinions.push(...otherOps);
 
                 }
 
             }else{
 
-                opinions.push(...response.data.body.opinions);
+                let otherOps = response.data.body.opinions.map(op => ({...op, replyBoxShown: false}));
+                opinions.push(...otherOps);
 
             }
 
@@ -328,6 +359,22 @@
             console.error(e);
         }finally{
             isOpinionsLoading.value = false;
+        }
+
+    }
+
+    const toggleReplyBox = (opinionId) => {
+
+        if(getIsLoggedIn.value === true && 
+        authUserOpinion.exists &&
+        authUserOpinion.opinionId === opinionId
+        ){
+
+            authUserOpinion.replyBoxShown = !authUserOpinion.replyBoxShown;
+
+        }else{
+            const matchingOpinion = opinions.findIndex(op => op.id === opinionId);
+            opinions[matchingOpinion].replyBoxShown = !opinions[matchingOpinion].replyBoxShown;
         }
 
     }
@@ -340,6 +387,8 @@
             authUserOpinion.username = null;
             authUserOpinion.userId = null;
             authUserOpinion.content = null;
+            authUserOpinion.replyBoxShown = false;
+            authUserOpinion.opinionId = null;
         }
 
         fetchThread();
@@ -410,6 +459,11 @@
         &__content{
             font-size:1.4rem;
             margin-top:1rem;
+        }
+
+        &__footer{
+            background:#fff;
+            border-top:1px solid #ccc;
         }
 
         .user-icon{
@@ -485,6 +539,33 @@
         border:1px solid #f00;
         padding:1rem;
         border-radius:.5rem;
+    }
+
+    .reply-icon{
+        margin-right:.5rem;
+    }
+
+    .reply-btn{
+        background:transparent;
+        border:none;
+        color:#11998e;
+        padding:.5rem;
+    }
+
+    .reply-box{
+        background:#fff;
+        padding:1rem;
+        box-shadow:0 0 .5rem rgba(0,0,0,.24);
+
+        h4{
+            font-size:1.4rem;
+        }
+
+        .reply-textarea{
+            width:100%;
+            display:block;
+            padding:3px;
+        }
     }
 
     @media (max-width: 800px) {
