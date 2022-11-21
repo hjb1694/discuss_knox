@@ -148,7 +148,7 @@
 
         try{
 
-            const response = await axios.get('http://localhost:3002/api/v1/channels');
+            const response = await axios.get('http://155.138.197.17:8080/api/v1/channels');
 
             const opts = response.data.body.channels.map(channel => `c/${channel.channel_slug}`);
             const rec = response.data.body.channels.filter(channel => channel.is_featured === true);

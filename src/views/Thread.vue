@@ -275,7 +275,7 @@
 
             isThreadLoading.value = true;
 
-            const response = await axios.get(`http://localhost:3002/api/v1/thread/${slug.value}`);
+            const response = await axios.get(`http://155.138.197.17:8080/api/v1/thread/${slug.value}`);
 
             const thread = response.data.body.thread;
 
@@ -291,7 +291,7 @@
                 image.style.display = 'block';
                 image.style.margin = '1rem auto';
                 image.style.maxWidth = '300px';
-                image.src = `http://localhost:3002/thread_img/${url.pathname.split('/')[2]}`;
+                image.src = `http://155.138.197.17:8080/thread_img/${url.pathname.split('/')[2]}`;
             });
 
             thread.content = dom.body.innerHTML;
@@ -369,7 +369,7 @@
 
         try{
 
-            await axios.post('http://localhost:3002/api/v1/opinions', 
+            await axios.post('http://155.138.197.17:8080/api/v1/opinions', 
             {
                 thread_id: threadData.id, 
                 content: opinionInput.value
@@ -396,7 +396,7 @@
 
         try{
 
-            const response = await axios.get(`http://localhost:3002/api/v1/opinions/${threadData.id}`);
+            const response = await axios.get(`http://155.138.197.17:8080/api/v1/opinions/${threadData.id}`);
 
             if(getIsLoggedIn.value === true){
 
@@ -485,7 +485,7 @@
 
         try{
 
-            await axios.post('http://localhost:3002/api/v1/opinion-replies', 
+            await axios.post('http://155.138.197.17:8080/api/v1/opinion-replies', 
             {
                 opinion_id: opinionId, 
                 content: replyInput.value, 
