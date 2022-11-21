@@ -16,6 +16,7 @@
                 </div>
             </div>
         </div>
+        <button v-if="isOlderThreadBtnShown" class="btn center" @click="loadThreads">Load Older Threads</button>
     </div>
 </template>
 
@@ -29,6 +30,7 @@
 
     const shownThreads = reactive([]);
     const newThreadsToLoad = reactive([]);
+    const isOlderThreadBtnShown = ref<boolean>(true);
 
     const maxId = ref<number | null>(null);
 
@@ -79,6 +81,10 @@
             maxId.value = Math.min(...threads.map(thread => +thread.id)) - 1;
 
             shownThreads.push(...threads);
+
+            if(threads.length < 10){
+                isOlderThreadBtnShown.value = false;
+            }
 
         }catch(e){
             console.error(e);
