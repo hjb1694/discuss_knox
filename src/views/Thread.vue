@@ -3,6 +3,16 @@
         <div v-if="isThreadLoading" class="spinner-container">
             <img class="spinner" src="@/assets/ring-spinner.svg" />
         </div>
+        <div v-else-if="isThreadNotFound" class="error-display">
+            <i class="big-error-icon fa fa-close"></i>
+            <h2 class="error-heading">Aww Snap!</h2>
+            <p class="error-text">This thread cannot be found.</p>
+        </div>
+        <div v-else-if="isErrorLoadingThread" class="error-display">
+            <i class="big-error-icon fa fa-close"></i>
+            <h2 class="error-heading">Aww Snap!</h2>
+            <p class="error-text">There was an error loading this page.</p>
+        </div>
         <template v-else>
             <div class="thread">
                 <header class="thread__header">
@@ -159,6 +169,8 @@
     const isThreadLoading = ref<boolean>(true);
     const isOpinionsLoading = ref<boolean>(true);
     const opinions = reactive([]);
+    const isThreadNotFound = ref<boolean>(false);
+    const isErrorLoadingThread = ref<boolean>(false);
 
     const replyInput = ref<string>('');
 
@@ -294,6 +306,20 @@
 
         }catch(e){
             console.error(e);
+
+            if(e.response?.data?.short_msg){
+
+                const shortMsg = e.response.data.short_msg;
+
+                if(shortMsg === 'ERR_NOT_FOUND'){
+                    isThreadNotFound.value = true;
+                }else{
+                    isErrorLoadingThread.value = true;
+                }
+
+            }else{
+                isErrorLoadingThread.value = true;
+            }
         }finally{
             isThreadLoading.value = false;
         }
@@ -693,6 +719,29 @@
             font-weight:bold;
             margin-bottom:1rem;
         }
+    }
+
+    .error-display{
+        height:70vh;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        flex-direction:column;
+        color:#888;
+
+        .big-error-icon{
+            font-size:6rem;
+        }
+
+        .error-heading{
+            font-size:3rem;
+        }
+
+        .error-text{
+            font-size:1.8rem;
+        }
+
+
     }
 
     @media (max-width: 800px) {

@@ -141,6 +141,7 @@
         box-shadow:0 0 .5rem rgba(0,0,0,.24);
         margin-right:2rem;
         margin-bottom:2rem;
+        background:#fff;
 
         &__image{
             display:block;
