@@ -1,22 +1,30 @@
 <template>
     <div class="container">
-        <button v-if="newThreadsToLoad.length" class="load-new-btn btn center" @click="loadNewerThreads">Load New Threads ({{ newThreadsToLoad.length }})</button>
-        <div class="threads">
-            <div v-for="thread in shownThreads" :key="thread.id" class="thread-tile">
-                <img v-if="!thread.main_image" src="@/assets/sunsphere_tower.jpg" class="thread-tile__image"/>
-                <img v-else :src="'http://localhost:3002/thread_img/' + thread.main_image" class="thread-tile__image"/>
-                <div class="thread-tile__body">
-                    <h2 @click="routerPush('/thread/' + thread.slug)">{{ thread.headline.substring(0,75) }}...</h2>
-                </div>
-                <div class="thread-tile__footer">
-                    <button @click="routerPush('/user/profile/' + thread.author_username)" class="thread-tile__author">
-                        <i class="user-icon fa fa-user"></i>
-                        <span>u/{{ thread.author_username }}</span>
-                    </button>
+        <button v-if="!isInitialLoadProcessing && newThreadsToLoad.length" class="load-new-btn btn center" @click="loadNewerThreads">Load New Threads ({{ newThreadsToLoad.length }})</button>
+        <div v-if="isInitialLoadProcessing" class="load-spinner-container">
+            <img src="@/assets/ring-spinner.svg" class="load-spinner"/>
+        </div>
+        <div v-else-if="isInitialLoad && !shownThreads.length" class="no-activity">
+            <p>No activity at the moment :(</p>
+        </div>
+        <template v-else>
+            <div class="threads">
+                <div v-for="thread in shownThreads" :key="thread.id" class="thread-tile">
+                    <img v-if="!thread.main_image" src="@/assets/sunsphere_tower.jpg" class="thread-tile__image"/>
+                    <img v-else :src="'http://localhost:3002/thread_img/' + thread.main_image" class="thread-tile__image"/>
+                    <div class="thread-tile__body">
+                        <h2 @click="routerPush('/thread/' + thread.slug)">{{ thread.headline.substring(0,75) }}...</h2>
+                    </div>
+                    <div class="thread-tile__footer">
+                        <button @click="routerPush('/user/profile/' + thread.author_username)" class="thread-tile__author">
+                            <i class="user-icon fa fa-user"></i>
+                            <span>u/{{ thread.author_username }}</span>
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
-        <button v-if="isOlderThreadBtnShown" class="btn center" @click="loadThreads">Load Older Threads</button>
+            <button v-if="isOlderThreadBtnShown" class="btn center" @click="loadThreads">Load Older Threads</button>
+        </template>
     </div>
 </template>
 
@@ -31,6 +39,8 @@
     const shownThreads = reactive([]);
     const newThreadsToLoad = reactive([]);
     const isOlderThreadBtnShown = ref<boolean>(true);
+    const isInitialLoad = ref<boolean>(true);
+    const isInitialLoadProcessing = ref<boolean>(true);
 
     const maxId = ref<number | null>(null);
 
@@ -86,8 +96,14 @@
                 isOlderThreadBtnShown.value = false;
             }
 
+            if(threads.length){
+                isInitialLoad.value = false;
+            }
+
         }catch(e){
             console.error(e);
+        }finally{
+            isInitialLoadProcessing.value = false;
         }
 
     }
@@ -180,6 +196,24 @@
     .load-new-btn{
         margin-bottom:2rem;
         animation: rise 1s alternate infinite;
+    }
+
+    .load-spinner-container{
+        height:70vh;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+    }
+
+    .load-spinner{
+        width:10rem;
+    }
+
+    .no-activity p{
+        text-align:center;
+        margin:2rem 0;
+        color:#888;
+        font-size:1.4rem;
     }
 
 
