@@ -128,7 +128,7 @@
 <script lang="ts" setup>
     import { ref, reactive, onMounted, computed, watch, onUnmounted } from 'vue';
     import axios from 'axios';
-    import { useRoute, useRouter } from 'vue-router';
+    import { useRoute, useRouter, onBeforeRouteUpdate } from 'vue-router';
     import { QuillEditor } from '@vueup/vue-quill';
     import '@vueup/vue-quill/dist/vue-quill.snow.css';
     import { useAuthStore } from '@/stores/useAuthStore';
@@ -493,7 +493,15 @@
 
         fetchThread();
 
-    })
+    });
+
+    onBeforeRouteUpdate(to => {
+
+        slug.value = to.params.slug;
+
+        fetchThread();
+
+    });
 
     onMounted(() => {
         fetchThread();
