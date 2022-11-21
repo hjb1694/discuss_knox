@@ -48,7 +48,7 @@
                     <i class="menu-icon fa fa-plus"></i>
                     <span>New Thread</span>
                 </button>
-                <button @click="routerPush('/')">
+                <button @click="goToFeed">
                     <i class="menu-icon fa fa-refresh"></i>
                     <span>Feed</span>
                 </button>
@@ -125,6 +125,7 @@
     }
 
     const goToNewThreadPage = () => {
+        isChannelDropdownShown.value = false;
         if(getIsLoggedIn.value === false){
             openAuthModal();
         }else if(getUserData.account_status === 'NOT_VERIFIED'){
@@ -132,6 +133,11 @@
         }else{
             routerPush('/thread/new');
         }
+    }
+
+    const goToFeed = () => {
+        isChannelDropdownShown.value = false;
+        routerPush('/');
     }
 
     const toggleChannelDropdown = () => {
@@ -201,6 +207,7 @@
         &__logo{
             display:block;
             width:25rem;
+            cursor:pointer;
         }
     }
 

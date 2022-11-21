@@ -718,6 +718,7 @@
         &__author{
             font-weight:bold;
             margin-bottom:1rem;
+            cursor:pointer;
         }
     }
 
