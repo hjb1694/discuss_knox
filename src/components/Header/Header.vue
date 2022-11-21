@@ -50,7 +50,7 @@
                 </button>
                 <button @click="routerPush('/')">
                     <i class="menu-icon fa fa-refresh"></i>
-                    <span>Live Feed</span>
+                    <span>Feed</span>
                 </button>
                 <div class="dropdown">
                     <button @click="toggleChannelDropdown">
