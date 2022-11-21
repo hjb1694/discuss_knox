@@ -1,5 +1,6 @@
 <template>
     <div class="container">
+        <button v-if="newThreadsToLoad.length" class="load-new-btn btn center" @click="loadNewerThreads">Load New Threads ({{ newThreadsToLoad.length }})</button>
         <div class="threads">
             <div v-for="thread in shownThreads" :key="thread.id" class="thread-tile">
                 <img v-if="!thread.main_image" src="@/assets/sunsphere_tower.jpg" class="thread-tile__image"/>
@@ -22,6 +23,7 @@
     import { ref, reactive, onMounted } from 'vue';
     import { useRouter } from 'vue-router';
     import axios from 'axios';
+    import Pusher from 'pusher-js';
 
     const { push: routerPush} = useRouter();
 
@@ -29,6 +31,38 @@
     const newThreadsToLoad = reactive([]);
 
     const maxId = ref<number | null>(null);
+
+    const pusher = reactive({
+        instance: null, 
+        channel: null
+    });
+
+
+    const loadNewerThreads = () => {
+
+        shownThreads.unshift(...newThreadsToLoad);
+
+        newThreadsToLoad.splice(0,newThreadsToLoad.length);
+
+    }
+
+    const listenForNewThreads = () => {
+
+        pusher.channel.bind('new-thread', data => {
+            newThreadsToLoad.unshift(data);
+        });
+
+    }
+
+    const createPusherInstance = () => {
+
+        pusher.instance = new Pusher('f5ea34c17095fbb4548a');
+
+        pusher.channel = pusher.instance.subscribe('live-feed');
+
+        listenForNewThreads();
+
+    }
 
     const loadThreads = async () => {
 
@@ -52,6 +86,7 @@
 
     }
 
+
     onMounted(() => {
         loadThreads();
     });
@@ -70,6 +105,7 @@
     .threads{
         display:flex;
         flex-wrap:wrap;
+        margin-top:1.75rem;
     }
 
     .thread-tile{
@@ -113,6 +149,27 @@
         }
     }
 
+    .btn{
+        display:block;
+        background:#21bf8f;
+        border:none;
+        padding:.8rem 1.2rem;
+        color:#fff;
+        font-size:1.6rem;
+        font-weight:bold;
+        border-radius:.5rem;
+
+        &.center{
+            margin:0 auto;
+        }
+
+    }
+
+    .load-new-btn{
+        margin-bottom:2rem;
+        animation: rise 1s alternate infinite;
+    }
+
 
     @media (max-width: 800px) {
 
@@ -140,6 +197,15 @@
             margin-right:0;
         }
 
+    }
+
+    @keyframes rise{
+        from{
+            transform:translateY(0);
+        }
+        to{
+            transform:translateY(1rem);
+        }
     }
 
 </style>
