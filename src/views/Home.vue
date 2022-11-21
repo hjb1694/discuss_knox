@@ -20,7 +20,7 @@
 </template>
 
 <script lang="ts" setup>
-    import { ref, reactive, onMounted } from 'vue';
+    import { ref, reactive, onMounted, onUnmounted } from 'vue';
     import { useRouter } from 'vue-router';
     import axios from 'axios';
     import Pusher from 'pusher-js';
@@ -90,6 +90,11 @@
     onMounted(() => {
         loadThreads();
         createPusherInstance();
+    });
+
+    onUnmounted(() => {
+        pusher.channel = null;
+        pusher.instance.unsubscribe();
     });
 
 
