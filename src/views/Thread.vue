@@ -510,7 +510,7 @@
 
     const validateReply = () => {
         replySubmitErrors.splice(0,replySubmitErrors.length);
-        const isValid = true;
+        let isValid = true;
 
         if(stringLength(stripAllWS(stripTags(value))) < 10){
             replySubmitErrors.push('Reply is too short.');
