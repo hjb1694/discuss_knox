@@ -487,13 +487,13 @@
         ){
 
             authUserOpinion.replyBoxShown = !authUserOpinion.replyBoxShown;
-            closeOtherReplyBoxes();
 
         }else{
             const matchingOpinion = opinions.findIndex(op => op.id === opinionId);
             opinions[matchingOpinion].replyBoxShown = !opinions[matchingOpinion].replyBoxShown;
-            closeOtherReplyBoxes();
         }
+
+        closeOtherReplyBoxes();
 
     }
 
@@ -552,6 +552,18 @@
 
             if(e.response?.data?.short_msg){
                 const shortMsg = e.response.data.short_msg;
+
+                if(shortMsg === 'ERR_DEACTIVATION'){
+                    openFlashToast(MessageTypes.ERROR, 'You have been deactivated.');
+                    logout();
+                }else if(shortMsg === 'ERR_NOT_VERIFIED'){
+                    openEmailVerifyModal();
+                }else if(shortMsg === 'FROZEN'){
+                    openFlashToast(MessageTypes.ERROR, 'Your account is frozen and under review by admins.');
+                }else{
+                    replySubmitErrors.push('An error has occurred.');
+                }
+
             }else{
                 replySubmitErrors.push('An error has occurred.');
             }
