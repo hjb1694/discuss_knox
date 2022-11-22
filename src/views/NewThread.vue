@@ -189,7 +189,7 @@
 
                 if(shortMsg === 'ERR_MAX_THREADS'){
                     openFlashToast(MessageTypes.ERROR, 'You have reached your peak limit for new threads for today.');
-                }else if(shortMsg === 'ERR_DEACTIVATED'){
+                }else if(shortMsg === 'ERR_DEACTIVATION'){
                     openFlashToast(MessageTypes.ERROR, 'Account deactivated.')
                     logout();
                     routerPush('/');

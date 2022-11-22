@@ -149,6 +149,7 @@
     import '@vueup/vue-quill/dist/vue-quill.snow.css';
     import { useAuthStore } from '@/stores/useAuthStore';
     import { useCoreModalStore } from '@/stores/useCoreModalStore';
+    import { useFlashToastStore, MessageTypes } from '@/stores/useFlashToastStore';
     import sanitizeHTML from 'sanitize-html';
     import stringLength from 'string-length';
     import { decode as htmlEntityDecode } from 'html-entities';
@@ -156,8 +157,9 @@
 
     const { params: routeParams } = useRoute();
     const { push: routerPush } = useRouter();
-    const { getIsLoggedIn, getUserData, getAuthToken } = useAuthStore();
+    const { getIsLoggedIn, getUserData, getAuthToken, logout , openEmailVerifyModal} = useAuthStore();
     const { openAuthModal } = useCoreModalStore();
+    const { openFlashToast } = useFlashToastStore();
 
     const slug = ref<string>(routeParams.slug);
     const threadData = reactive({});
@@ -389,6 +391,24 @@
 
         }catch(e){
             console.error(e);
+
+            if(e.response?.data?.short_msg){
+                const shortMsg = e.response.data.short_msg;
+
+                if(shortMsg === 'ERR_DEACTIVATION'){
+                    openFlashToast(MessageTypes.ERROR, 'You have been deactivated.');
+                    logout();
+                }else if(shortMsg === 'ERR_NOT_VERIFIED'){
+                    openEmailVerifyModal();
+                }else if(shortMsg === 'FROZEN'){
+                    openFlashToast(MessageTypes.ERROR, 'Your account is frozen and under review by admins.');
+                }else{
+                    pinionSubmitErrors.push('An error has occurred.');
+                }
+
+            }else{
+                opinionSubmitErrors.push('An error has occurred.');
+            }
         }finally{
             isOpinionSubmissionProcessing.value = false;
         }
@@ -529,6 +549,12 @@
 
         }catch(e){
             console.error(e);
+
+            if(e.response?.data?.short_msg){
+                const shortMsg = e.response.data.short_msg;
+            }else{
+                replySubmitErrors.push('An error has occurred.');
+            }
         }
 
     }
@@ -543,6 +569,7 @@
             authUserOpinion.content = null;
             authUserOpinion.replyBoxShown = false;
             authUserOpinion.opinionId = null;
+            closeAllReplyBoxes();
         }
 
         fetchThread();

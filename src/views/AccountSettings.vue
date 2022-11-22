@@ -208,7 +208,7 @@
 
                 const shortMsg = e.response.data.short_msg;
 
-                if(shortMsg === 'ERR_DEACTIVATED'){
+                if(shortMsg === 'ERR_DEACTIVATION'){
                     openFlashToast(MessageTypes.ERROR, 'Your account has been deactivated.');
                     logout();
                 }else if(shortMsg === 'ERR_PASSWORD_NOT_MATCHES'){
