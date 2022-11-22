@@ -79,6 +79,9 @@
                             <h4>Reply</h4>
                             <textarea v-model="replyInput" class="reply-textarea"></textarea>
                             <button @click="submitReply(authUserOpinion.opinionId)" class="btn">Submit</button>
+                            <div v-if="replySubmitErrors.length" class="errbox">
+                                <p v-for="error in replySubmitErrors" :key="error">{{ error}}</p>
+                            </div>
                         </div>
                         <div class="replies">
                             <div class="reply" v-for="reply in authUserOpinion.replies">
@@ -117,6 +120,9 @@
                                 <h4>Reply</h4>
                                 <textarea v-model="replyInput" class="reply-textarea"></textarea>
                                 <button @click="submitReply(opinion.id)" class="btn">Submit</button>
+                                <div v-if="replySubmitErrors.length" class="errbox">
+                                    <p v-for="error in replySubmitErrors" :key="error">{{ error}}</p>
+                                </div>
                             </div>
                             <div class="replies">
                                 <div class="reply" v-for="reply in opinion.replies">
@@ -171,6 +177,7 @@
     const opinions = reactive([]);
     const isThreadNotFound = ref<boolean>(false);
     const isErrorLoadingThread = ref<boolean>(false);
+    const replySubmitErrors = reactive([]);
 
     const replyInput = ref<string>('');
 
@@ -477,11 +484,32 @@
         }
         authUserOpinion.replyBoxShown = false;
         replyInput.value = '';
+        replySubmitErrors.splice(0,replySubmitErrors.length);
 
+    }
+
+    const validateReply = () => {
+        replySubmitErrors.splice(0,replySubmitErrors.length);
+        const isValid = true;
+
+        if(stringLength(stripAllWS(stripTags(value))) < 10){
+            replySubmitErrors.push('Reply is too short.');
+            isValid = false;
+        }
+
+        if(stringLength(stripAllWS(stripTags(value))) > 500){
+            replySubmitErrors.push('Reply is too long.');
+            isValid = false;
+        }
+
+        return isValid;
     }
 
     const submitReply = async (opinionId) => {
 
+        if(!validateReply()){
+            return;
+        }
 
         try{
 
