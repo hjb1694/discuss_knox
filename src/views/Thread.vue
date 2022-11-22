@@ -221,7 +221,7 @@
 
     const isThreadRemoveButtonShown = computed(() => {
 
-        if(!getIsLoggedIn){
+        if(!getIsLoggedIn.value){
             return false;
         }else if(['ADMINISTRATOR', 'SUPER_ADMINISTRATOR'].includes(threadData.author_core_role)){
             return false;
@@ -236,7 +236,7 @@
 
     const isThreadHideButtonShown = computed(() => {
 
-        if(!getIsLoggedIn){
+        if(!getIsLoggedIn.value){
             return false;
         }else if(threadData.author_core_role !== 'REGULAR_USER'){
             return false;
@@ -252,7 +252,9 @@
 
     const isThreadReportButtonShown = computed(() => {
 
-        if(getIsLoggedIn === true && getUserData.core_role !== 'REGULAR_USER'){
+        if(getIsLoggedIn.value === true && getUserData.core_role !== 'REGULAR_USER'){
+            return false;
+        }else if(getIsLoggedIn.value == true && (getUserData.user_id === +threadData.author_user_id)){
             return false;
         }
 
