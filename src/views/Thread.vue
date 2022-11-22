@@ -21,6 +21,17 @@
                         <span>u/{{ threadData.author_username }}</span>
                         <strong v-if="getIsLoggedIn && (threadData.author_user_id === getUserData.user_id)" class="you">(You)</strong>
                     </button>
+                    <div class="header-controls">
+                        <button v-if="isThreadRemoveButtonShown" class="header-controls__button">
+                            <i class="fa fa-close"></i>
+                        </button>
+                        <button v-if="isThreadHideButtonShown" class="header-controls__button">
+                            <i class="fa fa-eye-slash"></i>
+                        </button>
+                        <button v-if="isThreadReportButtonShown" class="header-controls__button">
+                            <i class="fa fa-flag"></i>
+                        </button>
+                    </div>
                 </header>
                 <section class="thread__body">
                     <h2 class="thread__headline">{{ threadData.headline }}</h2>
@@ -206,6 +217,46 @@
 
     const isClosedPromptShown = computed(() => {
         return threadData.status === 'CLOSED';
+    });
+
+    const isThreadRemoveButtonShown = computed(() => {
+
+        if(!getIsLoggedIn){
+            return false;
+        }else if(['ADMINISTRATOR', 'SUPER_ADMINISTRATOR'].includes(threadData.author_core_role)){
+            return false;
+        }else if(threadData.author_core_role === 'STAFF' && getUserData.core_role === 'STAFF'){
+            return false;
+        }else if(getUserData.core_role === 'REGULAR_USER'){
+            return false;
+        }
+
+        return true;
+    });
+
+    const isThreadHideButtonShown = computed(() => {
+
+        if(!getIsLoggedIn){
+            return false;
+        }else if(threadData.author_core_role !== 'REGULAR_USER'){
+            return false;
+        }else if(getUserData.core_role !== 'REGULAR_USER'){
+            return false;
+        }else if(!['SILVER','PLATINUM'].includes(getUserData.moderator_role)){
+            return false;
+        }
+
+        return true;
+
+    });
+
+    const isThreadReportButtonShown = computed(() => {
+
+        if(getIsLoggedIn === true && getUserData.core_role !== 'REGULAR_USER'){
+            return false;
+        }
+
+        return true;
     });
 
 
@@ -638,6 +689,9 @@
             background:#33ab87;
             padding:1rem;
             font-size:1.4rem;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
         }
 
         &__author{
@@ -669,6 +723,18 @@
 
         .user-icon{
             margin-right:.5rem;
+        }
+    }
+
+    .header-controls{
+        &__button{
+            background:transparent;
+            color:#fff;
+            border:none;
+
+            &:not(:last-child){
+                margin-right:.75rem;
+            }
         }
     }
 
