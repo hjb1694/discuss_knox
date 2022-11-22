@@ -403,7 +403,7 @@
                 }else if(shortMsg === 'FROZEN'){
                     openFlashToast(MessageTypes.ERROR, 'Your account is frozen and under review by admins.');
                 }else{
-                    pinionSubmitErrors.push('An error has occurred.');
+                    opinionSubmitErrors.push('An error has occurred.');
                 }
 
             }else{
