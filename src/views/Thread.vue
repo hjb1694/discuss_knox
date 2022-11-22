@@ -22,13 +22,13 @@
                         <strong v-if="getIsLoggedIn && (threadData.author_user_id === getUserData.user_id)" class="you">(You)</strong>
                     </button>
                     <div class="header-controls">
-                        <button v-if="isThreadRemoveButtonShown" class="header-controls__button">
+                        <button v-if="isThreadRemoveButtonShown" class="header-controls__button" title="Remove Thread">
                             <i class="fa fa-close"></i>
                         </button>
-                        <button v-if="isThreadHideButtonShown" class="header-controls__button">
+                        <button v-if="isThreadHideButtonShown" class="header-controls__button" title="Hide Thread">
                             <i class="fa fa-eye-slash"></i>
                         </button>
-                        <button v-if="isThreadReportButtonShown" class="header-controls__button">
+                        <button v-if="isThreadReportButtonShown" class="header-controls__button" title="Report Thread">
                             <i class="fa fa-flag"></i>
                         </button>
                     </div>
