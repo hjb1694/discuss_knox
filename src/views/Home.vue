@@ -161,7 +161,7 @@
             background:#fff;
 
             h2{
-                color:#888;
+                color:#2C414F;
                 cursor:pointer;
             }
         }

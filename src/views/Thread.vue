@@ -710,7 +710,7 @@
 
         &__headline{
             font-size:1.8rem;
-            color:#555;
+            color:#2C414F;
         }
 
         &__content{
