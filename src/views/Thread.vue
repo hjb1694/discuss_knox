@@ -547,13 +547,13 @@
             opinions[matchingOpinion].replyBoxShown = !opinions[matchingOpinion].replyBoxShown;
         }
 
-        closeOtherReplyBoxes();
+        closeOtherReplyBoxes(opinionId);
 
     }
 
     const closeAllReplyBoxes = () => {
 
-        for(opinion of opinions){
+        for(let opinion of opinions){
             opinion.replyBoxShown = false;
         }
         authUserOpinion.replyBoxShown = false;
