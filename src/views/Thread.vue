@@ -154,7 +154,7 @@
 
 <script lang="ts" setup>
     import { ref, reactive, onMounted, computed, watch, onUnmounted } from 'vue';
-    import axios from 'axios';
+    import axios, { AxiosError } from 'axios';
     import { useRoute, useRouter, onBeforeRouteUpdate } from 'vue-router';
     import { QuillEditor } from '@vueup/vue-quill';
     import '@vueup/vue-quill/dist/vue-quill.snow.css';
@@ -184,14 +184,14 @@
         replyBoxShown: false, 
         replies: []
     });
-    const opinionSubmitErrors = reactive([]);
+    const opinionSubmitErrors = reactive<string[]>([]);
     const isOpinionSubmissionProcessing = ref<boolean>(false);
     const isThreadLoading = ref<boolean>(true);
     const isOpinionsLoading = ref<boolean>(true);
     const opinions = reactive<object[]>([]);
     const isThreadNotFound = ref<boolean>(false);
     const isErrorLoadingThread = ref<boolean>(false);
-    const replySubmitErrors = reactive([]);
+    const replySubmitErrors = reactive<string[]>([]);
 
     const replyInput = ref<string>('');
 
@@ -443,7 +443,7 @@
                 }
             });
 
-        }catch(e){
+        }catch(e: any){
             console.error(e);
 
             if(e.response?.data?.short_msg){
@@ -566,12 +566,12 @@
         replySubmitErrors.splice(0,replySubmitErrors.length);
         let isValid = true;
 
-        if(stringLength(stripAllWS(stripTags(value))) < 10){
+        if(stringLength(stripAllWS(stripTags(replyInput.value))) < 10){
             replySubmitErrors.push('Reply is too short.');
             isValid = false;
         }
 
-        if(stringLength(stripAllWS(stripTags(value))) > 500){
+        if(stringLength(stripAllWS(stripTags(replyInput.value))) > 500){
             replySubmitErrors.push('Reply is too long.');
             isValid = false;
         }
@@ -579,7 +579,7 @@
         return isValid;
     }
 
-    const submitReply = async (opinionId) => {
+    const submitReply = async (opinionId: number) => {
 
         if(!validateReply()){
             return;
