@@ -168,8 +168,8 @@
 
     const { params: routeParams } = useRoute();
     const { push: routerPush } = useRouter();
-    const { getIsLoggedIn, getUserData, getAuthToken, logout , openEmailVerifyModal} = useAuthStore();
-    const { openAuthModal } = useCoreModalStore();
+    const { getIsLoggedIn, getUserData, getAuthToken, logout} = useAuthStore();
+    const { openAuthModal, openEmailVerifyModal } = useCoreModalStore();
     const { openFlashToast } = useFlashToastStore();
 
     const slug = ref<string>(routeParams.slug);
