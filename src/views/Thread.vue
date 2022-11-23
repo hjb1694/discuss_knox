@@ -6,30 +6,7 @@
         <app-big-error-display v-else-if="isThreadNotFound" message="This thread cannot be found."/>
         <app-big-error-display v-else-if="isErrorLoadingThread" message="There was an error loading this page."/>
         <template v-else>
-            <div class="thread">
-                <header class="thread__header">
-                    <button @click="routerPush('/user/profile/' + threadData.author_username)" class="thread__author">
-                        <i class="user-icon fa fa-user"></i>
-                        <span>u/{{ threadData.author_username }}</span>
-                        <strong v-if="getIsLoggedIn && (threadData.author_user_id === getUserData.user_id)" class="you">(You)</strong>
-                    </button>
-                    <div class="header-controls">
-                        <button v-if="isThreadRemoveButtonShown" class="header-controls__button" title="Remove Thread">
-                            <i class="fa fa-close"></i>
-                        </button>
-                        <button v-if="isThreadHideButtonShown" class="header-controls__button" title="Hide Thread">
-                            <i class="fa fa-eye-slash"></i>
-                        </button>
-                        <button v-if="isThreadReportButtonShown" class="header-controls__button" title="Report Thread">
-                            <i class="fa fa-flag"></i>
-                        </button>
-                    </div>
-                </header>
-                <section class="thread__body">
-                    <h2 class="thread__headline">{{ threadData.headline }}</h2>
-                    <div class="thread__content" v-html="threadData.content"></div>
-                </section>
-            </div>
+            <app-main-thread-post :thread="threadData"/>
             <form class="opinion-form" v-if="isResponseFormShown" @submit.prevent>
                 <h2>Add an Opinion</h2>
                 <quill-editor 
@@ -158,6 +135,9 @@
     import { decode as htmlEntityDecode } from 'html-entities';
     import Pusher from 'pusher-js';
     import AppBigErrorDisplay from '@/components/BigErrorDisplay/BigErrorDisplay.vue';
+    import { CoreRole, ModeratorRole } from '@/types';
+    import type { ThreadData } from '@/types';
+    import AppMainThreadPost from '@/components/MainThreadPost/MainThreadPost.vue';
 
     const { params: routeParams } = useRoute();
     const { push: routerPush } = useRouter();
@@ -166,7 +146,20 @@
     const { openFlashToast } = useFlashToastStore();
 
     const slug = ref<string>(routeParams.slug);
-    const threadData = reactive({});
+    const threadData = reactive<ThreadData>({
+        id: null, 
+        author_user_id: null,
+        author_username: null, 
+        slug: null, 
+        headline: null, 
+        channel_id: null, 
+        content: null, 
+        main_image: null, 
+        status: null, 
+        added_ts: null, 
+        author_core_role: null, 
+        author_moderator_role: null
+    });
     const authUserOpinion = reactive({
         id: null,
         exists: false,
@@ -217,11 +210,11 @@
 
         if(!getIsLoggedIn.value){
             return false;
-        }else if(['ADMINISTRATOR', 'SUPER_ADMINISTRATOR'].includes(threadData.author_core_role)){
+        }else if([CoreRole.ADMINISTRATOR, CoreRole.SUPER_ADMINISTRATOR].includes(threadData.author_core_role!)){
             return false;
-        }else if(threadData.author_core_role === 'STAFF' && getUserData.core_role === 'STAFF'){
+        }else if(threadData.author_core_role === CoreRole.STAFF && getUserData.core_role === CoreRole.STAFF){
             return false;
-        }else if(getUserData.core_role === 'REGULAR_USER'){
+        }else if(getUserData.core_role === CoreRole.REGULAR_USER){
             return false;
         }
 
@@ -236,7 +229,7 @@
             return false;
         }else if(getUserData.core_role !== 'REGULAR_USER'){
             return false;
-        }else if(!['SILVER','PLATINUM'].includes(getUserData.moderator_role)){
+        }else if(![ModeratorRole.SILVER_MODERATOR, ModeratorRole.PLATIMUM_MODERATOR].includes(getUserData.moderator_role!)){
             return false;
         }
 
@@ -248,7 +241,7 @@
 
         if(getIsLoggedIn.value === true && getUserData.core_role !== 'REGULAR_USER'){
             return false;
-        }else if(getIsLoggedIn.value == true && (getUserData.user_id === +threadData.author_user_id)){
+        }else if(getIsLoggedIn.value == true && (getUserData.user_id === +threadData.author_user_id!)){
             return false;
         }
 
@@ -258,7 +251,7 @@
 
     const listenForNewOpinions = () => {
 
-        pusher.channel.bind('new_opinion', data => {
+        pusher.channel.bind('new_opinion', (data: any) => {
 
             if(getIsLoggedIn.value === true){
 
