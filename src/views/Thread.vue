@@ -123,7 +123,7 @@
 
 <script lang="ts" setup>
     import { ref, reactive, onMounted, computed, watch, onUnmounted } from 'vue';
-    import axios, { AxiosError } from 'axios';
+    import axios from 'axios';
     import { useRoute, useRouter, onBeforeRouteUpdate } from 'vue-router';
     import { QuillEditor } from '@vueup/vue-quill';
     import '@vueup/vue-quill/dist/vue-quill.snow.css';
@@ -135,7 +135,6 @@
     import { decode as htmlEntityDecode } from 'html-entities';
     import Pusher from 'pusher-js';
     import AppBigErrorDisplay from '@/components/BigErrorDisplay/BigErrorDisplay.vue';
-    import { CoreRole, ModeratorRole } from '@/types';
     import type { ThreadData } from '@/types';
     import AppMainThreadPost from '@/components/MainThreadPost/MainThreadPost.vue';
 
@@ -205,49 +204,6 @@
     const isClosedPromptShown = computed(() => {
         return threadData.status === 'CLOSED';
     });
-
-    const isThreadRemoveButtonShown = computed(() => {
-
-        if(!getIsLoggedIn.value){
-            return false;
-        }else if([CoreRole.ADMINISTRATOR, CoreRole.SUPER_ADMINISTRATOR].includes(threadData.author_core_role!)){
-            return false;
-        }else if(threadData.author_core_role === CoreRole.STAFF && getUserData.core_role === CoreRole.STAFF){
-            return false;
-        }else if(getUserData.core_role === CoreRole.REGULAR_USER){
-            return false;
-        }
-
-        return true;
-    });
-
-    const isThreadHideButtonShown = computed(() => {
-
-        if(!getIsLoggedIn.value){
-            return false;
-        }else if(threadData.author_core_role !== 'REGULAR_USER'){
-            return false;
-        }else if(getUserData.core_role !== 'REGULAR_USER'){
-            return false;
-        }else if(![ModeratorRole.SILVER_MODERATOR, ModeratorRole.PLATIMUM_MODERATOR].includes(getUserData.moderator_role!)){
-            return false;
-        }
-
-        return true;
-
-    });
-
-    const isThreadReportButtonShown = computed(() => {
-
-        if(getIsLoggedIn.value === true && getUserData.core_role !== 'REGULAR_USER'){
-            return false;
-        }else if(getIsLoggedIn.value == true && (getUserData.user_id === +threadData.author_user_id!)){
-            return false;
-        }
-
-        return true;
-    });
-
 
     const listenForNewOpinions = () => {
 
