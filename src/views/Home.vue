@@ -1,5 +1,8 @@
 <template>
     <div class="container">
+        <div class="banner">
+            <p class="banner__heading-text">Live Feed</p>
+        </div>
         <button v-if="!isInitialLoadProcessing && newThreadsToLoad.length" class="load-new-btn btn center" @click="loadNewerThreads">Load New Threads ({{ newThreadsToLoad.length }})</button>
         <div v-if="isInitialLoadProcessing" class="load-spinner-container">
             <img src="@/assets/ring-spinner.svg" class="load-spinner"/>
@@ -138,10 +141,11 @@
 
     .thread-tile{
         width:25rem;
-        box-shadow:0 0 .5rem rgba(0,0,0,.24);
+        border:1px solid #ccc;
         margin-right:2rem;
         margin-bottom:2rem;
         background:#fff;
+        padding:1rem;
 
         &__image{
             display:block;
@@ -153,7 +157,7 @@
         }
 
         &__body{
-            padding:1rem;
+            padding:1rem 0;
             background:#fff;
 
             h2{
@@ -169,8 +173,7 @@
         }
 
         &__footer{
-            padding:1rem;
-            background:#fafafa;
+            padding:1rem 0;
 
             .user-icon{
                 margin-right:.5rem;
@@ -215,6 +218,22 @@
         margin:2rem 0;
         color:#888;
         font-size:1.4rem;
+    }
+
+    .banner{
+        height:8rem;
+        background:linear-gradient(35deg, #21bf8f 50%, #33ab87 50%);;
+        border-radius:.5rem;
+        box-shadow:0 0 .5rem rgba(0,0,0,.24);
+        position:relative;
+
+        &__heading-text{
+            font-size:2rem;
+            position:absolute;
+            left:2rem;
+            bottom:1rem;
+            color:#fff;
+        }
     }
 
 
