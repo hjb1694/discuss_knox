@@ -3,16 +3,8 @@
         <div v-if="isThreadLoading" class="spinner-container">
             <img class="spinner" src="@/assets/ring-spinner.svg" />
         </div>
-        <div v-else-if="isThreadNotFound" class="error-display">
-            <i class="big-error-icon fa fa-close"></i>
-            <h2 class="error-heading">Aww Snap!</h2>
-            <p class="error-text">This thread cannot be found.</p>
-        </div>
-        <div v-else-if="isErrorLoadingThread" class="error-display">
-            <i class="big-error-icon fa fa-close"></i>
-            <h2 class="error-heading">Aww Snap!</h2>
-            <p class="error-text">There was an error loading this page.</p>
-        </div>
+        <app-big-error-display v-else-if="isThreadNotFound" message="This thread cannot be found."/>
+        <app-big-error-display v-else-if="isErrorLoadingThread" message="There was an error loading this page."/>
         <template v-else>
             <div class="thread">
                 <header class="thread__header">
@@ -165,6 +157,7 @@
     import stringLength from 'string-length';
     import { decode as htmlEntityDecode } from 'html-entities';
     import Pusher from 'pusher-js';
+    import AppBigErrorDisplay from '@/components/BigErrorDisplay/BigErrorDisplay.vue';
 
     const { params: routeParams } = useRoute();
     const { push: routerPush } = useRouter();
@@ -858,28 +851,6 @@
         }
     }
 
-    .error-display{
-        height:70vh;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        flex-direction:column;
-        color:#888;
-
-        .big-error-icon{
-            font-size:6rem;
-        }
-
-        .error-heading{
-            font-size:3rem;
-        }
-
-        .error-text{
-            font-size:1.8rem;
-        }
-
-
-    }
 
     @media (max-width: 800px) {
 
