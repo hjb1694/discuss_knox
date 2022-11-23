@@ -175,6 +175,7 @@
     const slug = ref<string>(routeParams.slug);
     const threadData = reactive({});
     const authUserOpinion = reactive({
+        id: null,
         exists: false,
         opinionId: null,
         username: null, 
@@ -187,7 +188,7 @@
     const isOpinionSubmissionProcessing = ref<boolean>(false);
     const isThreadLoading = ref<boolean>(true);
     const isOpinionsLoading = ref<boolean>(true);
-    const opinions = reactive([]);
+    const opinions = reactive<object[]>([]);
     const isThreadNotFound = ref<boolean>(false);
     const isErrorLoadingThread = ref<boolean>(false);
     const replySubmitErrors = reactive([]);
@@ -275,7 +276,7 @@
                     authUserOpinion.userId = data.author_user_id;
                     authUserOpinion.content = data.content;
                     authUserOpinion.id = data.id;
-                    authUserOpinon.replyBoxShown = false;
+                    authUserOpinion.replyBoxShown = false;
 
                 }else{
                     opinions.unshift({...data, replyBoxShown: false});
@@ -294,7 +295,7 @@
 
     const listenForNewReplies = () => {
 
-        pusher.channel.bind('new-reply', data => {
+        pusher.channel.bind('new-reply', (data: any) => {
 
             if(getIsLoggedIn.value){
 
