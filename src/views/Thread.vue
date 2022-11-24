@@ -40,25 +40,25 @@
                         <h3>Your Opinion</h3>
                         <div class="opinion">
                             <header class="opinion__header">
-                                <button @click="routerPush('/user/profile/' + authUserOpinion.username)" class="opinion__author">
+                                <button @click="routerPush('/user/profile/' + authUserOpinion.author_username)" class="opinion__author">
                                     <i class="user-icon fa fa-user"></i>
-                                    <span>u/{{ authUserOpinion.username }}</span>
+                                    <span>u/{{ authUserOpinion.author_username }}</span>
                                 </button>
                             </header>
                              <section class="opinion__body">
                                 <div class="opinion__content" v-html="authUserOpinion.content"></div>
                             </section>
                             <footer class="opinion__footer">
-                                <button v-if="getIsLoggedIn" @click="toggleReplyBox(authUserOpinion.opinionId)" class="reply-btn">
+                                <button v-if="getIsLoggedIn" @click="toggleReplyBox(authUserOpinion.id!)" class="reply-btn">
                                     <i class="reply-icon fa fa-reply"></i>
                                     <span>Reply</span>
                                 </button>
                             </footer>
                         </div>
-                        <div v-if="authUserOpinion.replyBoxShown" class="reply-box">
+                        <div v-if="authUserOpinion.is_reply_box_shown" class="reply-box">
                             <h4>Reply</h4>
                             <textarea v-model="replyInput" class="reply-textarea"></textarea>
-                            <button @click="submitReply(authUserOpinion.opinionId)" class="btn">Submit</button>
+                            <button @click="submitReply(authUserOpinion.id!)" class="btn">Submit</button>
                             <div v-if="replySubmitErrors.length" class="errbox">
                                 <p v-for="error in replySubmitErrors" :key="error">{{ error}}</p>
                             </div>
@@ -83,30 +83,35 @@
                                     <button @click="routerPush('/user/profile/' + opinion.author_username)" class="opinion__author">
                                         <i class="user-icon fa fa-user"></i>
                                         <span>u/{{ opinion.author_username }}</span>
-                                        <strong v-if="getIsLoggedIn && (+opinion.author_user_id === getUserData.user_id)" class="you">(You)</strong>
+                                        <strong v-if="getIsLoggedIn && (+opinion.author_user_id! === getUserData.user_id)" class="you">(You)</strong>
                                     </button>
                                 </header>
                                 <section class="opinion__body">
                                     <div class="opinion__content" v-html="opinion.content"></div>
                                 </section>
                                 <footer class="opinion__footer">
-                                    <button v-if="getIsLoggedIn" @click="toggleReplyBox(opinion.id)" class="reply-btn">
+                                    <button v-if="getIsLoggedIn" @click="toggleReplyBox(opinion.id!)" class="reply-btn">
                                         <i class="reply-icon fa fa-reply"></i>
                                         <span>Reply</span>
                                     </button>
                                 </footer>
                             </div> 
-                            <div v-if="opinion.replyBoxShown" class="reply-box">
+                            <div v-if="opinion.is_reply_box_shown" class="reply-box">
                                 <h4>Reply</h4>
                                 <textarea v-model="replyInput" class="reply-textarea"></textarea>
-                                <button @click="submitReply(opinion.id)" class="btn">Submit</button>
+                                <button @click="submitReply(opinion.id!)" class="btn">Submit</button>
                                 <div v-if="replySubmitErrors.length" class="errbox">
                                     <p v-for="error in replySubmitErrors" :key="error">{{ error}}</p>
                                 </div>
                             </div>
                             <div class="replies">
                                 <div class="reply" v-for="reply in opinion.replies">
-                                    <div @click="routerPush('/user/profile/' + reply.author_username)" class="reply__author"><i class="user-icon fa fa-user"></i> u/{{ reply.author_username}}</div>
+                                    <div 
+                                    @click="routerPush('/user/profile/' + reply.author_username)" 
+                                    class="reply__author"
+                                    >
+                                        <i class="user-icon fa fa-user"></i> u/{{ reply.author_username}}
+                                    </div>
                                     <div class="reply__content">{{ reply.content }}</div>
                                 </div>
                             </div>
@@ -123,7 +128,7 @@
 
 <script lang="ts" setup>
     import { ref, reactive, onMounted, computed, watch, onUnmounted } from 'vue';
-    import axios from 'axios';
+    import axios, { Axios, AxiosError } from 'axios';
     import { useRoute, useRouter, onBeforeRouteUpdate } from 'vue-router';
     import { QuillEditor } from '@vueup/vue-quill';
     import '@vueup/vue-quill/dist/vue-quill.snow.css';
@@ -135,8 +140,13 @@
     import { decode as htmlEntityDecode } from 'html-entities';
     import Pusher from 'pusher-js';
     import AppBigErrorDisplay from '@/components/BigErrorDisplay/BigErrorDisplay.vue';
-    import type { ThreadData } from '@/types';
+    import type { ThreadData, Opinion, AuthUserOpinion } from '@/types';
     import AppMainThreadPost from '@/components/MainThreadPost/MainThreadPost.vue';
+
+    interface PusherInstance {
+        instance: Pusher | null;
+        channel: any;
+    }
 
     const { params: routeParams } = useRoute();
     const { push: routerPush } = useRouter();
@@ -144,7 +154,7 @@
     const { openAuthModal, openEmailVerifyModal } = useCoreModalStore();
     const { openFlashToast } = useFlashToastStore();
 
-    const slug = ref<string>(routeParams.slug);
+    const slug = ref<any>(routeParams.slug);
     const threadData = reactive<ThreadData>({
         id: null, 
         author_user_id: null,
@@ -159,28 +169,30 @@
         author_core_role: null, 
         author_moderator_role: null
     });
-    const authUserOpinion = reactive({
+    const authUserOpinion = reactive<AuthUserOpinion>({
         id: null,
         exists: false,
-        opinionId: null,
-        username: null, 
-        userId: null, 
+        author_username: null, 
+        author_user_id: null, 
         content: null, 
-        replyBoxShown: false, 
-        replies: []
+        is_reply_box_shown: false, 
+        status: null,
+        replies: [], 
+        added_ts: null, 
+        thread_id: null
     });
     const opinionSubmitErrors = reactive<string[]>([]);
     const isOpinionSubmissionProcessing = ref<boolean>(false);
     const isThreadLoading = ref<boolean>(true);
     const isOpinionsLoading = ref<boolean>(true);
-    const opinions = reactive<object[]>([]);
+    const opinions = reactive<Opinion[]>([]);
     const isThreadNotFound = ref<boolean>(false);
     const isErrorLoadingThread = ref<boolean>(false);
     const replySubmitErrors = reactive<string[]>([]);
 
     const replyInput = ref<string>('');
 
-    const pusher = reactive({
+    const pusher = reactive<PusherInstance>({
         instance: null, 
         channel: null
     });
@@ -214,19 +226,19 @@
                 if(+data.author_user_id === getUserData.user_id){
 
                     authUserOpinion.exists = true;
-                    authUserOpinion.username = data.author_username;
-                    authUserOpinion.userId = data.author_user_id;
+                    authUserOpinion.author_username = data.author_username;
+                    authUserOpinion.author_user_id = data.author_user_id;
                     authUserOpinion.content = data.content;
                     authUserOpinion.id = data.id;
-                    authUserOpinion.replyBoxShown = false;
+                    authUserOpinion.is_reply_box_shown = false;
 
                 }else{
-                    opinions.unshift({...data, replyBoxShown: false});
+                    opinions.unshift({...data, is_reply_box_shown: false});
                 }
 
             }else{
 
-                opinions.unshift({...data, replyBoxShown: false});
+                opinions.unshift({...data, is_reply_box_shown: false});
 
             }
 
@@ -241,7 +253,7 @@
 
             if(getIsLoggedIn.value){
 
-                if(authUserOpinion.exists && +data.opinion_id === authUserOpinion.opinionId){
+                if(authUserOpinion.exists && +data.opinion_id === authUserOpinion.id){
                     authUserOpinion.replies.push(data);
                 }else{
 
@@ -302,14 +314,14 @@
             thread.content = dom.body.innerHTML;
 
             for(let key in thread){
-                threadData[key] = thread[key];
+                threadData[key]  = thread[key];
             }
 
             fetchOpinions();
             createPusherInstance();
 
 
-        }catch(e){
+        }catch(e: any){
             console.error(e);
 
             if(e.response?.data?.short_msg){
@@ -331,13 +343,13 @@
 
     }
 
-    const stripTags = value => {
+    const stripTags = (value: string) => {
         return sanitizeHTML(value, {
             allowedTags: []
         })
     }
 
-    const stripAllWS = value => {
+    const stripAllWS = (value: string) => {
         let stripped = value.replace(/ +/g,'');
         stripped = value.replace(/\n+/g,'');
         stripped = value.replace(/\s+/g,'');
@@ -423,31 +435,31 @@
 
             if(getIsLoggedIn.value === true){
 
-                const authOp = response.data.body.opinions.filter(op => op.author_user_id === getUserData.user_id);
+                const authOp = response.data.body.opinions.filter((op: any) => op.author_user_id === getUserData.user_id);
 
                 if(authOp.length){
                     authUserOpinion.exists = true;
-                    authUserOpinion.username = authOp[0].author_username;
-                    authUserOpinion.userId = authOp[0].author_user_id;
+                    authUserOpinion.author_username = authOp[0].author_username;
+                    authUserOpinion.author_user_id = authOp[0].author_user_id;
                     authUserOpinion.content = authOp[0].content;
-                    authUserOpinion.opinionId = authOp[0].id;
+                    authUserOpinion.id = authOp[0].id;
                     authUserOpinion.replies = authOp[0].replies;
-                    authUserOpinion.replyBoxShown = false;
+                    authUserOpinion.is_reply_box_shown = false;
 
-                    let otherOps = response.data.body.opinions.filter(op => op.author_user_id !== getUserData.user_id);
-                    otherOps = otherOps.map(op => ({...op, replyBoxShown: false}));
+                    let otherOps = response.data.body.opinions.filter((op: any) => op.author_user_id !== getUserData.user_id);
+                    otherOps = otherOps.map((op: any) => ({...op, is_reply_box_shown: false}));
 
                     opinions.push(...otherOps);
                 }else{
                     
-                    let otherOps = response.data.body.opinions.map(op => ({...op, replyBoxShown: false}));
+                    let otherOps = response.data.body.opinions.map((op: any) => ({...op, is_reply_box_shown: false}));
                     opinions.push(...otherOps);
 
                 }
 
             }else{
 
-                let otherOps = response.data.body.opinions.map(op => ({...op, replyBoxShown: false}));
+                let otherOps = response.data.body.opinions.map((op: any) => ({...op, is_reply_box_shown: false}));
                 opinions.push(...otherOps);
 
             }
@@ -460,7 +472,7 @@
 
     }
 
-    const closeOtherReplyBoxes = (opinionId) => {
+    const closeOtherReplyBoxes = (opinionId: number) => {
 
         replyInput.value = '';
 
@@ -468,25 +480,25 @@
 
             if(opinion.id !== opinionId){
 
-                opinion.replyBoxShown = false;
+                opinion.is_reply_box_shown = false;
 
             }
         }
 
     }
 
-    const toggleReplyBox = (opinionId) => {
+    const toggleReplyBox = (opinionId: number) => {
 
         if(getIsLoggedIn.value === true && 
         authUserOpinion.exists &&
-        authUserOpinion.opinionId === opinionId
+        authUserOpinion.id === opinionId
         ){
 
-            authUserOpinion.replyBoxShown = !authUserOpinion.replyBoxShown;
+            authUserOpinion.is_reply_box_shown = !authUserOpinion.is_reply_box_shown;
 
         }else{
             const matchingOpinion = opinions.findIndex(op => op.id === opinionId);
-            opinions[matchingOpinion].replyBoxShown = !opinions[matchingOpinion].replyBoxShown;
+            opinions[matchingOpinion].is_reply_box_shown = !opinions[matchingOpinion].is_reply_box_shown;
         }
 
         closeOtherReplyBoxes(opinionId);
@@ -496,9 +508,9 @@
     const closeAllReplyBoxes = () => {
 
         for(let opinion of opinions){
-            opinion.replyBoxShown = false;
+            opinion.is_reply_box_shown = false;
         }
-        authUserOpinion.replyBoxShown = false;
+        authUserOpinion.is_reply_box_shown = false;
         replyInput.value = '';
         replySubmitErrors.splice(0,replySubmitErrors.length);
 
@@ -543,7 +555,7 @@
 
             closeAllReplyBoxes();
 
-        }catch(e){
+        }catch(e: any){
             console.error(e);
 
             if(e.response?.data?.short_msg){
@@ -572,11 +584,11 @@
 
         if(value === false){
             authUserOpinion.exists = false;
-            authUserOpinion.username = null;
-            authUserOpinion.userId = null;
+            authUserOpinion.author_username = null;
+            authUserOpinion.author_user_id = null;
             authUserOpinion.content = null;
-            authUserOpinion.replyBoxShown = false;
-            authUserOpinion.opinionId = null;
+            authUserOpinion.is_reply_box_shown = false;
+            authUserOpinion.id = null;
             closeAllReplyBoxes();
         }
 
@@ -598,7 +610,7 @@
 
     onUnmounted(() => {
         pusher.channel = null;
-        pusher.instance.unsubscribe();
+        pusher.instance!.unsubscribe(`thread-${slug.value}`);
     });
 
 

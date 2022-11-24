@@ -34,3 +34,30 @@ export interface ThreadData {
     author_core_role: CoreRole | null
     author_moderator_role: ModeratorRole | null
 }
+
+export enum OpinionStatus {
+    VISIBLE = 'VISIBLE', 
+    HIDDEN = 'HIDDEN', 
+    REMOVED = 'REMOVED'
+}
+
+export interface Reply {
+    author_username: string;
+    content: string;
+}
+
+export interface Opinion {
+    id: number | null;
+    thread_id: number | null;
+    author_user_id: number | null;
+    author_username: string | null;
+    content: string | null;
+    status: OpinionStatus | null;
+    added_ts: string | null;
+    replies : Reply[];
+    is_reply_box_shown: boolean;
+}
+
+export interface AuthUserOpinion extends Opinion {
+    exists: boolean;
+}
