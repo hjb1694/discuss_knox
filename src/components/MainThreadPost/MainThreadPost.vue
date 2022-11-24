@@ -86,3 +86,64 @@
     });
 
 </script>
+
+<style lang="scss" scoped>
+ .thread {
+        box-shadow:0 0 .5rem rgba(0,0,0,.24);
+        border-radius:.5rem;
+        overflow:hidden;
+        margin:1rem 0;
+
+        &__header{
+            background:#33ab87;
+            padding:1rem;
+            font-size:1.4rem;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+        }
+
+        &__author{
+            background:transparent;
+            border:none;
+            color:#fff;
+        }
+
+        &__body{
+            min-height:20rem;
+            background:#fff;
+            padding:1rem;
+        }
+
+        &__headline{
+            font-size:1.8rem;
+            color:#2C414F;
+        }
+
+        &__content{
+            font-size:1.4rem;
+            margin-top:1rem;
+        }
+
+        &__footer{
+            background:#fff;
+            border-top:1px solid #ccc;
+        }
+
+        .user-icon{
+            margin-right:.5rem;
+        }
+
+        .header-controls{
+            &__button{
+                background:transparent;
+                color:#fff;
+                border:none;
+
+                &:not(:last-child){
+                    margin-right:.75rem;
+                }
+            }
+        }
+    }
+</style>
