@@ -65,13 +65,17 @@
                         </div>
                         <div class="replies">
                             <div class="reply" v-for="reply in authUserOpinion.replies">
-                                <div 
-                                @click="routerPush('/user/profile/' + reply.author_username)" 
-                                class="reply__author"
-                                >
-                                    <i class="user-icon fa fa-user"></i> u/{{ reply.author_username}}
-                                </div>
-                                <div class="reply__content">{{ reply.content }}</div>
+                                <header class="reply__header">
+                                    <div 
+                                    @click="routerPush('/user/profile/' + reply.author_username)" 
+                                    class="reply__author"
+                                    >
+                                        <i class="user-icon fa fa-user"></i> u/{{ reply.author_username}}
+                                    </div>
+                                </header>
+                                <section class="reply__body">
+                                    <div class="reply__content">{{ reply.content }}</div>
+                                </section>
                             </div>
                         </div>
                     </template>
@@ -106,13 +110,17 @@
                             </div>
                             <div class="replies">
                                 <div class="reply" v-for="reply in opinion.replies">
-                                    <div 
-                                    @click="routerPush('/user/profile/' + reply.author_username)" 
-                                    class="reply__author"
-                                    >
-                                        <i class="user-icon fa fa-user"></i> u/{{ reply.author_username}}
-                                    </div>
-                                    <div class="reply__content">{{ reply.content }}</div>
+                                    <header class="reply__header">
+                                        <div 
+                                        @click="routerPush('/user/profile/' + reply.author_username)" 
+                                        class="reply__author"
+                                        >
+                                            <i class="user-icon fa fa-user"></i> u/{{ reply.author_username}}
+                                        </div>
+                                    </header>
+                                    <section class="reply__body">
+                                        <div class="reply__content">{{ reply.content }}</div>
+                                    </section>
                                 </div>
                             </div>
                         </div>
@@ -128,7 +136,7 @@
 
 <script lang="ts" setup>
     import { ref, reactive, onMounted, computed, watch, onUnmounted } from 'vue';
-    import axios, { Axios, AxiosError } from 'axios';
+    import axios from 'axios';
     import { useRoute, useRouter, onBeforeRouteUpdate } from 'vue-router';
     import { QuillEditor } from '@vueup/vue-quill';
     import '@vueup/vue-quill/dist/vue-quill.snow.css';
@@ -795,7 +803,6 @@
 
     .reply{
         background:#fff;
-        padding:1rem;
         border:1px solid #ccc;
         border-radius:.5rem;
         width:85%;
@@ -805,9 +812,20 @@
         margin-top:1rem;
         margin-bottom:1rem;
 
+        &__header{
+            display:flex;
+            justify-content: space-between;
+            align-items: center;
+            background:#33ab87;
+            padding:1rem;
+            color:#fff;
+        }
+
+        &__body{
+            padding:1rem;
+        }
+
         &__author{
-            font-weight:bold;
-            margin-bottom:1rem;
             cursor:pointer;
         }
     }
