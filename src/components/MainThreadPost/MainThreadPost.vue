@@ -62,9 +62,9 @@
 
         if(!getIsLoggedIn.value){
             return false;
-        }else if(props.thread.author_core_role !== 'REGULAR_USER'){
+        }else if(props.thread.author_core_role !== CoreRole.REGULAR_USER){
             return false;
-        }else if(getUserData.core_role !== 'REGULAR_USER'){
+        }else if(getUserData.core_role !== CoreRole.REGULAR_USER){
             return false;
         }else if(![ModeratorRole.SILVER_MODERATOR, ModeratorRole.PLATIMUM_MODERATOR].includes(getUserData.moderator_role as ModeratorRole)){
             return false;
@@ -76,7 +76,7 @@
 
     const isThreadReportButtonShown = computed(() => {
 
-        if(getIsLoggedIn.value === true && getUserData.core_role !== 'REGULAR_USER'){
+        if(getIsLoggedIn.value === true && getUserData.core_role !== CoreRole.REGULAR_USER){
             return false;
         }else if(getIsLoggedIn.value == true && (getUserData.user_id === +props.thread.author_user_id!)){
             return false;
@@ -118,6 +118,7 @@
         &__headline{
             font-size:1.8rem;
             color:#2C414F;
+            border-bottom:1px solid #ccc;
         }
 
         &__content{
