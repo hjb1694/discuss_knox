@@ -57,7 +57,7 @@
     const { openFlashToast } = useFlashToastStore();
     const { push: routerPush } = useRouter();
 
-    const channelOpts = reactive([]);
+    const channelOpts = reactive<string[]>([]);
     
 
     const headlineInput = ref<string>('');
@@ -75,7 +75,7 @@
 
             const response = await axios.get('http://155.138.197.17:8080/api/v1/channels');
 
-            const opts = response.data.body.channels.map(channel => `c/${channel.channel_slug}`);
+            const opts = response.data.body.channels.map((channel: any) => `c/${channel.channel_slug}`);
 
             channelOpts.push(...opts);
 
@@ -87,7 +87,7 @@
 
     }
 
-    const stripTags = value => {
+    const stripTags = (value: string) => {
 
         return sanitizeHTML(value, {
             allowedTags: []
@@ -95,7 +95,7 @@
 
     }
 
-    const stripAllWS = value => {
+    const stripAllWS = (value: string) => {
         let stripped = value.replace(/ +/g,'');
         stripped = value.replace(/\n+/g,'');
         stripped = value.replace(/\s+/g,'');
@@ -182,7 +182,7 @@
 
             }
 
-        }catch(e){
+        }catch(e: any){
             if(e.response?.data?.short_msg){
 
                 const shortMsg = e.response.data.short_msg;
