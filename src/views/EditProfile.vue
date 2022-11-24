@@ -132,7 +132,7 @@
 
         let sanitized = sanitizeHTML(value, {
             allowedTags: ['b', 'strong', 'u', 'i', 'em', 'br', 'a', 'h1', 'h2', 'h3', 'h4', 'ol', 'ul', 'li', 'p'], 
-            allowedAtrributes: {
+            allowedAttributes: {
                 'a': ['href']
             }, 
             allowedSchemes: ['http', 'https', 'mailto']

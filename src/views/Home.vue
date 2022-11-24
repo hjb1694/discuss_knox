@@ -16,7 +16,7 @@
                     <img v-if="!thread.main_image" src="@/assets/sunsphere_tower.jpg" class="thread-tile__image"/>
                     <img v-else :src="'http://155.138.197.17:8080/thread_img/' + thread.main_image" class="thread-tile__image"/>
                     <div class="thread-tile__body">
-                        <h2 @click="routerPush('/thread/' + thread.slug)">{{ thread.headline.substring(0,75) }}...</h2>
+                        <h2 @click="routerPush('/thread/' + thread.slug)">{{ thread.headline!.substring(0,75) }}...</h2>
                     </div>
                     <div class="thread-tile__footer">
                         <button @click="routerPush('/user/profile/' + thread.author_username)" class="thread-tile__author">
@@ -36,18 +36,24 @@
     import { useRouter } from 'vue-router';
     import axios from 'axios';
     import Pusher from 'pusher-js';
+    import type { ThreadData } from '@/types';
+
+    interface PusherInstance {
+        instance: Pusher | null, 
+        channel: any
+    }
 
     const { push: routerPush} = useRouter();
 
-    const shownThreads = reactive([]);
-    const newThreadsToLoad = reactive([]);
+    const shownThreads = reactive<ThreadData[]>([]);
+    const newThreadsToLoad = reactive<ThreadData[]>([]);
     const isOlderThreadBtnShown = ref<boolean>(true);
     const isInitialLoad = ref<boolean>(true);
     const isInitialLoadProcessing = ref<boolean>(true);
 
     const maxId = ref<number | null>(null);
 
-    const pusher = reactive({
+    const pusher = reactive<PusherInstance>({
         instance: null, 
         channel: null
     });
@@ -63,7 +69,7 @@
 
     const listenForNewThreads = () => {
 
-        pusher.channel.bind('new-thread', data => {
+        pusher.channel.bind('new-thread', (data: any) => {
             newThreadsToLoad.unshift(data);
         });
 
@@ -91,7 +97,7 @@
 
             const threads = response.data.body.threads;
 
-            maxId.value = Math.min(...threads.map(thread => +thread.id)) - 1;
+            maxId.value = Math.min(...threads.map((thread: any) => +thread.id)) - 1;
 
             shownThreads.push(...threads);
 
@@ -119,7 +125,7 @@
 
     onUnmounted(() => {
         pusher.channel = null;
-        pusher.instance.unsubscribe();
+        pusher.instance!.unsubscribe('live-feed');
     });
 
 
