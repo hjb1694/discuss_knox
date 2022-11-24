@@ -149,8 +149,9 @@
     import { useFlashToastStore, MessageTypes } from '@/stores/useFlashToastStore';
     import axios from 'axios';
     import privateMessageModal from '@/components/PrivateMessageModal/PrivateMessageModal.vue';
+    import type { ProfileData } from '@/types';
 
-    const { params: routeParams, beforeRouteUpdate } = useRoute();
+    const { params: routeParams } = useRoute();
     const { push: routerPush } = useRouter();
     const { getUserData, getIsLoggedIn, getAuthToken, logout } = useAuthStore();
     const { openAuthModal, openEmailVerifyModal, getIsMessagesModalOpen, closeMessagesModal, openMessagesModal } = useCoreModalStore();
@@ -160,11 +161,9 @@
     const isProfileNotFound = ref<boolean>(false);
     const isErrorLoadingProfile = ref<boolean>(false);
 
-    const username = ref<string>(routeParams.username);
+    const username = ref<any>(routeParams.username);
 
-    console.log('USERNAME VAL', routeParams.username);
-
-    const profileData = reactive({
+    const profileData = reactive<ProfileData>({
         isPrivate: null, 
         accountStatus: null, 
         coreRole: null, 
@@ -196,11 +195,11 @@
     });
 
     const isUserDeactivated = computed(() => {
-        return ['VIOLATION_DEACTIVATION', 'USER_SELF_DEACTIVATION'].includes(profileData.accountStatus);
+        return ['VIOLATION_DEACTIVATION', 'USER_SELF_DEACTIVATION'].includes(profileData.accountStatus!);
     });
 
     const isElevatedCoreStatus = computed(() => {
-        return ['SUPER_ADMINISTRATOR', 'ADMINISTRATOR', 'STAFF'].includes(profileData.coreRole);
+        return ['SUPER_ADMINISTRATOR', 'ADMINISTRATOR', 'STAFF'].includes(profileData.coreRole!);
     });
 
     const resetProfileData = () => {
@@ -231,7 +230,7 @@
             profileData.userId = user_id;
             profileData.profileImage = profile_img || null;
 
-        }catch(e){
+        }catch(e: any){
             if(e.response.data?.short_msg){
                 const shortMsg = e.response.data.short_msg;
 
@@ -293,7 +292,7 @@
             profileData.isBlocker = is_blocker;
             profileData.followStatus = follow_status;
 
-        }catch(e){
+        }catch(e: any){
 
             console.error(e);
 
@@ -320,7 +319,7 @@
         if(!getIsLoggedIn.value){
             openAuthModal();
             return false;
-        }else if(!getUserData.account_status === 'NOT_VERIFIED'){
+        }else if(getUserData.account_status === 'NOT_VERIFIED'){
             openEmailVerifyModal();
             return false;
         }
@@ -521,7 +520,7 @@
         }
     });
 
-    const goTo = path => {
+    const goTo = (path: string) => {
         routerPush(path);
     }
 

@@ -61,3 +61,19 @@ export interface Opinion {
 export interface AuthUserOpinion extends Opinion {
     exists: boolean;
 }
+
+export interface ProfileData {
+    isPrivate: boolean | null, 
+    accountStatus: string | null, 
+    coreRole: CoreRole | null, 
+    moderatorRole: ModeratorRole | null, 
+    gender: string | null, 
+    isBlocked: boolean | null, 
+    isBlocker: boolean | null,
+    bio: string | null, 
+    location: string | null, 
+    occupation: string | null, 
+    profileImage: string | null, 
+    userId: number | null, 
+    followStatus: string | null
+}
