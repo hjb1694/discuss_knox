@@ -89,7 +89,7 @@
 
 <style lang="scss" scoped>
  .thread {
-        box-shadow:0 0 .5rem rgba(0,0,0,.24);
+        border:1px solid #ccc;
         border-radius:.5rem;
         overflow:hidden;
         margin:1rem 0;

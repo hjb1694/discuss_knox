@@ -634,10 +634,9 @@
         display:flex;
         justify-content:center;
     }
-
-    .thread, 
+ 
     .opinion {
-        box-shadow:0 0 .5rem rgba(0,0,0,.24);
+        border:1px solid #ccc;
         border-radius:.5rem;
         overflow:hidden;
         margin:1rem 0;
@@ -699,7 +698,7 @@
     .auth-prompt {
         background:#fff;
         padding:2rem;
-        box-shadow:0 0 .5rem rgba(0,0,0,.24);
+        border:1px solid #ccc;
         margin:2rem 0;
         border-radius:.5rem;
 
@@ -797,7 +796,8 @@
     .reply{
         background:#fff;
         padding:1rem;
-        box-shadow:0 0 .5rem rgba(0,0,0,.24);
+        border:1px solid #ccc;
+        border-radius:.5rem;
         width:85%;
         margin-right:0;
         margin-left:auto;
