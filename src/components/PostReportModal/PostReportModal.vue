@@ -32,15 +32,24 @@
                 </form>
             </section>
             <footer class="post-report-modal__footer">
-               <button class="btn">Submit Report</button>
+               <button class="btn" @click="submitReport" :disabled="isReportSubmissionProcessing">
+                    <span v-if="!isReportSubmissionProcessing">Submit Report</span>
+                    <span v-else>Processing...</span>
+               </button>
             </footer>
         </div>
     </div>
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, reactive } from 'vue';
 import CheckboxInput from '@/components/ui_elements/CheckboxInput.vue';
+import axios from 'axios';
+import { useAuthStore } from '@/stores/useAuthStore';
+import { useFlashToastStore, MessageTypes } from '@/stores/useFlashToastStore';
+
+const { getAuthToken, logout } = useAuthStore();
+const { openFlashToast } = useFlashToastStore();
 
 const isDuplicatePostChecked = ref<boolean>(false);
 const isOffensiveChecked = ref<boolean>(false);
@@ -49,7 +58,103 @@ const isNonsenseChecked = ref<boolean>(false);
 const isIllegalChecked = ref<boolean>(false);
 const isOtherChecked = ref<boolean>(false);
 
+const reportSubmissionErrors = reactive<string[]>([]);
+const isReportSubmissionProcessing = ref<boolean>(false);
+
+const props = defineProps({
+    entityType: {
+        type: String, 
+        required: true
+    }, 
+    entityId: {
+        type: Number, 
+        required: true
+    }
+});
+
 const emit = defineEmits(['closeModal']);
+
+const validation = () => {
+
+    reportSubmissionErrors.splice(0,reportSubmissionErrors.length);
+    let isValid = true;
+
+    if(![
+        isDuplicatePostChecked.value, 
+        isOffensiveChecked.value, 
+        isExplicitChecked.value, 
+        isNonsenseChecked.value, 
+        isIllegalChecked.value, 
+        isOtherChecked.value
+    ].includes(true)){
+        isValid = false;
+        reportSubmissionErrors.push('Must select at least 1 reason.');
+    }
+
+    return isValid;
+
+}
+
+const submitReport = async () => {
+
+    if(!validation()){
+        return;
+    }
+
+    isReportSubmissionProcessing.value = true;
+
+    try{
+
+        await axios.post('http://155.138.197.17:8080/api/v1/report-post', {
+            entity_type: props.entityType, 
+            entity_id: props.entityId,
+            is_duplicate: isDuplicatePostChecked.value,
+            is_offensive: isOffensiveChecked.value, 
+            is_nonsense: isNonsenseChecked.value,
+            is_explicit: isExplicitChecked.value, 
+            is_illegal: isIllegalChecked.value, 
+            is_other: isOtherChecked.value
+        }, 
+        {
+            headers: {
+                'x-auth-token': getAuthToken.value
+            }
+        });
+
+        openFlashToast(MessageTypes.SUCCESS, 'Posting successfully reported.');
+        emit('closeModal');
+
+    }catch(e: any){
+
+        console.error(e);
+
+        if(e.response?.data?.short_msg){
+
+            const shortMsg = e.response.data.short_msg;
+
+            if(shortMsg === 'ERR_DEACTIVATED'){
+                openFlashToast(MessageTypes.ERROR, 'You have been deactivated.');
+                logout();
+                emit('closeModal');
+            }else if(shortMsg === 'ERR_FROZEN'){
+                openFlashToast(MessageTypes.ERROR, 'Your account is frozen and under review by admins.');
+                emit('closeModal');
+            }else if(shortMsg === 'ERR_ALREADY_REPORTED'){
+                reportSubmissionErrors.push('You have already reported this posting.');
+            }else{
+                reportSubmissionErrors.push('An unexpected error has occurred.');
+            }
+
+        }else{
+            reportSubmissionErrors.push('An unexpected error has occurred.');
+        }
+
+
+    }finally{
+        isReportSubmissionProcessing.value = false;
+    }
+
+}
 
 const closeModal = () => {
     emit('closeModal');
