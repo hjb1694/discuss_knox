@@ -1,6 +1,11 @@
 <template>
     <div class="container">
-        <post-report-modal v-if="isPostReportModalShown" @close-modal="isPostReportModalShown = false" />
+        <post-report-modal 
+        v-if="isPostReportModalShown" 
+        :entity-type="reportEntityType" 
+        :entity-id="reportEntityId" 
+        @close-modal="closePostReportModal" 
+        />
         <div v-if="isThreadLoading" class="spinner-container">
             <img class="spinner" src="@/assets/ring-spinner.svg" />
         </div>
@@ -212,7 +217,10 @@
     const isThreadNotFound = ref<boolean>(false);
     const isErrorLoadingThread = ref<boolean>(false);
     const replySubmitErrors = reactive<string[]>([]);
+
     const isPostReportModalShown = ref<boolean>(false);
+    const reportEntityType = ref<string | null>('');
+    const reportEntityId = ref<number | null>(null);
 
     const replyInput = ref<string>('');
 
@@ -645,6 +653,12 @@
         }
 
         return true;
+    }
+
+    const closePostReportModal = () => {
+        isPostReportModalShown.value = false;
+        reportEntityId.value = null;
+        reportEntityType.value = null;
     }
 
 
