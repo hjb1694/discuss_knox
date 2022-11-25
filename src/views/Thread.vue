@@ -89,6 +89,17 @@
                                         <span>u/{{ opinion.author_username }}</span>
                                         <strong v-if="getIsLoggedIn && (+opinion.author_user_id! === getUserData.user_id)" class="you">(You)</strong>
                                     </button>
+                                    <div class="header-controls">
+                                        <button v-if="determineOpinionRemoveButtonShown(opinion.author_core_role!)" class="header-controls__button">
+                                            <i class="fa fa-close"></i>
+                                        </button>
+                                        <button v-if="determineOpinionHideButtonShown(opinion.author_core_role!, opinion.author_moderator_role!, opinion.author_user_id!)" class="header-controls__button">
+                                            <i class="fa fa-eye-slash"></i>
+                                        </button>
+                                        <button class="header-controls__button">
+                                            <i class="fa fa-flag"></i>
+                                        </button>
+                                    </div>
                                 </header>
                                 <section class="opinion__body">
                                     <div class="opinion__content" v-html="opinion.content"></div>
@@ -148,7 +159,7 @@
     import { decode as htmlEntityDecode } from 'html-entities';
     import Pusher from 'pusher-js';
     import AppBigErrorDisplay from '@/components/BigErrorDisplay/BigErrorDisplay.vue';
-    import type { ThreadData, Opinion, AuthUserOpinion } from '@/types';
+    import { type ThreadData, type Opinion, type AuthUserOpinion, CoreRole, ModeratorRole } from '@/types';
     import AppMainThreadPost from '@/components/MainThreadPost/MainThreadPost.vue';
 
     interface PusherInstance {
@@ -187,7 +198,9 @@
         status: null,
         replies: [], 
         added_ts: null, 
-        thread_id: null
+        thread_id: null,
+        author_core_role: null, 
+        author_moderator_role: null
     });
     const opinionSubmitErrors = reactive<string[]>([]);
     const isOpinionSubmissionProcessing = ref<boolean>(false);
@@ -443,16 +456,18 @@
 
             if(getIsLoggedIn.value === true){
 
-                const authOp = response.data.body.opinions.filter((op: any) => op.author_user_id === getUserData.user_id);
+                const authOp = response.data.body.opinions.find((op: any) => op.author_user_id === getUserData.user_id);
 
                 if(authOp.length){
                     authUserOpinion.exists = true;
-                    authUserOpinion.author_username = authOp[0].author_username;
-                    authUserOpinion.author_user_id = authOp[0].author_user_id;
-                    authUserOpinion.content = authOp[0].content;
-                    authUserOpinion.id = authOp[0].id;
-                    authUserOpinion.replies = authOp[0].replies;
+                    authUserOpinion.author_username = authOp.author_username;
+                    authUserOpinion.author_user_id = authOp.author_user_id;
+                    authUserOpinion.content = authOp.content;
+                    authUserOpinion.id = authOp.id;
+                    authUserOpinion.replies = authOp.replies;
                     authUserOpinion.is_reply_box_shown = false;
+                    authUserOpinion.author_core_role = authOp.author_core_role;
+                    authUserOpinion.author_moderator_role = authOp.author_moderator_role;
 
                     let otherOps = response.data.body.opinions.filter((op: any) => op.author_user_id !== getUserData.user_id);
                     otherOps = otherOps.map((op: any) => ({...op, is_reply_box_shown: false}));
@@ -585,6 +600,37 @@
             }
         }
 
+    }
+
+    const determineOpinionRemoveButtonShown = (coreRole: CoreRole) => {
+
+        if(!getIsLoggedIn.value){
+            return false;
+        }else if(![CoreRole.SUPER_ADMINISTRATOR, CoreRole.ADMINISTRATOR, CoreRole.STAFF].includes(getUserData.core_role as CoreRole)){
+            return false;
+        }else if([CoreRole.SUPER_ADMINISTRATOR, CoreRole.ADMINISTRATOR].includes(coreRole) && getUserData.core_role === CoreRole.STAFF){
+            return false;
+        }
+
+        return true;
+
+    }
+
+    const determineOpinionHideButtonShown = (coreRole: CoreRole, moderatorRole: ModeratorRole, authorUserId: number) => {
+
+        if(!getIsLoggedIn.value){
+            return false;
+        }else if([CoreRole.SUPER_ADMINISTRATOR, CoreRole.ADMINISTRATOR, CoreRole.STAFF].includes(getUserData.core_role as CoreRole)){
+            return false;
+        }else if([CoreRole.SUPER_ADMINISTRATOR, CoreRole.ADMINISTRATOR, CoreRole.STAFF].includes(coreRole)){
+            return false;
+        }else if(moderatorRole === ModeratorRole.NONE){
+            return false;
+        }else if(authorUserId === getUserData.user_id){
+            return false;
+        }
+
+        return true;
     }
 
 

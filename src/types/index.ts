@@ -55,6 +55,8 @@ export interface Opinion {
     status: OpinionStatus | null;
     added_ts: string | null;
     replies : Reply[];
+    author_core_role: CoreRole | null, 
+    author_moderator_role: ModeratorRole | null
     is_reply_box_shown: boolean;
 }
 
