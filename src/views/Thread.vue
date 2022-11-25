@@ -6,6 +6,12 @@
         :entity-id="reportEntityId" 
         @close-modal="closePostReportModal" 
         />
+        <post-hide-modal 
+        v-if="isPostHideModalShown" 
+        :entity-type="hideEntityType" 
+        :entity-id="hideEntityId" 
+        @close-modal="closePostHideModal" 
+        />
         <div v-if="isThreadLoading" class="spinner-container">
             <img class="spinner" src="@/assets/ring-spinner.svg" />
         </div>
@@ -99,7 +105,7 @@
                                         <button v-if="determineOpinionorReplyRemoveButtonShown(opinion.author_core_role!)" class="header-controls__button">
                                             <i class="fa fa-close"></i>
                                         </button>
-                                        <button v-if="determineOpinionOrReplyHideButtonShown(opinion.author_core_role!, opinion.author_moderator_role!, opinion.author_user_id!)" class="header-controls__button">
+                                        <button v-if="determineOpinionOrReplyHideButtonShown(opinion.author_core_role!, opinion.author_moderator_role!, opinion.author_user_id!)" class="header-controls__button" @click="hidePosting({entityType: 'opinion', entityId: opinion.id!})">
                                             <i class="fa fa-eye-slash"></i>
                                         </button>
                                         <button v-if="determineOpinionOrReplyReportButtonShown(opinion.author_core_role!, opinion.author_user_id!)" class="header-controls__button" @click="reportPosting({entityType: 'opinion', entityId: opinion.id!})">
@@ -138,7 +144,7 @@
                                             <button v-if="determineOpinionorReplyRemoveButtonShown(reply.author_core_role!)" class="header-controls__button">
                                                 <i class="fa fa-close"></i>
                                             </button>
-                                            <button v-if="determineOpinionOrReplyHideButtonShown(reply.author_core_role!, reply.author_moderator_role!, reply.author_user_id!)" class="header-controls__button">
+                                            <button v-if="determineOpinionOrReplyHideButtonShown(reply.author_core_role!, reply.author_moderator_role!, reply.author_user_id!)" class="header-controls__button" @click="hidePosting({entityType: 'reply', entityId: reply.id!})">
                                                 <i class="fa fa-eye-slash"></i>
                                             </button>
                                             <button  v-if="determineOpinionOrReplyReportButtonShown(reply.author_core_role!, reply.author_user_id!)" class="header-controls__button" @click="reportPosting({entityType: 'reply', entityId: reply.id!})">
@@ -179,6 +185,7 @@
     import { type ThreadData, type Opinion, type AuthUserOpinion, CoreRole, ModeratorRole } from '@/types';
     import AppMainThreadPost from '@/components/MainThreadPost/MainThreadPost.vue';
     import PostReportModal from '@/components/PostReportModal/PostReportModal.vue';
+    import PostHideModal from '@/components/PostHideModal/PostHideModal.vue';
 
     interface PusherInstance {
         instance: Pusher | null;
@@ -232,6 +239,10 @@
     const isPostReportModalShown = ref<boolean>(false);
     const reportEntityType = ref<string>('');
     const reportEntityId = ref<number>(0);
+
+    const isPostHideModalShown = ref<boolean>(false);
+    const hideEntityType = ref<string>('');
+    const hideEntityId = ref<number>(0);
 
     const replyInput = ref<string>('');
 
@@ -685,6 +696,21 @@
             reportEntityType.value = details.entityType;
             isPostReportModalShown.value = true;
         }
+
+    }
+
+    const closePostHideModal = () => {
+        isPostHideModalShown.value = false;
+        hideEntityId.value = 0;
+        hideEntityType.value = '';
+        fetchThread();
+    }
+
+    const hidePosting = (details: {entityType: string, entityId: number}) => {
+
+        hideEntityType.value = details.entityType;
+        hideEntityId.value = details.entityId;
+        isPostHideModalShown.value = true;
 
     }
 
