@@ -30,6 +30,9 @@
                         <checkbox-input input-id="other" v-model="isOtherChecked" label="Other"/>
                     </div>
                 </form>
+                <div v-if="reportSubmissionErrors.length" class="errbox">
+                    <p v-for="error in reportSubmissionErrors" :key="error">{{ error }}</p>
+                </div>
             </section>
             <footer class="post-report-modal__footer">
                <button class="btn" @click="submitReport" :disabled="isReportSubmissionProcessing">
@@ -240,10 +243,20 @@ const closeModal = () => {
             font-weight:bold;
             border-radius:.5rem;
         }
-    }
 
-    .fgrp{
-        margin:1rem 0;
+        .fgrp{
+            margin:1rem 0;
+        }
+
+        .errbox{
+            color:#f00;
+            margin-top:2rem;
+            font-size:1.4rem;
+            background:#ffe0de;
+            border:1px solid #f00;
+            padding:1rem;
+            border-radius:.5rem;
+        }
     }
 
 </style>
