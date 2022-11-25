@@ -42,6 +42,7 @@ export enum OpinionStatus {
 }
 
 export interface Reply {
+    id: number;
     author_user_id: number;
     author_username: string;
     content: string;

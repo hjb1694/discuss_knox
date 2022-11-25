@@ -141,7 +141,7 @@
                                             <button v-if="determineOpinionOrReplyHideButtonShown(reply.author_core_role!, reply.author_moderator_role!, reply.author_user_id!)" class="header-controls__button">
                                                 <i class="fa fa-eye-slash"></i>
                                             </button>
-                                            <button  v-if="determineOpinionOrReplyReportButtonShown(opinion.author_core_role!, opinion.author_user_id!)" class="header-controls__button" @click="reportPosting({entityType: 'opinion', entityId: opinion.id!})">
+                                            <button  v-if="determineOpinionOrReplyReportButtonShown(reply.author_core_role!, reply.author_user_id!)" class="header-controls__button" @click="reportPosting({entityType: 'reply', entityId: reply.id!})">
                                                 <i class="fa fa-flag"></i>
                                             </button>
                                         </div>
