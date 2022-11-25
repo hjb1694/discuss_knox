@@ -96,13 +96,13 @@
                                         <strong v-if="getIsLoggedIn && (+opinion.author_user_id! === getUserData.user_id)" class="you">(You)</strong>
                                     </button>
                                     <div class="header-controls">
-                                        <button v-if="determineOpinionRemoveButtonShown(opinion.author_core_role!)" class="header-controls__button">
+                                        <button v-if="determineOpinionorReplyRemoveButtonShown(opinion.author_core_role!)" class="header-controls__button">
                                             <i class="fa fa-close"></i>
                                         </button>
-                                        <button v-if="determineOpinionHideButtonShown(opinion.author_core_role!, opinion.author_moderator_role!, opinion.author_user_id!)" class="header-controls__button">
+                                        <button v-if="determineOpinionOrReplyHideButtonShown(opinion.author_core_role!, opinion.author_moderator_role!, opinion.author_user_id!)" class="header-controls__button">
                                             <i class="fa fa-eye-slash"></i>
                                         </button>
-                                        <button v-if="determineOpinionReportButtonShown(opinion.author_core_role!, opinion.author_user_id!)" class="header-controls__button" @click="reportPosting({entityType: 'opinion', entityId: opinion.id!})">
+                                        <button v-if="determineOpinionOrReplyReportButtonShown(opinion.author_core_role!, opinion.author_user_id!)" class="header-controls__button" @click="reportPosting({entityType: 'opinion', entityId: opinion.id!})">
                                             <i class="fa fa-flag"></i>
                                         </button>
                                     </div>
@@ -133,6 +133,17 @@
                                         class="reply__author"
                                         >
                                             <i class="user-icon fa fa-user"></i> u/{{ reply.author_username}}
+                                        </div>
+                                        <div class="header-controls">
+                                            <button v-if="determineOpinionorReplyRemoveButtonShown(reply.author_core_role!)" class="header-controls__button">
+                                                <i class="fa fa-close"></i>
+                                            </button>
+                                            <button v-if="determineOpinionOrReplyHideButtonShown(reply.author_core_role!, reply.author_moderator_role!, reply.author_user_id!)" class="header-controls__button">
+                                                <i class="fa fa-eye-slash"></i>
+                                            </button>
+                                            <button  v-if="determineOpinionOrReplyReportButtonShown(opinion.author_core_role!, opinion.author_user_id!)" class="header-controls__button" @click="reportPosting({entityType: 'opinion', entityId: opinion.id!})">
+                                                <i class="fa fa-flag"></i>
+                                            </button>
                                         </div>
                                     </header>
                                     <section class="reply__body">
@@ -615,7 +626,7 @@
 
     }
 
-    const determineOpinionRemoveButtonShown = (coreRole: CoreRole) => {
+    const determineOpinionorReplyRemoveButtonShown = (coreRole: CoreRole) => {
 
         if(!getIsLoggedIn.value){
             return false;
@@ -629,7 +640,7 @@
 
     }
 
-    const determineOpinionHideButtonShown = (coreRole: CoreRole, moderatorRole: ModeratorRole, authorUserId: number) => {
+    const determineOpinionOrReplyHideButtonShown = (coreRole: CoreRole, moderatorRole: ModeratorRole, authorUserId: number) => {
 
         if(!getIsLoggedIn.value){
             return false;
@@ -646,7 +657,7 @@
         return true;
     }
 
-    const determineOpinionReportButtonShown = (coreRole: CoreRole, authorUserId: number) => {
+    const determineOpinionOrReplyReportButtonShown = (coreRole: CoreRole, authorUserId: number) => {
 
         if(getIsLoggedIn.value && getUserData.user_id === authorUserId){
             return false;
@@ -659,8 +670,8 @@
 
     const closePostReportModal = () => {
         isPostReportModalShown.value = false;
-        reportEntityId.value = null;
-        reportEntityType.value = null;
+        reportEntityId.value = 0;
+        reportEntityType.value = '';
     }
 
     const reportPosting = (details: {entityType: string, entityId: number}) => {
