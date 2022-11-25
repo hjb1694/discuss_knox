@@ -18,7 +18,7 @@
         <app-big-error-display v-else-if="isThreadNotFound" message="This thread cannot be found."/>
         <app-big-error-display v-else-if="isErrorLoadingThread" message="There was an error loading this page."/>
         <template v-else>
-            <app-main-thread-post :thread="threadData" @report-thread="reportPosting($event)"/>
+            <app-main-thread-post :thread="threadData" @report-thread="reportPosting($event)" @hide-thread="hidePosting($event)"/>
             <form class="opinion-form" v-if="isResponseFormShown" @submit.prevent>
                 <h2>Add an Opinion</h2>
                 <quill-editor 

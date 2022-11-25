@@ -10,7 +10,7 @@
                 <button v-if="isThreadRemoveButtonShown" class="header-controls__button" title="Remove Thread">
                     <i class="fa fa-close"></i>
                 </button>
-                <button v-if="isThreadHideButtonShown" class="header-controls__button" title="Hide Thread">
+                <button v-if="isThreadHideButtonShown" class="header-controls__button" title="Hide Thread" @click="hideThread">
                     <i class="fa fa-eye-slash"></i>
                 </button>
                 <button v-if="isThreadReportButtonShown" class="header-controls__button" title="Report Thread" @click="reportThread">
@@ -40,7 +40,7 @@
         }
     });
 
-    const emit = defineEmits(['reportThread']);
+    const emit = defineEmits(['reportThread', 'hideThread']);
 
     const { push: routerPush } = useRouter();
     const { getIsLoggedIn, getUserData } = useAuthStore();
@@ -90,6 +90,13 @@
     const reportThread = () => {
         emit('reportThread', {
             entityType: 'thread',
+            entityId: props.thread.id
+        });
+    }
+
+    const hideThread = () => {
+        emit('hideThread', {
+            entityType: 'thread', 
             entityId: props.thread.id
         });
     }
