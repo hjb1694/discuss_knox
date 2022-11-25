@@ -1,5 +1,6 @@
 <template>
     <div class="container">
+        <post-report-modal v-if="isPostReportModalShown" @close-modal="isPostReportModalShown = false" />
         <div v-if="isThreadLoading" class="spinner-container">
             <img class="spinner" src="@/assets/ring-spinner.svg" />
         </div>
@@ -161,6 +162,7 @@
     import AppBigErrorDisplay from '@/components/BigErrorDisplay/BigErrorDisplay.vue';
     import { type ThreadData, type Opinion, type AuthUserOpinion, CoreRole, ModeratorRole } from '@/types';
     import AppMainThreadPost from '@/components/MainThreadPost/MainThreadPost.vue';
+    import PostReportModal from '@/components/PostReportModal/PostReportModal.vue';
 
     interface PusherInstance {
         instance: Pusher | null;
@@ -210,6 +212,7 @@
     const isThreadNotFound = ref<boolean>(false);
     const isErrorLoadingThread = ref<boolean>(false);
     const replySubmitErrors = reactive<string[]>([]);
+    const isPostReportModalShown = ref<boolean>(false);
 
     const replyInput = ref<string>('');
 
