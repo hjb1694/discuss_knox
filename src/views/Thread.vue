@@ -96,7 +96,7 @@
                                         <button v-if="determineOpinionHideButtonShown(opinion.author_core_role!, opinion.author_moderator_role!, opinion.author_user_id!)" class="header-controls__button">
                                             <i class="fa fa-eye-slash"></i>
                                         </button>
-                                        <button class="header-controls__button">
+                                        <button v-if="determineOpinionReportButtonShown(opinion.author_core_role!, opinion.author_user_id!)" class="header-controls__button">
                                             <i class="fa fa-flag"></i>
                                         </button>
                                     </div>
@@ -627,6 +627,17 @@
         }else if(moderatorRole === ModeratorRole.NONE){
             return false;
         }else if(authorUserId === getUserData.user_id){
+            return false;
+        }
+
+        return true;
+    }
+
+    const determineOpinionReportButtonShown = (coreRole: CoreRole, authorUserId: number) => {
+
+        if(getIsLoggedIn.value && getUserData.user_id === authorUserId){
+            return false;
+        }else if([CoreRole.SUPER_ADMINISTRATOR, CoreRole.ADMINISTRATOR, CoreRole.STAFF].includes(coreRole)){
             return false;
         }
 
