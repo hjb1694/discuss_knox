@@ -102,7 +102,7 @@
                                         <button v-if="determineOpinionHideButtonShown(opinion.author_core_role!, opinion.author_moderator_role!, opinion.author_user_id!)" class="header-controls__button">
                                             <i class="fa fa-eye-slash"></i>
                                         </button>
-                                        <button v-if="determineOpinionReportButtonShown(opinion.author_core_role!, opinion.author_user_id!)" class="header-controls__button" @click="reportPosting({entityType: 'opinion', entityId: opinion.id})">
+                                        <button v-if="determineOpinionReportButtonShown(opinion.author_core_role!, opinion.author_user_id!)" class="header-controls__button" @click="reportPosting({entityType: 'opinion', entityId: opinion.id!})">
                                             <i class="fa fa-flag"></i>
                                         </button>
                                     </div>
@@ -661,12 +661,16 @@
         reportEntityType.value = null;
     }
 
-    const reportPosting = (details: object) => {
+    const reportPosting = (details: {entityType: string, entityId: number}) => {
 
         if(!getIsLoggedIn.value){
             openAuthModal();
         }else if(getUserData.account_status === 'NOT_VERIFIED'){
             openEmailVerifyModal();
+        }else{
+            reportEntityId.value = details.entityId;
+            reportEntityType.value = details.entityType;
+            isPostReportModalShown.value = true;
         }
 
     }
