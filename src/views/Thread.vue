@@ -464,6 +464,9 @@
                     openEmailVerifyModal();
                 }else if(shortMsg === 'FROZEN'){
                     openFlashToast(MessageTypes.ERROR, 'Your account is frozen and under review by admins.');
+                }else if(shortMsg === 'ERR_NOT_FOUND'){
+                    openFlashToast(MessageTypes.ERROR, 'This thread does not exist, is hidden, or no longer exists.');
+                    fetchThread();
                 }else{
                     opinionSubmitErrors.push('An error has occurred.');
                 }
