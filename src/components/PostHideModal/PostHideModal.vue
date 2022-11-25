@@ -79,7 +79,7 @@ const submitReport = async () => {
 
     try{
 
-        await axios.post('http://155.138.197.17:8080/api/v1/hide-post', {
+        await axios.patch('http://155.138.197.17:8080/api/v1/hide-post', {
             entity_type: props.entityType, 
             entity_id: props.entityId,
             explanation: explanationInput.value.trim()
