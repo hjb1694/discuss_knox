@@ -219,8 +219,8 @@
     const replySubmitErrors = reactive<string[]>([]);
 
     const isPostReportModalShown = ref<boolean>(false);
-    const reportEntityType = ref<string | null>('');
-    const reportEntityId = ref<number | null>(null);
+    const reportEntityType = ref<string>('');
+    const reportEntityId = ref<number>(0);
 
     const replyInput = ref<string>('');
 
