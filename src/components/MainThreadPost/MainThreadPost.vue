@@ -29,7 +29,7 @@
     import { useRouter } from 'vue-router';
     import { computed } from 'vue';
     import { useAuthStore } from '@/stores/useAuthStore';
-    import { CoreRole, ModeratorRole, ThreadStatus } from '@/types';
+    import { CoreRole, ModeratorRole } from '@/types';
     import type { PropType } from 'vue';
     import type { ThreadData } from '@/types';
 

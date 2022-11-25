@@ -7,9 +7,9 @@ export enum CoreRole {
 
 export enum ModeratorRole {
     NONE = 'NONE',
-    BRONZE_MODERATOR = 'BRONZE_MODERATOR', 
-    SILVER_MODERATOR = 'SILVER_MODERATOR', 
-    PLATIMUM_MODERATOR = 'PLATINUM_MODERATOR'
+    BRONZE_MODERATOR = 'BRONZE', 
+    SILVER_MODERATOR = 'SILVER', 
+    PLATIMUM_MODERATOR = 'PLATINUM'
 }
 
 export enum ThreadStatus {
