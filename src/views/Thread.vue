@@ -465,11 +465,13 @@
 
             const response = await axios.get(`http://155.138.197.17:8080/api/v1/opinions/${threadData.id}`);
 
+            console.log('OPINIONS', response.data.body);
+
             if(getIsLoggedIn.value === true){
 
                 const authOp = response.data.body.opinions.find((op: any) => op.author_user_id === getUserData.user_id);
 
-                if(authOp.length){
+                if(authOp){
                     authUserOpinion.exists = true;
                     authUserOpinion.author_username = authOp.author_username;
                     authUserOpinion.author_user_id = authOp.author_user_id;
