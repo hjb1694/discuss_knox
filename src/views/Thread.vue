@@ -12,7 +12,7 @@
         <app-big-error-display v-else-if="isThreadNotFound" message="This thread cannot be found."/>
         <app-big-error-display v-else-if="isErrorLoadingThread" message="There was an error loading this page."/>
         <template v-else>
-            <app-main-thread-post :thread="threadData"/>
+            <app-main-thread-post :thread="threadData" @report-thread="reportPosting($event)"/>
             <form class="opinion-form" v-if="isResponseFormShown" @submit.prevent>
                 <h2>Add an Opinion</h2>
                 <quill-editor 
@@ -102,7 +102,7 @@
                                         <button v-if="determineOpinionHideButtonShown(opinion.author_core_role!, opinion.author_moderator_role!, opinion.author_user_id!)" class="header-controls__button">
                                             <i class="fa fa-eye-slash"></i>
                                         </button>
-                                        <button v-if="determineOpinionReportButtonShown(opinion.author_core_role!, opinion.author_user_id!)" class="header-controls__button">
+                                        <button v-if="determineOpinionReportButtonShown(opinion.author_core_role!, opinion.author_user_id!)" class="header-controls__button" @click="reportPosting({entityType: 'opinion', entityId: opinion.id})">
                                             <i class="fa fa-flag"></i>
                                         </button>
                                     </div>
@@ -659,6 +659,16 @@
         isPostReportModalShown.value = false;
         reportEntityId.value = null;
         reportEntityType.value = null;
+    }
+
+    const reportPosting = (details: object) => {
+
+        if(!getIsLoggedIn.value){
+            openAuthModal();
+        }else if(getUserData.account_status === 'NOT_VERIFIED'){
+            openEmailVerifyModal();
+        }
+
     }
 
 

@@ -13,7 +13,7 @@
                 <button v-if="isThreadHideButtonShown" class="header-controls__button" title="Hide Thread">
                     <i class="fa fa-eye-slash"></i>
                 </button>
-                <button v-if="isThreadReportButtonShown" class="header-controls__button" title="Report Thread">
+                <button v-if="isThreadReportButtonShown" class="header-controls__button" title="Report Thread" @click="reportThread">
                     <i class="fa fa-flag"></i>
                 </button>
             </div>
@@ -29,7 +29,7 @@
     import { useRouter } from 'vue-router';
     import { computed } from 'vue';
     import { useAuthStore } from '@/stores/useAuthStore';
-    import { CoreRole, ModeratorRole } from '@/types';
+    import { CoreRole, ModeratorRole, ThreadStatus } from '@/types';
     import type { PropType } from 'vue';
     import type { ThreadData } from '@/types';
 
@@ -39,6 +39,8 @@
             required: true
         }
     });
+
+    const emit = defineEmits(['reportThread']);
 
     const { push: routerPush } = useRouter();
     const { getIsLoggedIn, getUserData } = useAuthStore();
@@ -84,6 +86,13 @@
 
         return true;
     });
+
+    const reportThread = () => {
+        emit('reportThread', {
+            entityType: 'thread',
+            entityId: props.thread.id
+        });
+    }
 
 </script>
 
