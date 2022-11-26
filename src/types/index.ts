@@ -91,3 +91,9 @@ export interface ProfileData {
     userId: number | null, 
     followStatus: string | null
 }
+
+export interface Channel{
+    id: number | undefined;
+    channel_name: string | null;
+    channel_slug: string | null;
+}

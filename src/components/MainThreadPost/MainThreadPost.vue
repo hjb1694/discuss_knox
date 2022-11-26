@@ -80,7 +80,7 @@
 
         if(getIsLoggedIn.value === true && getUserData.core_role !== CoreRole.REGULAR_USER){
             return false;
-        }else if(getIsLoggedIn.value == true && (getUserData.user_id === +props.thread.author_user_id!)){
+        }else if(getIsLoggedIn.value === true && (getUserData.user_id === +props.thread.author_user_id!)){
             return false;
         }
 

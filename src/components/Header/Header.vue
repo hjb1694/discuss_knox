@@ -77,10 +77,11 @@
     import { useAuthStore } from '@/stores/useAuthStore';
     import { useFlashToastStore, MessageTypes } from '@/stores/useFlashToastStore';
     import { useFollowsStore } from '@/stores/useFollowsStore';
-    import { ref, reactive, computed, onMounted } from 'vue';
+    import { ref, reactive, onMounted } from 'vue';
     import { useRouter } from 'vue-router';
     import AppMultiSelect from 'vue-multiselect';
     import axios from 'axios';
+    import type { Channel } from '@/types';
 
     const { openAuthModal, openEmailVerifyModal } = useCoreModalStore();
     const { getIsLoggedIn, getUserData, logout } = useAuthStore();
@@ -92,9 +93,9 @@
 
     const isChannelDropdownShown = ref<boolean>(false);
     const channelSelection = ref<string>('');
-    const channelSelectOpts = reactive([]);
+    const channelSelectOpts = reactive<string[]>([]);
 
-    const recommendedChannels = reactive([]);
+    const recommendedChannels = reactive<Channel[]>([]);
 
     const userLogout = () => {
         logout();
