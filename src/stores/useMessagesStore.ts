@@ -15,16 +15,6 @@ export const useMessagesStore = defineStore('useMessagesStore', () => {
 
 
     const getLatestMessages = computed(() => latestMessages);
-    const getNewMessageCount = computed(() => {
-
-        console.log(latestMessages.length);
-        
-        return latestMessages.filter(msg => {
-            console.log(msg);
-            return !msg.is_read && getUserData.user_id !== msg.sender_user_id; 
-        }).length;
-
-    });
 
 
     const fetchLatestMessages = async () => {
@@ -115,11 +105,17 @@ export const useMessagesStore = defineStore('useMessagesStore', () => {
         currentChatWithUsername.value = username;
     }
 
+    const fetchNewMessageCount = () => {
+
+        return latestMessages.filter(msg => !msg.is_read && getUserData.user_id !== msg.sender_user_id).length;
+
+    }
+
 
 
     return {
         getLatestMessages, 
-        getNewMessageCount,
+        fetchNewMessageCount,
         fetchLatestMessages, 
         markAsRead, 
         clearMessages, 

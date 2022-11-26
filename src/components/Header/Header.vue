@@ -13,7 +13,10 @@
                 </button>
                 <div v-else class="user-dropdown">
                     <button class="user-dropdown__toggle" @click="isUserPaneShown = !isUserPaneShown">
-                        {{ getUserData.username!.substring(0,1) }}
+                        <span>{{ getUserData.username!.substring(0,1) }}</span>
+                        <div v-if="totalBadgeCount" class="badge user-dropdown__badge">
+                        {{ totalBadgeCount }}
+                        </div>
                     </button>
                     <div class="user-dropdown__pane" v-show="isUserPaneShown">
                         <div class="user-dropdown__item">
@@ -28,8 +31,8 @@
                         </div>
                         <div class="user-dropdown__item space-between" @click="goToMessages">
                             <span>Messages</span>
-                            <span class="badge">
-                                {{ getNewMessageCount }}
+                            <span v-if="newMessageCount" class="badge">
+                                {{ newMessageCount }}
                             </span>
                         </div>
                         <div class="user-dropdown__item" @click="handleFollowsButtonClick">
@@ -81,7 +84,7 @@
     import { useFlashToastStore, MessageTypes } from '@/stores/useFlashToastStore';
     import { useFollowsStore } from '@/stores/useFollowsStore';
     import { useMessagesStore } from '@/stores/useMessagesStore';
-    import { ref, reactive, onMounted } from 'vue';
+    import { ref, reactive, onMounted, watch, computed } from 'vue';
     import { useRouter } from 'vue-router';
     import AppMultiSelect from 'vue-multiselect';
     import axios from 'axios';
@@ -92,15 +95,20 @@
     const { openFlashToast } = useFlashToastStore();
     const { openFollowDrawer } = useFollowsStore();
     const { push: routerPush } = useRouter();
-    const { getNewMessageCount } = useMessagesStore();
+    const { fetchNewMessageCount, getLatestMessages } = useMessagesStore();
 
     const isUserPaneShown = ref<boolean>(false);
 
     const isChannelDropdownShown = ref<boolean>(false);
     const channelSelection = ref<string>('');
     const channelSelectOpts = reactive<string[]>([]);
+    const newMessageCount = ref<number>(0);
 
     const recommendedChannels = reactive<Channel[]>([]);
+
+    const totalBadgeCount = computed(() => {
+        return newMessageCount.value;
+    });
 
     const userLogout = () => {
         logout();
@@ -188,6 +196,10 @@
 
     }
 
+    watch(getLatestMessages, () => {
+        newMessageCount.value = fetchNewMessageCount();
+    })
+
     onMounted(() => {
         fetchChannels();
     });
@@ -248,6 +260,7 @@
         align-items:center;
         background:transparent;
         border:none;
+        position:relative;
 
         &__icon-container{
             width:4rem;
@@ -261,6 +274,7 @@
             background:#21bf8f;
             color:#fff;
         }
+
     }
 
     .secondary-header{
@@ -294,6 +308,12 @@
             justify-content:center;
             align-items:center;
             border:1px solid #ccc;
+        }
+
+        &__badge{
+            position:absolute;
+            top:-.5rem;
+            right:-1rem;
         }
 
         &__pane{
@@ -369,6 +389,17 @@
         margin-right:.5rem;
     }
 
+    .badge{
+        font-size:1.2rem;
+        background:#f00;
+        color:#fff;
+        border-radius:.5rem;
+        display:flex;
+        align-items: center;
+        justify-content: center;
+        width:3rem;
+    }
+
 
     @media (max-width:700px) {
 
@@ -397,13 +428,6 @@
 
             }
 
-        }
-
-        .badge{
-            font-size:1.2rem;
-            background:#f00;
-            color:#fff;
-            border-radius:90%;
         }
 
 
