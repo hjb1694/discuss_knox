@@ -18,7 +18,7 @@
   const { getIsFlashToastOpen, getMessageType, getMessageText, closeFlashToast } = useFlashToastStore();
   const { getFollowDrawerIsOpen } = useFollowsStore();
   const { getPusherInstance, createPusherInstance } = usePusherStore();
-  const { addIncomingMessage } = useMessagesStore();
+  const { addIncomingMessage, fetchLatestMessages } = useMessagesStore();
 
   const initPusher = () => {
 
@@ -38,6 +38,7 @@
 
     if(value === true){
       initPusher();
+      fetchLatestMessages();
     }
 
   });

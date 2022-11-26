@@ -26,8 +26,11 @@
                         <div class="user-dropdown__item">
                             Notifications
                         </div>
-                        <div class="user-dropdown__item" @click="goToMessages">
-                            Messages
+                        <div class="user-dropdown__item space-between" @click="goToMessages">
+                            <span>Messages</span>
+                            <span class="badge">
+                                {{ getNewMessageCount }}
+                            </span>
                         </div>
                         <div class="user-dropdown__item" @click="handleFollowsButtonClick">
                             Follows
@@ -77,6 +80,7 @@
     import { useAuthStore } from '@/stores/useAuthStore';
     import { useFlashToastStore, MessageTypes } from '@/stores/useFlashToastStore';
     import { useFollowsStore } from '@/stores/useFollowsStore';
+    import { useMessagesStore } from '@/stores/useMessagesStore';
     import { ref, reactive, onMounted } from 'vue';
     import { useRouter } from 'vue-router';
     import AppMultiSelect from 'vue-multiselect';
@@ -88,6 +92,7 @@
     const { openFlashToast } = useFlashToastStore();
     const { openFollowDrawer } = useFollowsStore();
     const { push: routerPush } = useRouter();
+    const { getNewMessageCount } = useMessagesStore();
 
     const isUserPaneShown = ref<boolean>(false);
 
@@ -315,6 +320,10 @@
             &:hover{
                 background:#fafafa;
             }
+
+            &.space-between{
+                justify-content: space-between;
+            }
         }
 
 
@@ -388,6 +397,13 @@
 
             }
 
+        }
+
+        .badge{
+            font-size:1.2rem;
+            background:#f00;
+            color:#fff;
+            border-radius:90%;
         }
 
 

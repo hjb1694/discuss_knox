@@ -34,7 +34,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 import { useMessagesStore } from '@/stores/useMessagesStore';
 import { useAuthStore } from '@/stores/useAuthStore';
 import PrivateMessageModal from '@/components/PrivateMessageModal/PrivateMessageModal.vue';
@@ -82,13 +82,6 @@ watch(getIsLoggedIn, (val) => {
 
 });
 
-onMounted(() => {
-
-    fetchLatestMessages();
-
-    console.log(getLatestMessages);
-
-});
 
 
 </script>
