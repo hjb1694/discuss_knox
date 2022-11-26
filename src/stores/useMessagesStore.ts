@@ -73,6 +73,19 @@ export const useMessagesStore = defineStore('useMessagesStore', () => {
             latestMessages.unshift(latestMessages[existingEntryIdx]);
             latestMessages.splice(existingEntryIdx, 1);
 
+        }else{
+
+            latestMessages.unshift({
+                message_id: data.message_id, 
+                sender_user_id: data.sender_user_id, 
+                receiver_user_id: data.receiver_user_id,
+                sender_username: data.sender_username, 
+                receiver_username: data.receiver_username,
+                message_content: data.message_content,
+                added_ts: '', 
+                is_read: false
+            });
+
         }
 
     }
