@@ -29,7 +29,7 @@ export enum AccountStatus {
 }
 
 export interface ThreadData {
-    id: number | null;
+    id: number | undefined;
     author_user_id: number | null;
     author_username: string | null;
     slug: string | null;

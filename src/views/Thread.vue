@@ -201,7 +201,7 @@
 
     const slug = ref<any>(routeParams.slug);
     const threadData = reactive<ThreadData>({
-        id: null, 
+        id: undefined, 
         author_user_id: null,
         author_username: null, 
         slug: null, 

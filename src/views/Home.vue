@@ -12,7 +12,7 @@
         </div>
         <template v-else>
             <div class="threads">
-                <div v-for="thread in shownThreads" :key="thread.id" class="thread-tile">
+                <div v-for="thread in shownThreads" class="thread-tile">
                     <img v-if="!thread.main_image" src="@/assets/sunsphere_tower.jpg" class="thread-tile__image"/>
                     <img v-else :src="'http://155.138.197.17:8080/thread_img/' + thread.main_image" class="thread-tile__image"/>
                     <div class="thread-tile__body">
