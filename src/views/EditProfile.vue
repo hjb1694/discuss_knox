@@ -76,15 +76,6 @@
     const zipHasError = ref<boolean>(false);
     const submissionErrors = reactive<string[]>([]);
 
-    const profileImgSrc = computed(() => {
-        console.log(profileImgURI.value);
-        if(!profileImgURI.value){
-            return '../assets/no_user.png';
-        }else{
-            return `http://66.42.81.246:8080/profile_img/${profileImgURI.value}`;
-        }
-    });
-
     const genderOptions = ['Male','Female'];
 
     const occupationOptions = [
@@ -128,7 +119,7 @@
 
     }
 
-    const sanitizeBio = (value) => {
+    const sanitizeBio = (value: string) => {
 
         let sanitized = sanitizeHTML(value, {
             allowedTags: ['b', 'strong', 'u', 'i', 'em', 'br', 'a', 'h1', 'h2', 'h3', 'h4', 'ol', 'ul', 'li', 'p'], 

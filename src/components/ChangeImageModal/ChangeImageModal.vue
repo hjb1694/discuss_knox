@@ -41,7 +41,7 @@
         emit('closeModal');
     }
 
-    const updateProfileImage = async (data) => {
+    const updateProfileImage = async (data: string | null) => {
 
         try{
 
@@ -69,7 +69,7 @@
             const fileReader = new FileReader();
             let cropper = '';
 
-            fileReader.onload = e => {
+            fileReader.onload = (e: Event) => {
 
                 if(e.target.result){
 
