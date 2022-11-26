@@ -46,7 +46,10 @@ export const useMessagesStore = defineStore('useMessagesStore', () => {
 
     const addIncomingMessage = (data: any) => {
 
-        const existingEntryIdx = latestMessages.findIndex(msg => msg.sender_user_id === data.sender_user_id && msg.receiver_user_id === data.receiver_user_id);
+        const existingEntryIdx = latestMessages.findIndex(msg => (
+            msg.sender_user_id === data.sender_user_id && msg.receiver_user_id === data.receiver_user_id ||
+            msg.sender_user_id === data.receiver_user_id && msg.receiver_user_id === data.sender_user_id
+        ));
 
         if(existingEntryIdx > -1){
 

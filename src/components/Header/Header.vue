@@ -120,6 +120,7 @@
 
     const goToAccountSettings = () => {
         isUserPaneShown.value = false;
+        isChannelDropdownShown.value = false;
         routerPush({
             name: 'account-settings'
         });
@@ -127,6 +128,7 @@
 
     const goToNewThreadPage = () => {
         isChannelDropdownShown.value = false;
+        isUserPaneShown.value = false;
         if(getIsLoggedIn.value === false){
             openAuthModal();
         }else if(getUserData.account_status === 'NOT_VERIFIED'){
@@ -138,11 +140,13 @@
 
     const goToFeed = () => {
         isChannelDropdownShown.value = false;
+        isUserPaneShown.value = false;
         routerPush('/');
     }
 
     const goToMessages = () => {
         isChannelDropdownShown.value = false;
+        isUserPaneShown.value = false;
         routerPush('/user/messages');
     }
 
