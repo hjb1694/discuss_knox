@@ -20,6 +20,14 @@ export enum ThreadStatus {
     CLOSED = 'CLOSED'
 }
 
+export enum AccountStatus {
+    NOT_VERIFIED = 'NOT_VERIFIED', 
+    ACTIVE = 'ACTIVE',
+    FROZEN = 'FROZEN',
+    VIOLATION_DEACTIVATION = 'VIOLATION_DEACTIVATION', 
+    USER_SELF_DEACTIVATION = 'USER_SELF_DEACTIVATION'
+}
+
 export interface ThreadData {
     id: number | null;
     author_user_id: number | null;

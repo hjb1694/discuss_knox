@@ -194,6 +194,15 @@
     import { useCoreModalStore } from '@/stores/useCoreModalStore';
     import { useAuthStore } from '@/stores/useAuthStore';
     import { useFlashToastStore, MessageTypes } from '@/stores/useFlashToastStore';
+    import { AccountStatus } from '@/types';
+
+    interface RegistrationErrors {
+        dob: string[];
+        email: string[];
+        username: string[];
+        password: string[];
+        agrees: string[];
+    }
 
     const props = defineProps({
         isOpen: {
@@ -230,7 +239,7 @@
         agreeRules: false
     });
 
-    const registrationErrors = reactive({
+    const registrationErrors = reactive<RegistrationErrors>({
         dob: [], 
         email: [], 
         username: [], 
@@ -266,12 +275,12 @@
             const now = DateTime.now();
             const userDobInput = DateTime.fromJSDate(registrationFormFields.dob);
 
-            if(now.diff(userDobInput, 'years').toObject().years < 13){
+            if(now.diff(userDobInput, 'years').toObject().years! < 13){
                 registrationErrors.dob.push('You must be at least 13 years of age to join.');
                 return false;
             }
 
-            if(now.diff(userDobInput, 'years').toObject().years > 100){
+            if(now.diff(userDobInput, 'years').toObject().years! > 100){
                 registrationErrors.dob.push('Invalid date input.');
                 return false;
             }
@@ -295,8 +304,7 @@
                     email: registrationFormFields.email
                 });
                 return true;
-            }catch(err){
-                console.error(err);
+            }catch(err: any){
                 if(err.response?.data?.short_msg){
                     const shortMsg = err.response.data.short_msg;
 
@@ -331,8 +339,8 @@
                 });
                 return true;
 
-            }catch(err){
-                console.error(err);
+            }catch(err: any){
+
                 if(err.response?.data?.short_msg){
                     const shortMsg = err.response.data.short_msg;
 
@@ -427,8 +435,8 @@
         registrationFormFields.username = '';
         registrationFormFields.password = '';
         registrationFormFields.confirmPassword = '';
-        registrationFormFields.agreeTos = '';
-        registrationFormFields.agreeRules = '';
+        registrationFormFields.agreeTos = false;
+        registrationFormFields.agreeRules = false;
         registrationErrors.dob = []; 
         registrationErrors.email = [];
         registrationErrors.username = [];
@@ -437,9 +445,8 @@
     }
 
     const resetLogin = () => {
-        for(let key in loginFormFields){
-            loginFormFields[key] = '';
-        }
+        loginFormFields.email = '';
+        loginFormFields.password = '';
     }
 
     const toggleToLogin = () => {
@@ -473,8 +480,6 @@
                 dob: DateTime.fromJSDate(registrationFormFields.dob).toFormat('yyyy-MM-dd')
             });
 
-            console.log(response);
-
             const { token, user_id, username, core_role, moderator_role, account_status } = response.data.body;
 
             loginUser(token, user_id, username, core_role, moderator_role, account_status);
@@ -484,7 +489,7 @@
             closeAuthModal();
 
         }catch(e){
-            console.error(e);
+            
             registrationErrors.agrees.push('There was an error processing your request.');
 
         }finally{
@@ -525,13 +530,11 @@
                 password: loginFormFields.password
             });
 
-            console.log(response);
-
             const { token, user_id, username, core_role, moderator_role, account_status } = response.data.body;
 
             loginUser(token, user_id, username, core_role, moderator_role, account_status);
 
-            if(account_status === 'NOT_VERIFIED'){
+            if(account_status === AccountStatus.NOT_VERIFIED){
                 openEmailVerifyModal();
             }
 
@@ -543,8 +546,7 @@
             closeAuthModal();
 
 
-        }catch(e){
-            console.error(e);
+        }catch(e: any){
 
             if(e.response.data?.short_msg){
 
