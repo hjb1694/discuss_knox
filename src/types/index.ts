@@ -97,3 +97,14 @@ export interface Channel{
     channel_name: string | null;
     channel_slug: string | null;
 }
+
+export interface Message{
+    message_id: number;
+    message_content: string;
+    sender_user_id: number;
+    receiver_user_id: number;
+    sender_username: string;
+    receiver_username: string;
+    added_ts: string;
+    is_read: boolean;
+}

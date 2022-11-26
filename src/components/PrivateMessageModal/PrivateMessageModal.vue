@@ -10,7 +10,10 @@
             </header>
             <section class="private-message-modal__body">
                 <div class="messages-area" ref="messagesArea">
-                    <template v-if="messages.length">
+                    <div v-if="isFetchMessagesProcessing" class="spinner-container">
+                        <img src="@/assets/ring-spinner.svg" alt="Loading..."/>
+                    </div>
+                    <template v-if="!isFetchMessagesProcessing && messages.length">
                         <div v-for="message in messages" :key="message.message_id" :class="{'right': message.sender_user_id === getUserData.user_id, 'left': message.sender_user_id === chatWithUserId}">
                             <div class="message-bubble" :class="{'grey': message.sender_user_id === getUserData.user_id, 'green': message.sender_user_id === chatWithUserId}">
                                 {{ message.message_body }}
@@ -33,6 +36,7 @@
     import axios from 'axios';
     import { useAuthStore } from '@/stores/useAuthStore';
     import { usePusherStore } from '@/stores/usePusherStore';
+    import { useMessagesStore } from '@/stores/useMessagesStore';
 
     const props = defineProps({
         isOpen: {
@@ -55,12 +59,17 @@
 
     const { getAuthToken, getUserData, getIsLoggedIn } = useAuthStore();
     const { getPusherInstance } = usePusherStore();
+    const { markAsRead, clearCurrentChatWithUsername, setCurrentChatWithUsername } = useMessagesStore();
 
     const newMessageContent = ref<string>('');
     const isSending = ref<boolean>(false);
     const messages = reactive([]);
+    const isFetchMessagesProcessing = ref<boolean>(true);
+
 
     const fetchMostRecentMessages = async () => {
+
+        isFetchMessagesProcessing.value = true;
         
         try{
 
@@ -70,19 +79,21 @@
                 }
             });
 
-            console.log(response);
-
             messages.splice(0,messages.length);
 
             messages.push(...response.data.body.reverse());
 
-            messagesArea.value.scrollIntoView(false);
+            messagesArea.value.scrollTop = '100%';
+
+            response.data.body.forEach((msg: any) => markAsRead(msg.message_id))
 
 
         }catch(e){
 
             console.error(e);
 
+        }finally{
+            isFetchMessagesProcessing.value = false;
         }
 
 
@@ -102,13 +113,11 @@
                 }
             })
 
-            console.log('success');
-
             newMessageContent.value = '';
 
         }catch(e){
 
-            console.log(e);
+            console.error(e);
 
         }finally{
             isSending.value = false;
@@ -118,6 +127,7 @@
 
 
     const closeModal = () => {
+        clearCurrentChatWithUsername();
         emit('closeModal');
     }
 
@@ -126,9 +136,11 @@
 
         if(getIsLoggedIn.value){
 
+            setCurrentChatWithUsername(props.chatWithUsername);
+
             fetchMostRecentMessages();
 
-            getPusherInstance.channel.bind('new-message', data => {
+            getPusherInstance.channel.bind('new-message', (data: any) => {
 
                     if(data.sender_user_id === props.chatWithUserId){
                         fetchMostRecentMessages();
@@ -255,6 +267,13 @@
         .green{
             background:green;
             color:#fff;
+        }
+
+        .spinner-container{
+            height:100%;
+            display:flex;
+            justify-content: center;
+            align-items: center;
         }
 
 

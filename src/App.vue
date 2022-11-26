@@ -8,13 +8,39 @@
   import { useCoreModalStore } from '@/stores/useCoreModalStore';
   import { useFlashToastStore } from '@/stores/useFlashToastStore';
   import { useFollowsStore } from '@/stores/useFollowsStore';
-  import { computed, onMounted } from 'vue';
+  import { usePusherStore } from '@/stores/usePusherStore';
+  import { useMessagesStore } from '@/stores/useMessagesStore';
+  import { onMounted, watch } from 'vue';
   import { RouterView } from 'vue-router'
 
-  const { autoLogin, getIsLoggedIn } = useAuthStore();
+  const { autoLogin, getIsLoggedIn, getAuthToken, getUserData } = useAuthStore();
   const { isAuthModalShown, closeAuthModal, getIsEmailVerifyModalShown, closeEmailVerifyModal, openEmailVerifyModal } = useCoreModalStore();
   const { getIsFlashToastOpen, getMessageType, getMessageText, closeFlashToast } = useFlashToastStore();
   const { getFollowDrawerIsOpen } = useFollowsStore();
+  const { getPusherInstance, createPusherInstance } = usePusherStore();
+  const { addIncomingMessage } = useMessagesStore();
+
+  const initPusher = () => {
+
+    if(getIsLoggedIn.value){
+      createPusherInstance(getAuthToken.value, getUserData.user_id!);
+
+      getPusherInstance.channel.bind('new-message', (data: any) => {
+ 
+        addIncomingMessage(data);
+
+      });
+    }
+
+  }
+
+  watch(getIsLoggedIn, (value: boolean) => {
+
+    if(value === true){
+      initPusher();
+    }
+
+  });
 
 
   onMounted(() => {
@@ -22,6 +48,7 @@
     if(accountStatus === 'NOT_VERIFIED'){
       openEmailVerifyModal();
     }
+    initPusher();
   });
 
 </script>
