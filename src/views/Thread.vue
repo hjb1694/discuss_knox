@@ -186,6 +186,7 @@
     import AppMainThreadPost from '@/components/MainThreadPost/MainThreadPost.vue';
     import PostReportModal from '@/components/PostReportModal/PostReportModal.vue';
     import PostHideModal from '@/components/PostHideModal/PostHideModal.vue';
+    import { AccountStatus } from '@/types';
 
     interface PusherInstance {
         instance: Pusher | null;
@@ -692,7 +693,7 @@
 
         if(!getIsLoggedIn.value){
             openAuthModal();
-        }else if(getUserData.account_status === 'NOT_VERIFIED'){
+        }else if(getUserData.account_status === AccountStatus.NOT_VERIFIED){
             openEmailVerifyModal();
         }else{
             reportEntityId.value = details.entityId;

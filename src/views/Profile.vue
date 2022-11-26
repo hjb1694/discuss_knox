@@ -203,9 +203,19 @@
     });
 
     const resetProfileData = () => {
-        for(let key in profileData){
-            profileData[key] = null;
-        }
+        profileData.isPrivate = null; 
+        profileData.accountStatus = null; 
+        profileData.coreRole = null;
+        profileData.moderatorRole = null; 
+        profileData.gender = null; 
+        profileData.isBlocked = null; 
+        profileData.isBlocker = null;
+        profileData.bio = null; 
+        profileData.location = null; 
+        profileData.occupation = null; 
+        profileData.profileImage = null; 
+        profileData.userId = null;
+        profileData.followStatus = null;
     }
 
     const fetchPublicFacingProfile = async () => {
@@ -327,7 +337,7 @@
         return true;
     }
 
-    const handleBlockUnblockResponseErrors = (e) => {
+    const handleBlockUnblockResponseErrors = (e: any) => {
 
         if(e.response?.data?.short_msg){
 
