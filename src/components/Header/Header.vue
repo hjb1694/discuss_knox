@@ -13,7 +13,7 @@
                 </button>
                 <div v-else class="user-dropdown">
                     <button class="user-dropdown__toggle" @click="isUserPaneShown = !isUserPaneShown">
-                        {{ getUserData.username.substring(0,1) }}
+                        {{ getUserData.username!.substring(0,1) }}
                     </button>
                     <div class="user-dropdown__pane" v-show="isUserPaneShown">
                         <div class="user-dropdown__item">
@@ -26,7 +26,7 @@
                         <div class="user-dropdown__item">
                             Notifications
                         </div>
-                        <div class="user-dropdown__item">
+                        <div class="user-dropdown__item" @click="goToMessages">
                             Messages
                         </div>
                         <div class="user-dropdown__item" @click="handleFollowsButtonClick">
@@ -140,6 +140,11 @@
         routerPush('/');
     }
 
+    const goToMessages = () => {
+        isChannelDropdownShown.value = false;
+        routerPush('/user/messages');
+    }
+
     const toggleChannelDropdown = () => {
         isChannelDropdownShown.value = !isChannelDropdownShown.value;
     }
@@ -150,8 +155,8 @@
 
             const response = await axios.get('http://155.138.197.17:8080/api/v1/channels');
 
-            const opts = response.data.body.channels.map(channel => `c/${channel.channel_slug}`);
-            const rec = response.data.body.channels.filter(channel => channel.is_featured === true);
+            const opts = response.data.body.channels.map((channel: any) => `c/${channel.channel_slug}`);
+            const rec = response.data.body.channels.filter((channel: any) => channel.is_featured === true);
 
             channelSelectOpts.push(...opts);
 
@@ -164,11 +169,11 @@
 
     }
 
-    const channelSelect = (selectedOption) => {
+    const channelSelect = (selectedOption: string) => {
 
         routerPush(`/channel/${selectedOption.substring(2)}`);
 
-        channelSelection.value = null;
+        channelSelection.value = '';
         isChannelDropdownShown.value = false;
 
     }

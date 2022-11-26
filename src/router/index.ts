@@ -8,6 +8,7 @@ const EditProfileView = () => import('@/views/EditProfile.vue');
 const AccountSettings = () => import('@/views/AccountSettings.vue');
 const NewThread = () => import('@/views/NewThread.vue');
 const Thread = () => import('@/views/Thread.vue');
+const Messages = () => import('@/views/Messages.vue');
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -41,6 +42,14 @@ const router = createRouter({
         isAuthRequired: true
       }
     }, 
+    {
+      path: '/user/messages', 
+      name: 'messages', 
+      component: Messages,
+      meta: {
+        isAuthRequired: true
+      }
+    },
     {
       path: '/thread/new', 
       name: 'new-thread', 
