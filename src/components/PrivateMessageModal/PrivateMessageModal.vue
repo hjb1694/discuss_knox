@@ -76,7 +76,7 @@
         },100);
     }
 
-    const fetchMostRecentMessages = async () => {
+    const fetchMostRecentMessages = async (isToMarkRead: boolean = true) => {
 
         isFetchMessagesProcessing.value = true;
         
@@ -96,7 +96,11 @@
 
             messages.push(...response.data.body.reverse());
 
-            response.data.body.forEach((msg: any) => markAsRead(msg.message_id))
+            if(isToMarkRead){
+
+                 response.data.body.forEach((msg: any) => markAsRead(msg.message_id))
+
+            }
 
 
         }catch(e){
@@ -150,6 +154,14 @@
             setCurrentChatWithUsername(props.chatWithUsername);
 
             fetchMostRecentMessages();
+
+            getPusherInstance.channel.bind('new-message', (data: any) => {
+
+                    if(data.sender_user_id === props.chatWithUserId){
+                        fetchMostRecentMessages(false);
+                    }
+
+            });
 
         }
 
