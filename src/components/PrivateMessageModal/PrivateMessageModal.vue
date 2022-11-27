@@ -68,7 +68,7 @@
 
     const scrollToBottom = () => {
         setTimeout(() => {
-            if(props.isOpen){
+            if(document.querySelector('.messages-area')){
                 document.querySelector('.messages-area')!.scrollTo({
                     top: document.querySelector('.messages-area')!.scrollHeight - 300, 
                     behavior: 'smooth'
