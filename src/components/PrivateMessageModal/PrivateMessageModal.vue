@@ -96,6 +96,8 @@
 
             messages.push(...response.data.body.reverse());
 
+            console.log('mark as read');
+
             response.data.body.forEach((msg: any) => markAsRead(msg.message_id))
 
 
