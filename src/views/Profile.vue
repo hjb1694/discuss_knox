@@ -1,7 +1,7 @@
 <template>
     <div class="profile">
         <private-message-modal 
-        v-if="profileData.userId"
+        v-if="profileData.userId && getIsMessagesModalOpen"
         :chat-with-username="username" 
         :chat-with-user-id="profileData.userId"
         :is-open="getIsMessagesModalOpen"

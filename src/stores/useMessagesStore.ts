@@ -3,6 +3,7 @@ import { reactive, computed, ref } from 'vue';
 import axios from 'axios';
 import { useAuthStore } from '@/stores/useAuthStore';
 import type { Message } from '@/types';
+import { useRouter } from 'vue-router';
 
 export const useMessagesStore = defineStore('useMessagesStore', () => {
 

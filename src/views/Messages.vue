@@ -71,7 +71,6 @@ const closeChatModal = () => {
     isPrivateChatModalOpen.value = false;
     chatWithUserId.value = 0;
     chatWithUsername.value = '';
-    clearCurrentChatWithUsername();
 }
 
 

@@ -68,10 +68,12 @@
 
     const scrollToBottom = () => {
         setTimeout(() => {
-            document.querySelector('.messages-area')!.scrollTo({
-                top: document.querySelector('.messages-area')!.scrollHeight - 300, 
-                behavior: 'smooth'
-            });
+            if(props.isOpen){
+                document.querySelector('.messages-area')!.scrollTo({
+                    top: document.querySelector('.messages-area')!.scrollHeight - 300, 
+                    behavior: 'smooth'
+                });
+            }
         },100);
     }
 
