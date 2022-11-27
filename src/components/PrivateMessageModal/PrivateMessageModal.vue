@@ -96,11 +96,7 @@
 
             messages.push(...response.data.body.reverse());
 
-            if(props.isOpen){
-
-                response.data.body.forEach((msg: any) => markAsRead(msg.message_id))
-
-            }
+            response.data.body.forEach((msg: any) => markAsRead(msg.message_id))
 
 
         }catch(e){
@@ -154,14 +150,6 @@
             setCurrentChatWithUsername(props.chatWithUsername);
 
             fetchMostRecentMessages();
-
-            getPusherInstance.channel.bind('new-message', (data: any) => {
-
-                    if(data.sender_user_id === props.chatWithUserId){
-                        fetchMostRecentMessages();
-                    }
-
-            });
 
         }
 
