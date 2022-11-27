@@ -64,7 +64,14 @@
                         <span>Channels</span>
                     </button>
                     <div v-if="isChannelDropdownShown" class="dropdown__area dropdown__area--channels">
-                        <app-multi-select v-model="channelSelection" :options="channelSelectOpts" @select="channelSelect($event)" placeholder="Search or Select Channel" :style="{fontSize: '1.2rem'}"/>
+                        <app-multi-select 
+                        v-model="channelSelection" 
+                        :options="channelSelectOpts" 
+                        @select="channelSelect($event)" 
+                        placeholder="Search or Select Channel" 
+                        :style="{fontSize: '1.2rem'}"
+                        :show-labels="false"
+                        />
                         <div class="recommended-channels">
                             <h3>Recommended Channels</h3>
                             <ul v-if="recommendedChannels.length">
@@ -287,7 +294,6 @@
             color:#fff;
             font-weight:bold;
             font-size:1.6rem;
-            text-shadow:1px 1px 1px rgba(0,0,0,.24);
 
             &:not(:last-child){
                 margin-right:2rem;

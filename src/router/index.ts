@@ -9,6 +9,7 @@ const AccountSettings = () => import('@/views/AccountSettings.vue');
 const NewThread = () => import('@/views/NewThread.vue');
 const Thread = () => import('@/views/Thread.vue');
 const Messages = () => import('@/views/Messages.vue');
+const Channel = () => import('@/views/Channel.vue');
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -51,6 +52,11 @@ const router = createRouter({
       }
     },
     {
+      path: '/channel/:slug', 
+      name: 'channel', 
+      component: Channel
+    },
+    {
       path: '/thread/new', 
       name: 'new-thread', 
       component: NewThread, 
@@ -73,7 +79,6 @@ router.beforeEach((to, from, next) => {
       if(to.meta.isAuthRequired){
 
           if(!getIsLoggedIn.value){
-            console.log('not logged in');
             next({name: 'home'});
           }else{
             next();
