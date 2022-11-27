@@ -40,7 +40,7 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import PrivateMessageModal from '@/components/PrivateMessageModal/PrivateMessageModal.vue';
 import { useRouter } from 'vue-router';
 
-const { fetchLatestMessages, getLatestMessages, clearMessages } = useMessagesStore();
+const { getLatestMessages, clearMessages, clearCurrentChatWithUsername } = useMessagesStore();
 const { getUserData, getIsLoggedIn } = useAuthStore();
 const { push: routerPush } = useRouter();
 
@@ -71,7 +71,11 @@ const closeChatModal = () => {
     isPrivateChatModalOpen.value = false;
     chatWithUserId.value = 0;
     chatWithUsername.value = '';
+    clearCurrentChatWithUsername();
 }
+
+
+
 
 watch(getIsLoggedIn, (val) => {
 
