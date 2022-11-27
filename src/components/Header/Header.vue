@@ -75,7 +75,9 @@
                         <div class="recommended-channels">
                             <h3>Recommended Channels</h3>
                             <ul v-if="recommendedChannels.length">
-                                <li v-for="channel in recommendedChannels" :key="channel.id">c/{{ channel.channel_slug }}</li>
+                                <li v-for="channel in recommendedChannels" :key="channel.id" @click="gotoChannel(channel.channel_slug!)" class="rec-channel">
+                                    c/{{ channel.channel_slug }}
+                                </li>
                             </ul>
                         </div>
                     </div>
@@ -192,6 +194,11 @@
         }
 
 
+    }
+
+    const gotoChannel = (channel: string) => {
+        routerPush(`/channel/${channel}`);
+        isChannelDropdownShown.value = false;
     }
 
     const channelSelect = (selectedOption: string) => {
@@ -404,6 +411,11 @@
         align-items: center;
         justify-content: center;
         width:3rem;
+    }
+
+    .rec-channel{
+        cursor: pointer;
+        color:#11998e;
     }
 
 
