@@ -14,7 +14,7 @@
                         <img src="@/assets/ring-spinner.svg" alt="Loading..."/>
                     </div>
                     <template v-if="!isFetchMessagesProcessing && messages.length">
-                        <div v-for="message in messages" :key="message.message_id" :class="{'right': message.sender_user_id === getUserData.user_id, 'left': message.sender_user_id === chatWithUserId}">
+                        <div v-for="(message, idx) in messages" :key="message.message_id" :class="{'right': message.sender_user_id === getUserData.user_id, 'left': message.sender_user_id === chatWithUserId}">
                             <div class="message-bubble" :class="{'grey': message.sender_user_id === getUserData.user_id, 'green': message.sender_user_id === chatWithUserId}">
                                 {{ message.message_body }}
                                 {{ getUserData.userId }}
@@ -32,7 +32,7 @@
 </template>
 
 <script lang="ts" setup>
-    import { defineProps, defineEmits, ref, reactive, onMounted } from 'vue';
+    import { defineProps, defineEmits, ref, reactive, onMounted, nextTick } from 'vue';
     import axios from 'axios';
     import { useAuthStore } from '@/stores/useAuthStore';
     import { usePusherStore } from '@/stores/usePusherStore';
@@ -55,7 +55,7 @@
 
     const emit = defineEmits(['closeModal']);
 
-    const messagesArea = ref<HTMLElement>();
+    const messagesArea = ref();
 
     const { getAuthToken, getUserData, getIsLoggedIn } = useAuthStore();
     const { getPusherInstance } = usePusherStore();
@@ -66,6 +66,14 @@
     const messages = reactive([]);
     const isFetchMessagesProcessing = ref<boolean>(true);
 
+    const scrollToBottom = () => {
+        setTimeout(() => {
+            document.querySelector('.messages-area')!.scrollTo({
+                top: document.querySelector('.messages-area')!.scrollHeight - 300, 
+                behavior: 'smooth'
+            });
+        },100);
+    }
 
     const fetchMostRecentMessages = async () => {
 
@@ -81,9 +89,11 @@
 
             messages.splice(0,messages.length);
 
-            messages.push(...response.data.body.reverse());
+            await nextTick();
 
-            messagesArea.value.scrollTop = '100%';
+            scrollToBottom();
+
+            messages.push(...response.data.body.reverse());
 
             response.data.body.forEach((msg: any) => markAsRead(msg.message_id))
 
@@ -211,6 +221,7 @@
                 height:30rem;
                 background:#fafafa;
                 border:1px solid #ccc;
+                overflow:hidden;
                 overflow-y:auto;
                 padding:2rem;
             }
@@ -258,6 +269,7 @@
             padding:1rem;
             border-radius:.5rem;
             margin-bottom:1rem;
+            font-size:1.2rem;
         }
 
         .grey{
