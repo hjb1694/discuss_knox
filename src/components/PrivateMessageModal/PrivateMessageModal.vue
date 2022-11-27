@@ -96,9 +96,11 @@
 
             messages.push(...response.data.body.reverse());
 
-            console.log('mark as read');
+            if(props.isOpen){
 
-            response.data.body.forEach((msg: any) => markAsRead(msg.message_id))
+                response.data.body.forEach((msg: any) => markAsRead(msg.message_id))
+
+            }
 
 
         }catch(e){
