@@ -34,8 +34,16 @@
             <template v-else>
                 <div class="profile-banner">
                     <img 
+                    v-if="profileData.profileImage"
                     class="profile-banner__img" 
-                    :src="profileData.profileImage ? 'http://66.42.81.246:8080/profile_img/' + profileData.profileImage : '@/assets/no_user.png'" 
+                    :src="'http://66.42.81.246:8080/profile_img/' + profileData.profileImage" 
+                    alt="Profile Image"
+                    />
+                    <img 
+                    v-else
+                    class="profile-banner__img" 
+                    src="@/assets/no_user.png" 
+                    alt="Profile Image"
                     />
                     <h1 class="profile-banner__username">{{ username }}</h1>
                     <template v-if="isElevatedCoreStatus">
