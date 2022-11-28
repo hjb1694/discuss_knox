@@ -1,9 +1,10 @@
 <script setup lang="ts">
-  import authModal from '@/components/AuthModal/AuthModal.vue';
-  import accountVerificationModal from '@/components/AccountVerificationModal/AccountVerificationModal.vue';
-  import appHeader from '@/components/Header/Header.vue';
-  import followsSideDrawer from '@/components/FollowsSideDrawer/FollowsSideDrawer.vue';
-  import flashToast from '@/components/ui_elements/FlashToast.vue';
+  import AuthModal from '@/components/AuthModal/AuthModal.vue';
+  import AccountVerificationModal from '@/components/AccountVerificationModal/AccountVerificationModal.vue';
+  import AppHeader from '@/components/Header/Header.vue';
+  import AppFooter from '@/components/Footer/Footer.vue';
+  import FollowsSideDrawer from '@/components/FollowsSideDrawer/FollowsSideDrawer.vue';
+  import FlashToast from '@/components/ui_elements/FlashToast.vue';
   import { useAuthStore } from '@/stores/useAuthStore';
   import { useCoreModalStore } from '@/stores/useCoreModalStore';
   import { useFlashToastStore } from '@/stores/useFlashToastStore';
@@ -60,9 +61,14 @@
     <account-verification-modal :is-open="getIsEmailVerifyModalShown" @close-modal="closeEmailVerifyModal" />
     <follows-side-drawer v-if="getIsLoggedIn && getFollowDrawerIsOpen" />
     <app-header />
-    <RouterView />
+    <div class="view">
+      <RouterView />
+    </div>
+    <app-footer />
 </template>
 
 <style lang="scss" scoped>
-
+    .view{
+      min-height:70vh;
+    }
 </style>

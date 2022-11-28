@@ -3,7 +3,7 @@
         <div class="follows-side-drawer__backdrop" @click="closeFollowDrawer"></div>
         <div class="follows-side-drawer__drawer">
             <div class="follows-side-drawer__requests section">
-                <h2>Pending Follower Requests</h2>
+                <h2>Pending Follower Requests ({{ getPendingRequests.length }})</h2>
                 <template v-if="getFirstFivePendingRequests.length">
                     <div v-for="request in getFirstFivePendingRequests" class="item">
                         <div class="pointer" @click="goTo('/user/profile/' + follower.follower_username)"><i class="fa fa-user"></i> {{ request.username }}</div>
@@ -73,7 +73,7 @@
     const followerCount = computed(() => getFollowers.length);
     const followingCount = computed(() => getFollowings.length);
 
-    const goTo = (path) => {
+    const goTo = (path: string) => {
         closeFollowDrawer();
         routerPush(path);
     }
