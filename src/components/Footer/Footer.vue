@@ -4,13 +4,23 @@
         <div class="footer-links">
             <a class="footer-links__link">Get Help</a>
             <a class="footer-links__link">Ad Opportunities</a>
-            <a class="footer-links__link">Platform Rules</a>
+            <a class="footer-links__link" @click="goTo('/rules-and-regulations')">Platform Rules</a>
             <a class="footer-links__link">Terms of Service</a>
             <a class="footer-links__link">Privacy Policy</a>
             <a class="footer-links__link">Core Values</a>
         </div>
     </footer>
 </template>
+
+<script lang="ts" setup>
+    import { useRouter } from 'vue-router';
+
+    const { push: routerPush } = useRouter();
+
+    const goTo = (path: string) => {
+        routerPush(path);
+    }
+</script>
 
 <style lang="scss" scoped>
     .footer{

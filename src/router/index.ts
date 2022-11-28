@@ -10,6 +10,7 @@ const NewThread = () => import('@/views/NewThread.vue');
 const Thread = () => import('@/views/Thread.vue');
 const Messages = () => import('@/views/Messages.vue');
 const Channel = () => import('@/views/Channel.vue');
+const PlatformRules = () => import ('@/views/PlatformRules.vue');
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -68,6 +69,11 @@ const router = createRouter({
       path: '/thread/:slug', 
       name: 'thread', 
       component: Thread
+    }, 
+    {
+      path: '/rules-and-regulations', 
+      name: 'rules-and-regulations',
+      component: PlatformRules
     }
   ]
 });
