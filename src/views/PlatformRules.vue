@@ -47,6 +47,9 @@
                     Content that promotes injurious behaviors or is indicative of harming behaviors, also including self-harm, will be removed. If you are having thoughts
                     or urges to harm yourself or others, please seek immediate help, speak with a trusted professional, or if it is safe to do so, go to the nearest emergency room. 
                 </li>
+                <li>
+                    Accounts or content that is used to scam, deceive other users, and/or provide links to malicious websites is strictly prohibited.
+                </li>
             </ol>
             <div class="conclusion">
                 <p>
