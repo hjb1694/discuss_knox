@@ -3,7 +3,7 @@
         <div class="statement">
             <p>
                 We want to help local Knoxville businesses and organizations. For ad opportunity inquiries, please email 
-                <a href="mailto:help@ktownportal.com">help@ktownportal.com</a>
+                <a href="mailto:help@ktown-portal.com">help@ktown-portal.com</a>
             </p>
         </div>
     </div>
