@@ -51,6 +51,11 @@
                         <div v-if="profileData.coreRole === 'ADMINISTRATOR'" class="profile-banner__role-badge">Admin</div>
                         <div v-if="profileData.coreRole === 'STAFF'" class="profile-banner__role-badge">Staff</div>
                     </template>
+                    <template v-if="!isElevatedCoreStatus && hasModeratorRole">
+                        <div v-if="profileData.moderatorRole === 'PLATINUM'" class="profile-banner__role-badge">Platinum Mod</div>
+                        <div v-if="profileData.moderatorRole === 'SILVER'" class="profile-banner__role-badge">Silver Mod</div>
+                        <div v-if="profileData.moderatorRole === 'BRONZE'" class="profile-banner__role-badge">Bronze Mod</div>
+                    </template>
                 </div>
                 <div class="profile-grid">
                     <div v-if="!isUserDeactivated" class="control-pane">
@@ -158,6 +163,7 @@
     import axios from 'axios';
     import privateMessageModal from '@/components/PrivateMessageModal/PrivateMessageModal.vue';
     import type { ProfileData } from '@/types';
+    import { CoreRole, ModeratorRole } from '@/types';
 
     const { params: routeParams } = useRoute();
     const { push: routerPush } = useRouter();
@@ -207,7 +213,11 @@
     });
 
     const isElevatedCoreStatus = computed(() => {
-        return ['SUPER_ADMINISTRATOR', 'ADMINISTRATOR', 'STAFF'].includes(profileData.coreRole!);
+        return [CoreRole.SUPER_ADMINISTRATOR, CoreRole.ADMINISTRATOR, CoreRole.STAFF].includes(profileData.coreRole!);
+    });
+
+    const hasModeratorRole = computed(() => {
+        return profileData.moderatorRole !== ModeratorRole.NONE;
     });
 
     const resetProfileData = () => {
