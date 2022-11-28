@@ -3,7 +3,7 @@
         <small>&copy;2022 Ktown Portal and Knox Discuss</small>
         <div class="footer-links">
             <a class="footer-links__link">Get Help</a>
-            <a class="footer-links__link">Ad Opportunities</a>
+            <a class="footer-links__link" @click="goTo('/ad-opportunities')">Ad Opportunities</a>
             <a class="footer-links__link" @click="goTo('/rules-and-regulations')">Platform Rules</a>
             <a class="footer-links__link">Terms of Service</a>
             <a class="footer-links__link">Privacy Policy</a>
