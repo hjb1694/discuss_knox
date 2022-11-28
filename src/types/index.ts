@@ -90,6 +90,7 @@ export interface ProfileData {
     profileImage: string | null, 
     userId: number | null, 
     followStatus: string | null
+    xperRanking: string | null
 }
 
 export interface Channel{

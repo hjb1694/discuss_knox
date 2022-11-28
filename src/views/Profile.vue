@@ -46,6 +46,9 @@
                     alt="Profile Image"
                     />
                     <h1 class="profile-banner__username">{{ username }}</h1>
+                    <p  v-if="!isElevatedCoreStatus && profileData.xperRanking" class="profile-banner__xper">
+                        xper: {{ profileData.xperRanking }}
+                    </p>
                     <template v-if="isElevatedCoreStatus">
                         <div v-if="profileData.coreRole === 'SUPER_ADMINISTRATOR'" class="profile-banner__role-badge">Super Admin</div>
                         <div v-if="profileData.coreRole === 'ADMINISTRATOR'" class="profile-banner__role-badge">Admin</div>
@@ -190,7 +193,8 @@
         occupation: null, 
         profileImage: null, 
         userId: null, 
-        followStatus: null
+        followStatus: null, 
+        xperRanking: null
     });
 
     const isControlProcessing = reactive({
@@ -248,7 +252,7 @@
 
             console.log(response);
 
-            const { account_status, core_role, moderator_role, is_profile_private, gender, user_id, profile_img} = response.data.body;
+            const { account_status, core_role, moderator_role, is_profile_private, gender, user_id, profile_img, xper_ranking} = response.data.body;
 
             profileData.isPrivate = is_profile_private;
             profileData.accountStatus = account_status;
@@ -257,6 +261,7 @@
             profileData.gender = gender;
             profileData.userId = user_id;
             profileData.profileImage = profile_img || null;
+            profileData.xperRanking = xper_ranking;
 
         }catch(e: any){
             if(e.response.data?.short_msg){
@@ -303,7 +308,8 @@
                 is_blocked, 
                 is_blocker,
                 user_id, 
-                follow_status
+                follow_status, 
+                xper_ranking
             } = response.data.body;
 
             profileData.accountStatus = account_status;
@@ -319,6 +325,7 @@
             profileData.userId = user_id;
             profileData.isBlocker = is_blocker;
             profileData.followStatus = follow_status;
+            profileData.xperRanking = xper_ranking;
 
         }catch(e: any){
 
@@ -588,6 +595,14 @@
             font-size:2rem;
             color:#fff;
             position:absolute;
+            bottom:2.5rem;
+            left:20rem;
+        }
+
+        &__xper{
+            font-size:1.2rem;
+            color:#fff;
+            position:absolute;
             bottom:1rem;
             left:20rem;
         }
@@ -793,6 +808,11 @@
                 position:static;
                 text-align:center;
                 margin-top:2rem;
+            }
+
+            &__xper{
+                position:static;
+                text-align: center;
             }
 
             &__role-badge{
