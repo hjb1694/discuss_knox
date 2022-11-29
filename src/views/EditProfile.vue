@@ -44,7 +44,7 @@
 </template>
 
 <script lang="ts" setup>
-    import { ref, reactive, onMounted, computed, watch } from "vue";
+    import { ref, reactive, onMounted, watch } from "vue";
     import { useRouter } from 'vue-router';
     import AppMultiSelect from 'vue-multiselect';
     import TextInput from '@/components/ui_elements/TextInput.vue';
