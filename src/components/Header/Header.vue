@@ -180,7 +180,7 @@
 
         try{
 
-            const response = await axios.get('http://155.138.197.17:8080/api/v1/channels');
+            const response = await axios.get('https://www.ktpdiscussapi.com/api/v1/channels');
 
             const opts = response.data.body.channels.map((channel: any) => `c/${channel.channel_slug}`);
             const rec = response.data.body.channels.filter((channel: any) => channel.is_featured === true);

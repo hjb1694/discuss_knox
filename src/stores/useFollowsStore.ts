@@ -19,7 +19,7 @@ export const useFollowsStore = defineStore('useFollowsStore', () => {
 
     const fetchPendingFollowRequests = async () => {
 
-        const response = await axios.get('http://66.42.81.246:8080/api/v1/pending-follow-requests', {
+        const response = await axios.get('https://www.ktpuserapi.com/api/v1/pending-follow-requests', {
             headers: {
                 'x-auth-token': getAuthToken.value
             }
@@ -32,7 +32,7 @@ export const useFollowsStore = defineStore('useFollowsStore', () => {
 
     const fetchFollowers = async () => {
 
-        const response = await axios.get('http://66.42.81.246:8080/api/v1/followers', {
+        const response = await axios.get('https://www.ktpuserapi.com/api/v1/followers', {
             headers: {
                 'x-auth-token': getAuthToken.value
             }
@@ -46,7 +46,7 @@ export const useFollowsStore = defineStore('useFollowsStore', () => {
 
     const fetchFollowings = async () => {
 
-        const response = await axios.get('http://66.42.81.246:8080/api/v1/followings', {
+        const response = await axios.get('https://www.ktpuserapi.com/api/v1/followings', {
             headers: {
                 'x-auth-token': getAuthToken.value
             }
@@ -59,7 +59,7 @@ export const useFollowsStore = defineStore('useFollowsStore', () => {
 
     const acceptDenyRequest = async (action: 'accept' | 'deny', followerUserId: number) => {
 
-        await axios.patch('http://66.42.81.246:8080/api/v1/followers', {
+        await axios.patch('https://www.ktpuserapi.com/api/v1/followers', {
             action, 
             follower_user_id: followerUserId
         }, 

@@ -22,7 +22,7 @@ export const useMessagesStore = defineStore('useMessagesStore', () => {
 
         latestMessages.splice(0,latestMessages.length);
 
-        const response = await axios.get('http://66.42.81.246:8080/api/v1/latest-messages', 
+        const response = await axios.get('https://www.ktpuserapi.com/api/v1/latest-messages', 
         {
             headers: {
                 'x-auth-token': getAuthToken.value

@@ -108,7 +108,7 @@ const submitReport = async () => {
 
     try{
 
-        await axios.post('http://155.138.197.17:8080/api/v1/report-post', {
+        await axios.post('https://www.ktpdiscussapi.com/api/v1/report-post', {
             entity_type: props.entityType, 
             entity_id: props.entityId,
             is_duplicate: isDuplicatePostChecked.value,
