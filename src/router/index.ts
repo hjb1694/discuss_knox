@@ -12,6 +12,7 @@ const Messages = () => import('@/views/Messages.vue');
 const Channel = () => import('@/views/Channel.vue');
 const PlatformRules = () => import ('@/views/PlatformRules.vue');
 const AdOpportunities = () => import('@/views/AdOpportunities.vue');
+const HelpCenter = () => import('@/views/HelpCenter.vue');
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -80,6 +81,11 @@ const router = createRouter({
       path: '/ad-opportunities', 
       name: 'ad-opportunities', 
       component: AdOpportunities
+    }, 
+    {
+      path: '/help-center', 
+      name: 'help-center', 
+      component: HelpCenter
     }
   ]
 });
