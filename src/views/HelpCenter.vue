@@ -107,6 +107,7 @@
         h2{
             font-size:2rem;
             margin-bottom:1rem;
+            user-select: none;
         }
     }
 
