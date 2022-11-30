@@ -28,8 +28,11 @@
                     />
                 </div>
                 <div class="fgrp">
-                    <button class="subbut" @click="submit('publish')" :disabled="isSubmissionProcessing">Publish</button>
-                    <button class="subbut" @click="submit('draft')" :disabled="isSubmissionProcessing">Save As Draft</button>
+                    <button class="subbut" @click="submit('publish')" :disabled="isSubmissionProcessing">
+                        <span v-if="!isPublishProcessing">Publish</span>
+                        <span v-else>Processing...</span>
+                    </button>
+                    <!-- <button class="subbut" @click="submit('draft')" :disabled="isSubmissionProcessing">Save As Draft</button> -->
                 </div>
                 <div v-if="errors.length" class="errbox">
                     <p v-for="error in errors" :key="error">{{ error }}</p>
@@ -64,6 +67,7 @@
     const channelInput = ref<string>('');
     const contentInput = ref<string>('');
     const isSubmissionProcessing = ref<boolean>(false);
+    const isPublishProcessing = ref<boolean>(false);
 
     const editorToolbar = ['bold', 'italic', 'underline', 'image', {'list': 'ordered'}, {'list': 'bullet'}];
 
@@ -152,6 +156,12 @@
             return;
         }
 
+        isSubmissionProcessing.value = true;
+
+        if(action === 'publish'){
+            isPublishProcessing.value = true;
+        }
+
         try{
 
             const response = await axios.post(
@@ -202,6 +212,12 @@
 
             }else{
                 openFlashToast(MessageTypes.ERROR, 'An unexpected error has occurred.');
+            }
+        }finally{
+            isSubmissionProcessing.value = false;
+
+            if(action === 'publish'){
+                isPublishProcessing.value = false;
             }
         }
         
