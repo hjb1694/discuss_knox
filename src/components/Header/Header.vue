@@ -37,7 +37,7 @@
                         </div>
                         <div class="user-dropdown__item space-between" @click="handleFollowsButtonClick">
                             <span>Follows</span>
-                            <span v-if="newFollowRequestCount">
+                            <span v-if="newFollowRequestCount" class="badge">
                                 {{ newFollowRequestCount }}
                             </span>
                         </div>
