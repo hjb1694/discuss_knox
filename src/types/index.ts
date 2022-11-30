@@ -118,7 +118,6 @@ export interface Message{
 export interface FollowRequest {
     id: number;
     follower_user_id: number;
-    followed_user_id: number;
-    status: FollowStatus, 
+    follower_username: number;
     seen: boolean
 }

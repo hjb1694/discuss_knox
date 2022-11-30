@@ -6,7 +6,7 @@
                 <h2>Pending Follower Requests ({{ getPendingRequests.length }})</h2>
                 <template v-if="getFirstFivePendingRequests.length">
                     <div v-for="request in getFirstFivePendingRequests" class="item">
-                        <div class="pointer" @click="goTo('/user/profile/' + follower.follower_username)"><i class="fa fa-user"></i> {{ request.username }}</div>
+                        <div class="pointer" @click="goTo('/user/profile/' + request.follower_username)"><i class="fa fa-user"></i> {{ request.follower_username }}</div>
                         <div class="response-buttons">
                             <button class="accept-btn" @click="acceptDenyRequest('accept', request.follower_user_id)">
                                 <i class="fa fa-check"></i> Accept
@@ -51,15 +51,12 @@
 </template>
 
 <script lang="ts" setup>
-    import { computed, onMounted } from 'vue';
+    import { computed } from 'vue';
     import { useRouter } from 'vue-router';
     import { useFollowsStore } from '@/stores/useFollowsStore';
 
     const { push: routerPush } = useRouter();
     const { 
-        // fetchPendingFollowRequests, 
-        // fetchFollowers, 
-        // fetchFollowings,
         getPendingRequests, 
         getFollowers, 
         getFollowings,
@@ -77,12 +74,6 @@
         closeFollowDrawer();
         routerPush(path);
     }
-
-    // onMounted(() => {
-    //     fetchPendingFollowRequests();
-    //     fetchFollowers();
-    //     fetchFollowings();
-    // });
 
 
 
