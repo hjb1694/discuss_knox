@@ -12,12 +12,13 @@
   import { usePusherStore } from '@/stores/usePusherStore';
   import { useMessagesStore } from '@/stores/useMessagesStore';
   import { onMounted, watch } from 'vue';
-  import { RouterView } from 'vue-router'
+  import { RouterView } from 'vue-router';
+  import { AccountStatus } from '@/types';
 
   const { autoLogin, getIsLoggedIn, getAuthToken, getUserData } = useAuthStore();
   const { isAuthModalShown, closeAuthModal, getIsEmailVerifyModalShown, closeEmailVerifyModal, openEmailVerifyModal } = useCoreModalStore();
   const { getIsFlashToastOpen, getMessageType, getMessageText, closeFlashToast } = useFlashToastStore();
-  const { getFollowDrawerIsOpen } = useFollowsStore();
+  const { getFollowDrawerIsOpen, initFollows } = useFollowsStore();
   const { getPusherInstance, createPusherInstance } = usePusherStore();
   const { addIncomingMessage, fetchLatestMessages } = useMessagesStore();
 
@@ -47,9 +48,10 @@
 
   onMounted(() => {
     const accountStatus = autoLogin();
-    if(accountStatus === 'NOT_VERIFIED'){
+    if(accountStatus === AccountStatus.NOT_VERIFIED){
       openEmailVerifyModal();
     }
+    initFollows();
     initPusher();
   });
 

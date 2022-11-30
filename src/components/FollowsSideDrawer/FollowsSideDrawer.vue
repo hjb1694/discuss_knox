@@ -57,9 +57,9 @@
 
     const { push: routerPush } = useRouter();
     const { 
-        fetchPendingFollowRequests, 
-        fetchFollowers, 
-        fetchFollowings,
+        // fetchPendingFollowRequests, 
+        // fetchFollowers, 
+        // fetchFollowings,
         getPendingRequests, 
         getFollowers, 
         getFollowings,
@@ -78,11 +78,11 @@
         routerPush(path);
     }
 
-    onMounted(() => {
-        fetchPendingFollowRequests();
-        fetchFollowers();
-        fetchFollowings();
-    });
+    // onMounted(() => {
+    //     fetchPendingFollowRequests();
+    //     fetchFollowers();
+    //     fetchFollowings();
+    // });
 
 
 

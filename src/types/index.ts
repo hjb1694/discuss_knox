@@ -49,6 +49,11 @@ export enum OpinionStatus {
     REMOVED = 'REMOVED'
 }
 
+export enum FollowStatus {
+    PENDING = 'PENDING', 
+    ACCEPTED = 'ACCEPTED'
+}
+
 export interface Reply {
     id: number;
     author_user_id: number;
@@ -108,4 +113,12 @@ export interface Message{
     receiver_username: string;
     added_ts: string;
     is_read: boolean;
+}
+
+export interface FollowRequest {
+    id: number;
+    follower_user_id: number;
+    followed_user_id: number;
+    status: FollowStatus, 
+    seen: boolean
 }

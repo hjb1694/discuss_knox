@@ -35,8 +35,11 @@
                                 {{ newMessageCount }}
                             </span>
                         </div>
-                        <div class="user-dropdown__item" @click="handleFollowsButtonClick">
-                            Follows
+                        <div class="user-dropdown__item space-between" @click="handleFollowsButtonClick">
+                            <span>Follows</span>
+                            <span v-if="newFollowRequestCount">
+                                {{ newFollowRequestCount }}
+                            </span>
                         </div>
                         <div class="user-dropdown__item" @click="goToAccountSettings">
                             Settings
@@ -102,7 +105,7 @@
     const { openAuthModal, openEmailVerifyModal } = useCoreModalStore();
     const { getIsLoggedIn, getUserData, logout } = useAuthStore();
     const { openFlashToast } = useFlashToastStore();
-    const { openFollowDrawer } = useFollowsStore();
+    const { openFollowDrawer, getPendingRequests, getUnseenFollowRequestsCount } = useFollowsStore();
     const { push: routerPush } = useRouter();
     const { fetchNewMessageCount, getLatestMessages } = useMessagesStore();
 
@@ -112,11 +115,12 @@
     const channelSelection = ref<string>('');
     const channelSelectOpts = reactive<string[]>([]);
     const newMessageCount = ref<number>(0);
+    const newFollowRequestCount = ref<number>(0);
 
     const recommendedChannels = reactive<Channel[]>([]);
 
     const totalBadgeCount = computed(() => {
-        return newMessageCount.value;
+        return newMessageCount.value + newFollowRequestCount.value;
     });
 
     const userLogout = () => {
@@ -212,7 +216,11 @@
 
     watch(getLatestMessages, () => {
         newMessageCount.value = fetchNewMessageCount();
-    })
+    });
+
+    watch(getPendingRequests, () => {
+        newFollowRequestCount.value = getUnseenFollowRequestsCount();
+    });
 
     onMounted(() => {
         fetchChannels();
