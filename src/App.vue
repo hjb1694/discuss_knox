@@ -41,6 +41,7 @@
     if(value === true){
       initPusher();
       fetchLatestMessages();
+      initFollows();
     }
 
   });
@@ -51,7 +52,6 @@
     if(accountStatus === AccountStatus.NOT_VERIFIED){
       openEmailVerifyModal();
     }
-    initFollows();
     initPusher();
   });
 
