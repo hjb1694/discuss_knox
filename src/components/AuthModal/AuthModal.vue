@@ -41,7 +41,9 @@
                         <div class="dob-selection" v-show="regStepIsShown[1]"> 
                             <h2 class="section-heading fade-in-down">First thing's first, what is your date of birth?</h2>
                             <div class="fade-in-up delay">
-                                <date-picker v-model="registrationFormFields.dob" :upper-limit="upperLimitDOB"/>
+                                <div style="background:#fff;">
+                                    <date-picker v-model="registrationFormFields.dob" :upper-limit="upperLimitDOB"/>
+                                </div>
                             </div>
                             <div class="datepicker-hint fade-in-up delay-2">
                                 <strong>HINT:</strong> To select the year, click the month and year on the top of the datepicker, then click the year. 
