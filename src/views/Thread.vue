@@ -102,7 +102,7 @@
                                         <strong v-if="getIsLoggedIn && (+opinion.author_user_id! === getUserData.user_id)" class="you">(You)</strong>
                                     </button>
                                     <div class="header-controls">
-                                        <button v-if="determineOpinionorReplyRemoveButtonShown(opinion.author_core_role!)" class="header-controls__button">
+                                        <button v-if="determineOpinionorReplyRemoveButtonShown(opinion.author_core_role!, opinion.author_user_id)" class="header-controls__button">
                                             <i class="fa fa-close"></i>
                                         </button>
                                         <button v-if="determineOpinionOrReplyHideButtonShown(opinion.author_core_role!, opinion.author_moderator_role!, opinion.author_user_id!)" class="header-controls__button" @click="hidePosting({entityType: 'opinion', entityId: opinion.id!})">
@@ -141,7 +141,7 @@
                                             <i class="user-icon fa fa-user"></i> u/{{ reply.author_username}}
                                         </div>
                                         <div class="header-controls">
-                                            <button v-if="determineOpinionorReplyRemoveButtonShown(reply.author_core_role!)" class="header-controls__button">
+                                            <button v-if="determineOpinionorReplyRemoveButtonShown(reply.author_core_role!, reply.author_user_id!)" class="header-controls__button">
                                                 <i class="fa fa-close"></i>
                                             </button>
                                             <button v-if="determineOpinionOrReplyHideButtonShown(reply.author_core_role!, reply.author_moderator_role!, reply.author_user_id!)" class="header-controls__button" @click="hidePosting({entityType: 'reply', entityId: reply.id!})">
@@ -641,13 +641,15 @@
 
     }
 
-    const determineOpinionorReplyRemoveButtonShown = (coreRole: CoreRole) => {
+    const determineOpinionorReplyRemoveButtonShown = (coreRole: CoreRole, authorId: number) => {
 
         if(!getIsLoggedIn.value){
             return false;
         }else if(![CoreRole.SUPER_ADMINISTRATOR, CoreRole.ADMINISTRATOR, CoreRole.STAFF].includes(getUserData.core_role as CoreRole)){
             return false;
         }else if([CoreRole.SUPER_ADMINISTRATOR, CoreRole.ADMINISTRATOR].includes(coreRole) && getUserData.core_role === CoreRole.STAFF){
+            return false;
+        }else if(getUserData.user_id === authorId){
             return false;
         }
 
