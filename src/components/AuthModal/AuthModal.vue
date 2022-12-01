@@ -41,7 +41,7 @@
                         <div class="dob-selection" v-show="regStepIsShown[1]"> 
                             <h2 class="section-heading fade-in-down">First thing's first, what is your date of birth?</h2>
                             <div class="fade-in-up delay">
-                                <div style="background:#fff;">
+                                <div style="background:#fff; position:relative; z-index:1001;">
                                     <date-picker v-model="registrationFormFields.dob" :upper-limit="upperLimitDOB"/>
                                 </div>
                             </div>
