@@ -313,7 +313,7 @@
                 }else{
 
                     const idx = opinions.findIndex(op => op.id === +data.opinion_id)
-                    opinions.push(data);
+                    opinions[idx].replies.push(data);
 
                 }
 
