@@ -43,6 +43,10 @@
                             <div class="fade-in-up delay">
                                 <date-picker v-model="registrationFormFields.dob" :upper-limit="upperLimitDOB"/>
                             </div>
+                            <div class="datepicker-hint fade-in-up delay-2">
+                                <strong>HINT:</strong> To select the year, click the month and year on the top of the datepicker, then click the year. 
+                                You will then see a range of years to choose from.
+                            </div>
                             <div v-if="registrationErrors.dob.length" class="errbox">
                                 <p v-for="error of registrationErrors.dob" :key="error" >{{ error }}</p>
                             </div>
@@ -805,6 +809,10 @@
             font-size:1.4rem;
             color:#888;
             margin-top:2rem;
+        }
+
+        .datepicker-hint{
+            margin-top:1rem;
         }
 
         .errbox{
