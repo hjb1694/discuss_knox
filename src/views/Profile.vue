@@ -36,7 +36,7 @@
                     <img 
                     v-if="profileData.profileImage"
                     class="profile-banner__img" 
-                    :src="'https://www.ktpuserapi.com/profile_img/' + profileData.profileImage" 
+                    :src="'http://206.189.193.136:3001/profile_img/' + profileData.profileImage" 
                     alt="Profile Image"
                     />
                     <img 
@@ -248,7 +248,7 @@
 
         try{
 
-            const response = await axios.get(`https://www.ktpuserapi.com/api/v1/profile/public/${username.value}`);
+            const response = await axios.get(`http://206.189.193.136:3001/api/v1/profile/public/${username.value}`);
 
             console.log(response);
 
@@ -289,7 +289,7 @@
 
         try{
 
-            const response = await axios.get(`https://www.ktpuserapi.com/api/v1/profile/member/${username.value}`, {
+            const response = await axios.get(`http://206.189.193.136:3001/api/v1/profile/member/${username.value}`, {
                 headers: {
                     'x-auth-token': getAuthToken.value
                 }
@@ -394,7 +394,7 @@
 
         try{
 
-            await axios.post('https://www.ktpuserapi.com/api/v1/user-block-action', {
+            await axios.post('http://206.189.193.136:3001/api/v1/user-block-action', {
                 action: 'block', 
                 blocked_user_id: profileData.userId
             }, 
@@ -422,7 +422,7 @@
         try{
             isControlProcessing.unblock = true;
 
-             await axios.post('https://www.ktpuserapi.com/api/v1/user-block-action', {
+             await axios.post('http://206.189.193.136:3001/api/v1/user-block-action', {
                 action: 'unblock', 
                 blocked_user_id: profileData.userId
             }, 
@@ -454,7 +454,7 @@
 
         try{
 
-            await axios.post('https://www.ktpuserapi.com/api/v1/user-follow-action', {
+            await axios.post('http://206.189.193.136:3001/api/v1/user-follow-action', {
                 followed_user_id: profileData.userId, 
                 action: 'follow'
             }, 
@@ -485,7 +485,7 @@
 
         try{
 
-            await axios.post('https://www.ktpuserapi.com/api/v1/user-follow-action', {
+            await axios.post('http://206.189.193.136:3001/api/v1/user-follow-action', {
                 followed_user_id: profileData.userId, 
                 action: 'unfollow'
             }, 

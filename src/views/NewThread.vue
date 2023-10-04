@@ -77,7 +77,7 @@
 
         try{
 
-            const response = await axios.get('https://www.ktpdiscussapi.com/api/v1/channels');
+            const response = await axios.get('http://159.89.82.146:3002/api/v1/channels');
 
             const opts = response.data.body.channels.map((channel: any) => `c/${channel.channel_slug}`);
 
@@ -165,7 +165,7 @@
         try{
 
             const response = await axios.post(
-                'https://www.ktpdiscussapi.com/api/v1/thread', 
+                'http://159.89.82.146:3002/api/v1/thread', 
                 {
                     action, 
                     headline: headlineInput.value.trim(), 

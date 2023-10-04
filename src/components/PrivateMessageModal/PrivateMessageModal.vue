@@ -82,7 +82,7 @@
         
         try{
 
-            const response = await axios.get(`https://www.ktpuserapi.com/api/v1/private-message/${props.chatWithUserId}`, {
+            const response = await axios.get(`http://206.189.193.136:3001/api/v1/private-message/${props.chatWithUserId}`, {
                 headers: {
                     'x-auth-token': getAuthToken.value
                 }
@@ -119,7 +119,7 @@
 
         try{
 
-            await axios.post('https://www.ktpuserapi.com/api/v1/private-message', {
+            await axios.post('http://206.189.193.136:3001/api/v1/private-message', {
                 receiver_user_id: props.chatWithUserId, 
                 message: newMessageContent.value
             }, {

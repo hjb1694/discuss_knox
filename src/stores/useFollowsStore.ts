@@ -28,7 +28,7 @@ export const useFollowsStore = defineStore('useFollowsStore', () => {
 
     const fetchPendingFollowRequests = async () => {
 
-        const response = await axios.get('https://www.ktpuserapi.com/api/v1/pending-follow-requests', {
+        const response = await axios.get('http://206.189.193.136:3001/api/v1/pending-follow-requests', {
             headers: {
                 'x-auth-token': getAuthToken.value
             }
@@ -41,7 +41,7 @@ export const useFollowsStore = defineStore('useFollowsStore', () => {
 
     const fetchFollowers = async () => {
 
-        const response = await axios.get('https://www.ktpuserapi.com/api/v1/followers', {
+        const response = await axios.get('http://206.189.193.136:3001/api/v1/followers', {
             headers: {
                 'x-auth-token': getAuthToken.value
             }
@@ -55,7 +55,7 @@ export const useFollowsStore = defineStore('useFollowsStore', () => {
 
     const fetchFollowings = async () => {
 
-        const response = await axios.get('https://www.ktpuserapi.com/api/v1/followings', {
+        const response = await axios.get('http://206.189.193.136:3001/api/v1/followings', {
             headers: {
                 'x-auth-token': getAuthToken.value
             }
@@ -68,7 +68,7 @@ export const useFollowsStore = defineStore('useFollowsStore', () => {
 
     const acceptDenyRequest = async (action: 'accept' | 'deny', followerUserId: number) => {
 
-        await axios.patch('https://www.ktpuserapi.com/api/v1/followers', {
+        await axios.patch('http://206.189.193.136:3001/api/v1/followers', {
             action, 
             follower_user_id: followerUserId
         }, 
@@ -89,7 +89,7 @@ export const useFollowsStore = defineStore('useFollowsStore', () => {
             req.seen = true;
         }
 
-        await axios.patch('https://www.ktpuserapi.com/api/v1/update-follows-seen', {}, {
+        await axios.patch('http://206.189.193.136:3001/api/v1/update-follows-seen', {}, {
             headers: {
                 'x-auth-token': getAuthToken.value
             }

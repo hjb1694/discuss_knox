@@ -79,7 +79,7 @@ const submitReport = async () => {
 
     try{
 
-        await axios.patch('https://www.ktpdiscussapi.com/api/v1/hide-post', {
+        await axios.patch('http://159.89.82.146:3002/api/v1/hide-post', {
             entity_type: props.entityType, 
             entity_id: props.entityId,
             explanation: explanationInput.value.trim()

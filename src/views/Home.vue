@@ -14,7 +14,7 @@
             <div class="threads">
                 <div v-for="thread in shownThreads" :key="thread.id" class="thread-tile">
                     <img v-if="!thread.main_image" src="@/assets/sunsphere_tower.jpg" class="thread-tile__image"/>
-                    <img v-else :src="'https://www.ktpdiscussapi.com/thread_img/' + thread.main_image" class="thread-tile__image"/>
+                    <img v-else :src="'http://159.89.82.146:3002/thread_img/' + thread.main_image" class="thread-tile__image"/>
                     <div class="thread-tile__body">
                         <h2 @click="routerPush('/thread/' + thread.slug)">{{ thread.headline!.substring(0,75) }}...</h2>
                     </div>
@@ -93,7 +93,7 @@
                 return;
             }
 
-            const response = await axios.get(`https://www.ktpdiscussapi.com/api/v1/thread?maxId=${maxId.value}`);
+            const response = await axios.get(`http://159.89.82.146:3002/api/v1/thread?maxId=${maxId.value}`);
 
             const threads = response.data.body.threads;
 

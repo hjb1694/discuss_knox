@@ -306,7 +306,7 @@
             }
 
             try{
-                const response = await axios.post('https://www.ktpuserapi.com/api/v1/validate-new-email', {
+                const response = await axios.post('http://206.189.193.136:3001/api/v1/validate-new-email', {
                     email: registrationFormFields.email
                 });
                 return true;
@@ -340,7 +340,7 @@
 
             try{
 
-                await axios.post('https://www.ktpuserapi.com/api/v1/validate-new-username', {
+                await axios.post('http://206.189.193.136:3001/api/v1/validate-new-username', {
                     username: registrationFormFields.username
                 });
                 return true;
@@ -479,7 +479,7 @@
 
         try{
 
-            const response = await axios.post('https://www.ktpuserapi.com/api/v1/register', {
+            const response = await axios.post('http://206.189.193.136:3001/api/v1/register', {
                 email: registrationFormFields.email, 
                 username: registrationFormFields.username, 
                 password: registrationFormFields.password, 
@@ -531,7 +531,7 @@
 
         try{
 
-            const response = await axios.post('https://www.ktpuserapi.com/api/v1/login', {
+            const response = await axios.post('http://206.189.193.136:3001/api/v1/login', {
                 email: loginFormFields.email, 
                 password: loginFormFields.password
             });
@@ -591,7 +591,7 @@
 
         try{
 
-            await axios.post('https://www.ktpuserapi.com/api/v1/forgot-password', {
+            await axios.post('http://206.189.193.136:3001/api/v1/forgot-password', {
                 email: forgotPasswordEmail.value
             });
 

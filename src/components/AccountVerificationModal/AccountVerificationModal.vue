@@ -78,7 +78,7 @@
         try{
             vericodeProcessing.value = true;
 
-            await axios.post('https://www.ktpuserapi.com/api/v1/verify-account', {
+            await axios.post('http://206.189.193.136:3001/api/v1/verify-account', {
                 vericode: vericodeInput.value
             }, {
                 headers: {

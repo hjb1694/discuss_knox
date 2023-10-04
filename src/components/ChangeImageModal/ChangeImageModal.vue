@@ -45,7 +45,7 @@
 
         try{
 
-            await axios.patch('https://www.ktpuserapi.com/api/v1/profile-image', {
+            await axios.patch('http://206.189.193.136:3001/api/v1/profile-image', {
                 data
             }, {
                 headers: {

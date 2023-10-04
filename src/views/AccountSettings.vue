@@ -111,7 +111,7 @@
 
             console.log(isProfilePrivate.value);
 
-            await axios.patch('https://www.ktpuserapi.com/api/v1/profile-privacy', {
+            await axios.patch('http://206.189.193.136:3001/api/v1/profile-privacy', {
                 is_private: isProfilePrivate.value === true ? 'yes' : 'no'
             }, 
             {
@@ -131,7 +131,7 @@
 
         try{
 
-            const response = await axios.get(`https://www.ktpuserapi.com/api/v1/profile-privacy/${getUserData.user_id}`);
+            const response = await axios.get(`http://206.189.193.136:3001/api/v1/profile-privacy/${getUserData.user_id}`);
 
             isProfilePrivate.value = response.data.body.is_profile_private;
 
@@ -187,7 +187,7 @@
 
         try{
 
-            await axios.patch('https://www.ktpuserapi.com/api/v1/change-password', {
+            await axios.patch('http://206.189.193.136:3001/api/v1/change-password', {
                 current_password: currentPassword.value, 
                 new_password: newPassword.value
             }, 
@@ -266,7 +266,7 @@
         
         try{
 
-            await axios.patch('https://www.ktpuserapi.com/api/v1/self-deactivation', {
+            await axios.patch('http://206.189.193.136:3001/api/v1/self-deactivation', {
                 reason_other_users: deactivateReasonOtherUsers.value, 
                 reason_taking_break: deactivateReasonTakingBreak.value, 
                 reason_bugs: deactivateReasonBugs.value, 

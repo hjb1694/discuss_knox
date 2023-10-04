@@ -347,7 +347,7 @@
 
             isThreadLoading.value = true;
 
-            const response = await axios.get(`https://www.ktpdiscussapi.com/api/v1/thread/${slug.value}`);
+            const response = await axios.get(`http://159.89.82.146:3002/api/v1/thread/${slug.value}`);
 
             const thread = response.data.body.thread;
 
@@ -363,7 +363,7 @@
                 image.style.display = 'block';
                 image.style.margin = '1rem auto';
                 image.style.maxWidth = '300px';
-                image.src = `https://www.ktpdiscussapi.com/thread_img/${url.pathname.split('/')[2]}`;
+                image.src = `http://159.89.82.146:3002/thread_img/${url.pathname.split('/')[2]}`;
             });
 
             thread.content = dom.body.innerHTML;
@@ -441,7 +441,7 @@
 
         try{
 
-            await axios.post('https://www.ktpdiscussapi.com/api/v1/opinions', 
+            await axios.post('http://159.89.82.146:3002/api/v1/opinions', 
             {
                 thread_id: threadData.id, 
                 content: opinionInput.value
@@ -489,7 +489,7 @@
 
         try{
 
-            const response = await axios.get(`https://www.ktpdiscussapi.com/api/v1/opinions/${threadData.id}`);
+            const response = await axios.get(`http://159.89.82.146:3002/api/v1/opinions/${threadData.id}`);
 
             console.log('OPINIONS', response.data.body);
 
@@ -603,7 +603,7 @@
 
         try{
 
-            await axios.post('https://www.ktpdiscussapi.com/api/v1/opinion-replies', 
+            await axios.post('http://159.89.82.146:3002/api/v1/opinion-replies', 
             {
                 opinion_id: opinionId, 
                 content: replyInput.value, 
